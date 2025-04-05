@@ -8,4 +8,4 @@ object NumberChecker {
             else -> "positive"
         }
     }
-}
+
