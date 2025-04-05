@@ -1,15 +1,15 @@
 package com.example.mankomaniaclient
 
-import org.junit.Assert.assertTrue
-import org.junit.Assert.assertFalse
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class NumberCheckerTest {
 
     @Test
-    fun testIsEven() {
-        assertTrue(NumberChecker.isEven(4))
-        assertFalse(NumberChecker.isEven(5))
+    fun testDescribeNumber() {
+        assertEquals("zero", NumberChecker.describeNumber(0))
+        assertEquals("positive", NumberChecker.describeNumber(5))
+        assertEquals("negative", NumberChecker.describeNumber(-2))
     }
 
 }

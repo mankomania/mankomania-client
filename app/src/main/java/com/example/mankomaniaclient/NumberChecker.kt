@@ -1,5 +1,11 @@
 package com.example.mankomaniaclient
 
 object NumberChecker {
-    fun isEven(number: Int): Boolean = number % 2 == 0
+    fun describeNumber(n: Int): String {
+        return when {
+            n == 0 -> "zero"
+            n < 0 -> "negative"
+            else -> "positive"
+        }
+    }
 }
