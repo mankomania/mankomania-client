@@ -1,7 +1,7 @@
 package com.example.mankomaniaclient
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions.assertEquals
 
 class NumberCheckerTest {
 
