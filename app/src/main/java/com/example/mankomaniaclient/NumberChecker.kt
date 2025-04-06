@@ -8,4 +8,10 @@ object NumberChecker {
             else -> "positive"
         }
     }
+
+    object NumberUtils {
+        fun isEven(number: Int): Boolean {
+            return number % 2 == 0
+        }
+    }
 }
