@@ -134,4 +134,15 @@ class LotteryViewModelTest {
         verify(mockApi).claimLottery("player1")
     }
 
+    // Tests error handling for failed API calls
+    @Test
+    fun apiErrorHandling() = runTest {
+        whenever(mockApi.getCurrentAmount()).thenThrow(RuntimeException("Network error"))
+
+        viewModel.refreshAmount()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("Error: Network error", viewModel.notification.value)
+        assertFalse(viewModel.isLoading.value)
+    }
 }
