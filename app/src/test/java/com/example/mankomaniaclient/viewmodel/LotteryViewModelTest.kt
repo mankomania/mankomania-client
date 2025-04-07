@@ -145,4 +145,18 @@ class LotteryViewModelTest {
         assertEquals("Error: Network error", viewModel.notification.value)
         assertFalse(viewModel.isLoading.value)
     }
+
+    @Test
+    fun `refresh amount updates state`() = runTest {
+        val mockApi = mock<LotteryApi> {
+            onBlocking { getCurrentAmount() } doReturn Response.success(15000)
+        }
+
+        val viewModel = LotteryViewModel(mockApi)
+        viewModel.refreshAmount()
+        advanceUntilIdle()
+
+        assert(viewModel.currentAmount.value == 15000)
+        assert(!viewModel.isLoading.value)
+    }
 }

@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -23,11 +24,6 @@ fun LotteryContent(
     onClaimClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val scaleAnim by animateFloatAsState(
-        targetValue = if (paymentAnimation) 1.2f else 1f,
-        animationSpec = tween(durationMillis = 300)
-    )
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -38,14 +34,15 @@ fun LotteryContent(
         Text(
             text = "LOTTERY-POOL",
             style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.testTag("lotteryTitle")
         )
 
         Text(
             text = "$currentAmount €",
             style = MaterialTheme.typography.displayMedium.copy(fontSize = 48.sp),
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.scale(scaleAnim)
+            modifier = Modifier.testTag("amountText")
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -53,7 +50,9 @@ fun LotteryContent(
         Button(
             onClick = { onPayClick(5000) },
             enabled = !isLoading,
-            modifier = Modifier.fillMaxWidth(0.8f)
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .testTag("pay5kButton")
         ) {
             Text("Pay 5.000 €")
         }
@@ -61,7 +60,9 @@ fun LotteryContent(
         Button(
             onClick = { onPayClick(10000) },
             enabled = !isLoading,
-            modifier = Modifier.fillMaxWidth(0.8f)
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .testTag("pay10kButton")
         ) {
             Text("Pay 10.000 €")
         }
@@ -71,26 +72,24 @@ fun LotteryContent(
         Button(
             onClick = onClaimClick,
             enabled = !isLoading && currentAmount > 0,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondary
-            ),
-            modifier = Modifier.fillMaxWidth(0.8f)
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .testTag("claimButton")
         ) {
             Text("CLAIM LOTTERY")
         }
 
         if (notification.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = notification,
-                color = if (currentAmount > 0) MaterialTheme.colorScheme.primary else Color.Red,
-                style = MaterialTheme.typography.bodyLarge
+                modifier = Modifier.testTag("notificationText")
             )
         }
 
         if (isLoading) {
-            Spacer(modifier = Modifier.height(16.dp))
-            CircularProgressIndicator()
+            CircularProgressIndicator(
+                modifier = Modifier.testTag("loadingIndicator")
+            )
         }
     }
 }
