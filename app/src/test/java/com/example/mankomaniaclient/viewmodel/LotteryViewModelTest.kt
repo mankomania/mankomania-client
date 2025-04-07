@@ -107,4 +107,31 @@ class LotteryViewModelTest {
         verify(mockApi).claimLottery("player123")
         verifyNoMoreInteractions(mockApi)
     }
+
+    // Tests empty pool scenario with automatic 50k refill
+    @Test
+    fun claimEmptyPool() = runTest {
+        whenever(mockApi.claimLottery(anyString()))
+            .thenReturn(Response.success(
+                LotteryApi.ClaimResponse(
+                    wonAmount = 0,
+                    newAmount = 50000,
+                    message = "Pool was empty"
+                )
+            ))
+
+        whenever(mockApi.getCurrentAmount()).thenReturn(Response.success(0))
+        val viewModel = LotteryViewModel(mockApi)
+        advanceUntilIdle()
+
+        viewModel.claimLottery("player1")
+        advanceUntilIdle()
+
+        assertEquals(50000, viewModel.currentAmount.value)
+        assertEquals("Lottery was empty! 50,000 € added to pool", viewModel.notification.value)
+        assertFalse(viewModel.isLoading.value)
+
+        verify(mockApi).claimLottery("player1")
+    }
+
 }
