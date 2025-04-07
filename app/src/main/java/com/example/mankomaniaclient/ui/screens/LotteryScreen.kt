@@ -9,17 +9,19 @@ import com.example.mankomaniaclient.viewmodel.LotteryViewModel
 
 @Composable
 fun LotteryScreen(
-    playerId: String,  // Player-ID
+    playerId: String,
     viewModel: LotteryViewModel = viewModel()
 ) {
     val currentAmount by viewModel.currentAmount.collectAsState()
     val notification by viewModel.notification.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val paymentAnimation by viewModel.paymentAnimation.collectAsState()
 
     LotteryContent(
         currentAmount = currentAmount,
         notification = notification,
         isLoading = isLoading,
+        paymentAnimation = paymentAnimation,
         onPayClick = { amount ->
             viewModel.payToLottery(playerId, amount, "Lottery Payment")
         },

@@ -21,18 +21,6 @@ interface LotteryApi {
     @POST("lottery/claim")
     suspend fun claimLottery(@Query("playerId") playerId: String): Response<ClaimResponse>
 
-    companion object {
-        private const val BASE_URL = "http://se2-demo.aau.at:53210/"
-
-        fun create(): LotteryApi {
-            return Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(LotteryApi::class.java)
-        }
-    }
-
     data class PaymentResponse(
         val success: Boolean,
         val newAmount: Int,
@@ -44,4 +32,16 @@ interface LotteryApi {
         val newAmount: Int,
         val message: String
     )
+
+    companion object {
+        private const val BASE_URL = "http://se2-demo.aau.at:53210/"
+
+        fun create(): LotteryApi {
+            return Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+                .create(LotteryApi::class.java)
+        }
+    }
 }
