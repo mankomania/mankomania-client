@@ -8,28 +8,22 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
 class LotteryViewModel(
     private val api: LotteryApi
 ) : ViewModel() {
     private val _currentAmount = MutableStateFlow(0)
     val currentAmount: StateFlow<Int> = _currentAmount
-
     private val _notification = MutableStateFlow("")
     val notification: StateFlow<String> = _notification
-
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
-
     private val _paymentAnimation = MutableStateFlow(false)
     val paymentAnimation: StateFlow<Boolean> = _paymentAnimation
-
     init {
         viewModelScope.launch {
             refreshAmount()
         }
     }
-
     fun refreshAmount() {
         _isLoading.value = true
         viewModelScope.launch {
@@ -45,7 +39,6 @@ class LotteryViewModel(
             }
         }
     }
-
     fun payToLottery(playerId: String, amount: Int, reason: String) {
         _isLoading.value = true
         viewModelScope.launch {
@@ -67,7 +60,6 @@ class LotteryViewModel(
             }
         }
     }
-
     fun claimLottery(playerId: String) {
         _isLoading.value = true
         viewModelScope.launch {

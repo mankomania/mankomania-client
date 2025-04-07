@@ -6,7 +6,6 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mankomaniaclient.ui.components.LotteryContent
 import com.example.mankomaniaclient.viewmodel.LotteryViewModel
-
 @Composable
 fun LotteryScreen(
     playerId: String,
@@ -16,7 +15,6 @@ fun LotteryScreen(
     val notification by viewModel.notification.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val paymentAnimation by viewModel.paymentAnimation.collectAsState()
-
     LotteryContent(
         currentAmount = currentAmount,
         notification = notification,

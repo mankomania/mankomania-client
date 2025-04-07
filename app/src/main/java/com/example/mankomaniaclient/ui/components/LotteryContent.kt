@@ -13,7 +13,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
 @Composable
 fun LotteryContent(
     currentAmount: Int,
@@ -39,16 +38,13 @@ fun LotteryContent(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.testTag(testTags.title)
         )
-
         Text(
             text = "$currentAmount €",
             style = MaterialTheme.typography.displayMedium.copy(fontSize = 48.sp),
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.testTag(testTags.amount)
         )
-
         Spacer(modifier = Modifier.height(32.dp))
-
         Button(
             onClick = { onPayClick(5000) },
             enabled = !isLoading,
@@ -58,7 +54,6 @@ fun LotteryContent(
         ) {
             Text("Pay 5.000 €")
         }
-
         Button(
             onClick = { onPayClick(10000) },
             enabled = !isLoading,
@@ -68,9 +63,7 @@ fun LotteryContent(
         ) {
             Text("Pay 10.000 €")
         }
-
         Spacer(modifier = Modifier.height(24.dp))
-
         Button(
             onClick = onClaimClick,
             enabled = !isLoading && currentAmount > 0,
@@ -80,14 +73,12 @@ fun LotteryContent(
         ) {
             Text("CLAIM LOTTERY")
         }
-
         if (notification.isNotEmpty()) {
             Text(
                 text = notification,
                 modifier = Modifier.testTag(testTags.notification)
             )
         }
-
         if (isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.testTag(testTags.loading)
@@ -95,7 +86,6 @@ fun LotteryContent(
         }
     }
 }
-
 // Test-Tag Container für bessere Wartbarkeit
 data class LotteryTestTags(
     val title: String = "lotteryTitle",
