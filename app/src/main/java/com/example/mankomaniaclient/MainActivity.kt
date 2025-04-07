@@ -3,6 +3,7 @@ package com.example.mankomaniaclient
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import com.example.mankomaniaclient.websocket.ServerCommunicationClient
 
 /**
  * # MainActivity
@@ -24,5 +25,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             // TODO: Hier GlobalTheme() und einen Screen aufrufen
         }
+        ServerCommunicationClient.start()
+
     }
 }

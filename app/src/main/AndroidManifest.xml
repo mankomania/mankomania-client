@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
 
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.mankomaniaclient">
+
+    <!-- Erlaubt das Senden und Empfangen von Daten übers Netzwerk -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--
+         Setzt die Cleartext-Kommunikation (HTTP/ws) auf "true",
+         damit ws://9.0.2.2:8080 zulässig ist.
+         (Ab Android 8/Pie ist dies standardmäßig verboten.)
+    -->
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -11,7 +22,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Mankomaniaclient"
-        tools:targetApi="31">
+        android:usesCleartextTraffic="true"
+        tools:targetApi="30">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -19,10 +32,11 @@
             android:theme="@style/Theme.Mankomaniaclient">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>
+
