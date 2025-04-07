@@ -3,6 +3,7 @@ package com.example.mankomaniaclient.viewmodel
 import com.example.mankomaniaclient.api.LotteryApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.*
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
@@ -158,5 +159,64 @@ class LotteryViewModelTest {
 
         assert(viewModel.currentAmount.value == 15000)
         assert(!viewModel.isLoading.value)
+    }
+
+    @Test
+    fun `loading state during API calls`() = runTest {
+        whenever(mockApi.getCurrentAmount())
+            .thenAnswer { advanceTimeBy(100); Response.success(5000) }
+
+        viewModel.refreshAmount()
+
+        // Verify loading state is true during call
+        assertTrue(viewModel.isLoading.value)
+        advanceUntilIdle()
+        // Then false after completion
+        assertFalse(viewModel.isLoading.value)
+    }
+
+    @Test
+    fun `payment animation state`() = runTest {
+        whenever(mockApi.payToLottery(any(), any(), any()))
+            .thenReturn(Response.success(
+                LotteryApi.PaymentResponse(true, 10000, "Success")
+            ))
+
+        viewModel.payToLottery("player1", 5000, "Test")
+        advanceUntilIdle()
+
+        assertTrue(viewModel.paymentAnimation.value)
+    }
+
+    @Test
+    fun `initial state values`() {
+        assertEquals(0, viewModel.currentAmount.value)
+        assertEquals("", viewModel.notification.value)
+        assertFalse(viewModel.isLoading.value)
+        assertFalse(viewModel.paymentAnimation.value)
+    }
+
+    @Test
+    fun `payment with notification handles API failure`() = runTest {
+        whenever(mockApi.payToLottery(any(), any(), any()))
+            .thenThrow(RuntimeException("Network error"))
+
+        viewModel.payToLottery("player1", 5000, "Test")
+        advanceUntilIdle()
+
+        assertEquals("Payment failed: Network error", viewModel.notification.value)
+        assertFalse(viewModel.isLoading.value)
+    }
+
+    @Test
+    fun `claim handles API failure`() = runTest {
+        whenever(mockApi.claimLottery(any()))
+            .thenThrow(RuntimeException("Server down"))
+
+        viewModel.claimLottery("player1")
+        advanceUntilIdle()
+
+        assertEquals("Claim failed: Server down", viewModel.notification.value)
+        assertFalse(viewModel.isLoading.value)
     }
 }

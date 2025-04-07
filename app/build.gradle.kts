@@ -163,8 +163,14 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.6.0")
     androidTestImplementation ("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation ("androidx.compose.ui:ui-test-junit5:1.6.0")
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.4.0")
-
+    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.6.0")
+    debugImplementation ("androidx.compose.ui:ui-test-manifest:1.6.0")
+    androidTestImplementation ("androidx.compose.ui:ui-test-junit5:1.6.0")
+    androidTestImplementation ("org.junit.jupiter:junit-jupiter-api:5.9.2")
+    androidTestImplementation ("de.mannodermaus.junit5:android-test-core:1.3.0")
+    androidTestRuntimeOnly ("de.mannodermaus.junit5:android-test-runner:1.3.0")
 }

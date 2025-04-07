@@ -1,44 +1,56 @@
 package com.example.mankomaniaclient.ui.components
 
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertTextEquals
+import org.junit.Rule
+import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.RegisterExtension
-import org.junit.rules.RuleChain
-import org.junit.rules.TestRule
+import org.junit.jupiter.api.Assertions.assertTrue
 
-class LotteryContentTest {/*
-    // JUnit 4 Rule needed for Compose testing
-    private val composeTestRule = createComposeRule()
+class LotteryContentTest {
+    @get:Rule
+    val composeTestRule = createComposeRule()
 
-    // JUnit 5 extension wrapper
-    @RegisterExtension
-    @JvmField
-    val rule: TestRule = RuleChain.outerRule(composeTestRule)
+    private val testTags = LotteryTestTags()
 
     @Test
-    fun `shows current amount correctly`() {
+    fun `displays all UI elements correctly`() {
         composeTestRule.setContent {
             LotteryContent(
-                currentAmount = 5000,
-                notification = "",
+                currentAmount = 10000,
+                notification = "Test message",
                 isLoading = false,
                 paymentAnimation = false,
                 onPayClick = {},
                 onClaimClick = {},
-                testTags = LotteryTestTags()
+                testTags = testTags
             )
         }
 
-        composeTestRule.onNodeWithTag("amountText").assertExists()
+        composeTestRule.onNodeWithTag(testTags.title)
+            .assertExists()
+            .assertTextEquals("LOTTERY-POOL")
+
+        composeTestRule.onNodeWithTag(testTags.amount)
+            .assertTextEquals("10000 €")
+
+        composeTestRule.onNodeWithTag(testTags.pay5k)
+            .assertIsEnabled()
+            .assertTextEquals("Pay 5.000 €")
+
+        composeTestRule.onNodeWithTag(testTags.notification)
+            .assertTextEquals("Test message")
     }
 
     @Test
-    fun `pay buttons trigger callbacks with correct amounts`() {
-        var lastAmount = 0
+    fun `buttons trigger callbacks`() {
+        var payAmount = 0
+        var claimClicked = false
 
         composeTestRule.setContent {
             LotteryContent(
@@ -46,21 +58,21 @@ class LotteryContentTest {/*
                 notification = "",
                 isLoading = false,
                 paymentAnimation = false,
-                onPayClick = { amount -> lastAmount = amount },
-                onClaimClick = {},
-                testTags = LotteryTestTags()
+                onPayClick = { payAmount = it },
+                onClaimClick = { claimClicked = true },
+                testTags = testTags
             )
         }
 
-        composeTestRule.onNodeWithTag("pay5kButton").performClick()
-        assertEquals(5000, lastAmount)
+        composeTestRule.onNodeWithTag(testTags.pay5k).performClick()
+        assertEquals(5000, payAmount)
 
-        composeTestRule.onNodeWithTag("pay10kButton").performClick()
-        assertEquals(10000, lastAmount)
+        composeTestRule.onNodeWithTag(testTags.claim).performClick()
+        assertTrue(claimClicked)
     }
 
     @Test
-    fun `shows loading indicator when loading`() {
+    fun `loading state disables buttons`() {
         composeTestRule.setContent {
             LotteryContent(
                 currentAmount = 5000,
@@ -69,31 +81,14 @@ class LotteryContentTest {/*
                 paymentAnimation = false,
                 onPayClick = {},
                 onClaimClick = {},
-                testTags = LotteryTestTags()
+                testTags = testTags
             )
         }
 
-        composeTestRule.onNodeWithTag("loadingIndicator").assertExists()
+        composeTestRule.onNodeWithTag(testTags.pay5k)
+            .assertIsNotEnabled()
+
+        composeTestRule.onNodeWithTag(testTags.claim)
+            .assertIsNotEnabled()
     }
-
-    @Test
-    fun `shows notification when present`() {
-        val testMessage = "Test notification"
-
-        composeTestRule.setContent {
-            LotteryContent(
-                currentAmount = 5000,
-                notification = testMessage,
-                isLoading = false,
-                paymentAnimation = false,
-                onPayClick = {},
-                onClaimClick = {},
-                testTags = LotteryTestTags()
-            )
-        }
-
-        composeTestRule.onNodeWithTag("notificationText")
-            .assertExists()
-            .assertTextEquals(testMessage)
-    }
-*/}
+}

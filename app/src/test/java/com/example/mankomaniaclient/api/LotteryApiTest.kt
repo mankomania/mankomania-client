@@ -1,6 +1,6 @@
 package com.example.mankomaniaclient.api
 
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.jupiter.api.AfterEach
@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
+import kotlin.test.assertNotNull
 
 class LotteryApiTest {
     private lateinit var mockWebServer: MockWebServer
@@ -18,6 +18,8 @@ class LotteryApiTest {
     @BeforeEach
     fun setup() {
         mockWebServer = MockWebServer()
+        mockWebServer.start()
+
         lotteryApi = Retrofit.Builder()
             .baseUrl(mockWebServer.url("/"))
             .addConverterFactory(GsonConverterFactory.create())
@@ -31,23 +33,37 @@ class LotteryApiTest {
     }
 
     @Test
-    fun `getCurrentAmount returns correct value`() = runTest {
+    fun `get current amount success`() {
         mockWebServer.enqueue(MockResponse().setBody("5000"))
 
-        val result = lotteryApi.getCurrentAmount()
+        val response = runBlocking { lotteryApi.getCurrentAmount() }
 
-        assertTrue(result.isSuccessful)
-        assertEquals(5000, result.body())
+        assert(response.isSuccessful)
+        assertEquals(5000, response.body())
     }
 
     @Test
-    fun `payToLottery returns correct response`() = runTest {
+    fun `pay to lottery success`() {
         val json = """{"success":true,"newAmount":15000,"message":"Payment successful"}"""
         mockWebServer.enqueue(MockResponse().setBody(json))
 
-        val result = lotteryApi.payToLottery("player1", 5000, "test")
+        val response = runBlocking {
+            lotteryApi.payToLottery("player1", 5000, "test")
+        }
 
-        assertTrue(result.isSuccessful)
-        assertEquals(15000, result.body()?.newAmount)
+        assert(response.isSuccessful)
+        assertNotNull(response.body())
+        assertEquals(15000, response.body()?.newAmount)
+    }
+
+    @Test
+    fun `claim lottery success`() {
+        val json = """{"wonAmount":20000,"newAmount":0,"message":"You won!"}"""
+        mockWebServer.enqueue(MockResponse().setBody(json))
+
+        val response = runBlocking { lotteryApi.claimLottery("player1") }
+
+        assert(response.isSuccessful)
+        assertEquals(20000, response.body()?.wonAmount)
     }
 }
