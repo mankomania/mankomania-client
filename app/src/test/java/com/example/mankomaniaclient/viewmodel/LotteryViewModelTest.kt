@@ -1,7 +1,9 @@
 package com.example.mankomaniaclient.viewmodel
+
 import com.example.mankomaniaclient.api.LotteryApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.*
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
@@ -11,34 +13,42 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.*
 import retrofit2.Response
+
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(MockitoExtension::class)
 class LotteryViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private val mockApi: LotteryApi = mock()
     private lateinit var viewModel: LotteryViewModel
+
     @BeforeEach
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         viewModel = LotteryViewModel(mockApi)
     }
+
     @AfterEach
     fun tearDown() {
         Dispatchers.resetMain()
     }
+
     // Tests initial lottery pool loading on ViewModel creation
     @Test
     fun initialPoolLoading() = runTest {
         whenever(mockApi.getCurrentAmount()).thenReturn(Response.success(10000))
+
         val vm = LotteryViewModel(mockApi)
         testDispatcher.scheduler.advanceUntilIdle()
+
         assertEquals(10000, vm.currentAmount.value)
         assertFalse(vm.isLoading.value)
     }
+
     // Tests payment flow with amount update and notification
     @Test
     fun paymentUpdatesAmount() = runTest {
         whenever(mockApi.getCurrentAmount()).thenReturn(Response.success(10000))
+
         whenever(mockApi.payToLottery(
             anyString(),
             anyInt(),
@@ -50,19 +60,24 @@ class LotteryViewModelTest {
                 message = "Payment successful"
             )
         ))
+
         val viewModel = LotteryViewModel(mockApi)
         advanceUntilIdle()
+
         viewModel.payToLottery("player1", 5000, "Test payment")
         advanceUntilIdle()
+
         assertEquals(15000, viewModel.currentAmount.value)
         assertEquals("Test payment - 5000 € added to lottery", viewModel.notification.value)
         assertFalse(viewModel.isLoading.value)
+
         verify(mockApi).payToLottery(
             "player1",
             5000,
             "Test payment"
         )
     }
+
     // Tests winning lottery claim with proper amount distribution
     @Test
     fun claimWithWin() = runTest {
@@ -71,22 +86,29 @@ class LotteryViewModelTest {
             newAmount = 0,
             message = "Payout successful"
         )
+
         whenever(mockApi.getCurrentAmount())
             .thenReturn(Response.success(25000))
             .thenReturn(Response.success(25000))
+
         whenever(mockApi.claimLottery(eq("player123")))
             .thenReturn(Response.success(claimResponse))
+
         val testViewModel = LotteryViewModel(mockApi)
         advanceUntilIdle()
+
         testViewModel.claimLottery("player123")
         advanceUntilIdle()
+
         assertEquals(0, testViewModel.currentAmount.value)
         assertEquals("You won 20000 €!", testViewModel.notification.value)
         assertFalse(testViewModel.isLoading.value)
+
         verify(mockApi, times(2)).getCurrentAmount()
         verify(mockApi).claimLottery("player123")
         verifyNoMoreInteractions(mockApi)
     }
+
     // Tests empty pool scenario with automatic 50k refill
     @Test
     fun claimEmptyPool() = runTest {
@@ -98,34 +120,103 @@ class LotteryViewModelTest {
                     message = "Pool was empty"
                 )
             ))
+
         whenever(mockApi.getCurrentAmount()).thenReturn(Response.success(0))
         val viewModel = LotteryViewModel(mockApi)
         advanceUntilIdle()
+
         viewModel.claimLottery("player1")
         advanceUntilIdle()
+
         assertEquals(50000, viewModel.currentAmount.value)
         assertEquals("Lottery was empty! 50,000 € added to pool", viewModel.notification.value)
         assertFalse(viewModel.isLoading.value)
+
         verify(mockApi).claimLottery("player1")
     }
+
     // Tests error handling for failed API calls
     @Test
     fun apiErrorHandling() = runTest {
         whenever(mockApi.getCurrentAmount()).thenThrow(RuntimeException("Network error"))
+
         viewModel.refreshAmount()
         testDispatcher.scheduler.advanceUntilIdle()
+
         assertEquals("Error: Network error", viewModel.notification.value)
         assertFalse(viewModel.isLoading.value)
     }
+
     @Test
     fun `refresh amount updates state`() = runTest {
         val mockApi = mock<LotteryApi> {
             onBlocking { getCurrentAmount() } doReturn Response.success(15000)
         }
+
         val viewModel = LotteryViewModel(mockApi)
         viewModel.refreshAmount()
         advanceUntilIdle()
+
         assert(viewModel.currentAmount.value == 15000)
         assert(!viewModel.isLoading.value)
+    }
+
+    @Test
+    fun `loading state during API calls`() = runTest {
+        whenever(mockApi.getCurrentAmount())
+            .thenAnswer { advanceTimeBy(100); Response.success(5000) }
+
+        viewModel.refreshAmount()
+
+        // Verify loading state is true during call
+        assertTrue(viewModel.isLoading.value)
+        advanceUntilIdle()
+        // Then false after completion
+        assertFalse(viewModel.isLoading.value)
+    }
+
+    @Test
+    fun `payment animation state`() = runTest {
+        whenever(mockApi.payToLottery(any(), any(), any()))
+            .thenReturn(Response.success(
+                LotteryApi.PaymentResponse(true, 10000, "Success")
+            ))
+
+        viewModel.payToLottery("player1", 5000, "Test")
+        advanceUntilIdle()
+
+        assertTrue(viewModel.paymentAnimation.value)
+    }
+
+    @Test
+    fun `initial state values`() {
+        assertEquals(0, viewModel.currentAmount.value)
+        assertEquals("", viewModel.notification.value)
+        assertFalse(viewModel.isLoading.value)
+        assertFalse(viewModel.paymentAnimation.value)
+    }
+
+    @Test
+    fun `payment with notification handles API failure`() = runTest {
+        whenever(mockApi.payToLottery(any(), any(), any()))
+            .thenThrow(RuntimeException("Network error"))
+
+        viewModel.payToLottery("player1", 5000, "Test")
+        advanceUntilIdle()
+
+        assertEquals("Payment failed: Network error", viewModel.notification.value)
+        assertFalse(viewModel.isLoading.value)
+    }
+
+    @Test
+    fun `claim handles API failure`() = runTest {
+        whenever(mockApi.claimLottery(any()))
+            .thenThrow(RuntimeException("Server down"))
+
+        viewModel.claimLottery("player1")
+        advanceUntilIdle()
+
+        assertEquals("Claim failed: Server down", viewModel.notification.value)
+        assertFalse(viewModel.isLoading.value)
     }
 }
