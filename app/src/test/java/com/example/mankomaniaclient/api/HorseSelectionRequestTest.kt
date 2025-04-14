@@ -26,3 +26,4 @@ class HorseSelectionRequestTest {
         assertEquals(2, request.horseId)
     }
 }
+
