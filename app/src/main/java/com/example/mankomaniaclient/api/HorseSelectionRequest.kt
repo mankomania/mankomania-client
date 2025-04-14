@@ -1,4 +1,6 @@
 package com.example.mankomaniaclient.api
 
-class HorseSelectionRequest {
-}
+data class HorseSelectionRequest(
+    val playerId: String,
+    val horseId: Int
+)
