@@ -100,8 +100,8 @@ sonar {
         property("sonar.projectKey", "mankomania_mankomania-client")
         property("sonar.organization", "mankomania-1")
         property("sonar.host.url", "https://sonarcloud.io")
-        property("sonar.sources", "src/main/kotlin")
-        property("sonar.tests", "src/test/kotlin")
+        property("sonar.sources", "src/main/java/com/example/mankomaniaclient")
+        property("sonar.tests", "src/test/java/com/example/mankomaniaclient")
         property("sonar.coverage.jacoco.xmlReportPaths", "${layout.buildDirectory.get().asFile}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
         property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties")
     }
