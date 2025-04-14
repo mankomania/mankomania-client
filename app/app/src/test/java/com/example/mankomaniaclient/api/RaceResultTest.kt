@@ -30,5 +30,3 @@ class RaceResultTest {
         assertEquals(0, result.amountWon)
     }
 }
-W
-
