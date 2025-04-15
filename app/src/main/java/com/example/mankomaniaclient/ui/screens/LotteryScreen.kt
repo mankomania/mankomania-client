@@ -1,4 +1,3 @@
-// LotteryScreen.kt
 package com.example.mankomaniaclient.ui.screens
 
 import androidx.compose.runtime.Composable
