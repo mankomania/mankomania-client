@@ -1,6 +1,7 @@
 package com.example.mankomaniaclient
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -26,11 +27,6 @@ import com.example.mankomaniaclient.network.WebSocketService
  */
 class MainActivity : ComponentActivity() {
 
-    /**
-     * Standard-Android-Lifecyclemethode.
-     * Hier könnte zukünftig die UI gesetzt werden.
-     */
-
     private val webSocketService = WebSocketService()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,11 +40,13 @@ class MainActivity : ComponentActivity() {
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Button(onClick = {
+                        Log.d("WebSocket", "Connect‑Button geklickt")
                         webSocketService.connect()
                     }) {
                         Text("Connect")
                     }
                     Button(onClick = {
+                        Log.d("WebSocket", "SendHello‑Button geklickt")
                         webSocketService.send("/app/greetings", "hello local")
                     }) {
                         Text("Send Hello")
