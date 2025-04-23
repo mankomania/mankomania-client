@@ -13,6 +13,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import android.widget.Toast
+
 
 import com.example.mankomaniaclient.network.WebSocketService
 
@@ -31,7 +34,11 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        Log.d("WebSocket", "MainActivity onCreate aufgerufen")
+
         setContent {
+            val context = LocalContext.current
             MaterialTheme {
                 Column(
                     modifier = Modifier
@@ -41,12 +48,14 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Button(onClick = {
                         Log.d("WebSocket", "Connect‑Button geklickt")
+                        Toast.makeText(context, "Connect geklickt", Toast.LENGTH_SHORT).show()
                         webSocketService.connect()
                     }) {
                         Text("Connect")
                     }
                     Button(onClick = {
                         Log.d("WebSocket", "SendHello‑Button geklickt")
+                        Toast.makeText(context, "Send Hello geklickt", Toast.LENGTH_SHORT).show()
                         webSocketService.send("/app/greetings", "hello local")
                     }) {
                         Text("Send Hello")
