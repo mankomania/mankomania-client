@@ -18,7 +18,7 @@ class WebSocketService {
     fun connect() {
         scope.launch {
             try {
-                session = stompClient.connect("ws://10.0.2.2:8080/ws")
+                session = stompClient.connect("wss://se2-demo.aau.at:53210/ws")
                 Log.d("WebSocket", "Verbindung hergestellt")
 
                 session
