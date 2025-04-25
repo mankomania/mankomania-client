@@ -165,4 +165,21 @@ class LotteryViewModelTest {
 
         assertEquals("Couldn't load lottery amount", viewModel.notification.value)
     }
+
+    // Test wo die API null zurückgibt
+    @Test
+    fun payToLottery_nullResponse_case() = runTest {
+        val playerId = "player1"
+        val amount = 100
+        val reason = "Test payment"
+
+        coEvery { mockLotteryApi.payToLottery(playerId, amount, reason) } returns null
+
+        viewModel.payToLottery(playerId, amount, reason)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("Payment failed", viewModel.notification.value)
+        assertFalse(viewModel.paymentAnimation.value)
+        assertFalse(viewModel.isLoading.value)
+    }
 }
