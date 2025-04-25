@@ -2,8 +2,7 @@
 <network-security-config>
     <!-- Erlaube Cleart­ext (ws://) für localhost und Emulator-IP -->
     <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="TODO">10.0.2.2</domain>
-        <domain includeSubdomains="TODO">localhost</domain>
+        <domain includeSubdomains="false">localhost</domain>
     </domain-config>
     <!-- Debug-Fallback: globale Cleart­ext-Erlaubnis -->
     <base-config cleartextTrafficPermitted="true"/>
