@@ -143,4 +143,26 @@ class LotteryViewModelTest {
         assertEquals("Claim failed", viewModel.notification.value)
         assertFalse(viewModel.isLoading.value)
     }
+
+    // Zusätzlicher Test für Betragsaktualisierung
+    @Test
+    fun lotteryAmount_updated_in_ViewModel() = runTest {
+        coEvery { mockLotteryApi.getCurrentAmount() } returns 12345
+
+        viewModel.refreshAmount()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(12345, viewModel.currentAmount.value)
+    }
+
+    // Zusätzlicher Test für Fehlermeldungen
+    @Test
+    fun notification_shown_failure() = runTest {
+        coEvery { mockLotteryApi.getCurrentAmount() } returns null
+
+        viewModel.refreshAmount()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("Couldn't load lottery amount", viewModel.notification.value)
+    }
 }
