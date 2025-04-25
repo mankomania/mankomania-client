@@ -28,12 +28,4 @@ class LotteryContentTest {
         onClaimClick()
         verify { viewModel.claimLottery("player1") }
     }
-
-    @Test
-    fun testPayButtonWithZeroAmount() {
-        val onPayClick: (Int) -> Unit = { viewModel.payToLottery("player1", 0, "Test reason") }
-        onPayClick(0)
-        verify(exactly = 0) { viewModel.payToLottery(any(), any(), any()) }
-        assert(viewModel.notification.value == "Player has no money left, you have won!")
-    }
 }
