@@ -1,27 +1,27 @@
 package com.example.mankomaniaclient.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mankomaniaclient.api.LotteryApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class LotteryViewModel(
     private val lotteryApi: LotteryApi = LotteryApi()
 ) : ViewModel() {
 
-    private val _currentAmount = MutableLiveData(0)
-    val currentAmount: LiveData<Int> = _currentAmount
+    private val _currentAmount = MutableStateFlow(0)
+    val currentAmount: StateFlow<Int> = _currentAmount
 
-    private val _notification = MutableLiveData<String>()
-    val notification: LiveData<String> = _notification
+    private val _notification = MutableStateFlow("")
+    val notification: StateFlow<String> = _notification
 
-    private val _isLoading = MutableLiveData(false)
-    val isLoading: LiveData<Boolean> = _isLoading
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val _paymentAnimation = MutableLiveData(false)
-    val paymentAnimation: LiveData<Boolean> = _paymentAnimation
+    private val _paymentAnimation = MutableStateFlow(false)
+    val paymentAnimation: StateFlow<Boolean> = _paymentAnimation
 
     fun refreshAmount() {
         viewModelScope.launch {
