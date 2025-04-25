@@ -6,9 +6,9 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 
-object LotteryApi {
+class LotteryApi {
 
-    private const val BASE_URL = "http://se2-demo.aau.at:53210"
+    private val BASE_URL = "http://se2-demo.aau.at:53210"
 
     suspend fun getCurrentAmount(): Int? = withContext(Dispatchers.IO) {
         try {
