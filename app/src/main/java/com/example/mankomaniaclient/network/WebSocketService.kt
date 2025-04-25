@@ -18,7 +18,7 @@ class WebSocketService {
     fun connect() {
         scope.launch {
             try {
-                session = stompClient.connect("ws://se2-demo.aau.at:53210/ws/websocket")
+                session = stompClient.connect("ws://se2-demo.aau.at:53210/ws")
                 Log.d("WebSocket", "Verbindung hergestellt")
 
                 session
@@ -27,20 +27,16 @@ class WebSocketService {
                         Log.d("WebSocket", "Nachricht empfangen: $message")
                     }
 
+
             } catch (e: Exception) {
-                Log.e("WebSocket", "Verbindung fehlgeschlagen: ${e.message}")
+                Log.e("WebSocket", " Verbindung fehlgeschlagen: ${e.message}")
             }
         }
     }
-
-
-
 
     fun send(destination: String, message: String) {
         scope.launch {
             session?.sendText(destination, message)
         }
     }
-
-
 }
