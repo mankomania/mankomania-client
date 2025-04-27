@@ -27,20 +27,16 @@ class WebSocketService {
                         Log.d("WebSocket", "Nachricht empfangen: $message")
                     }
 
+
             } catch (e: Exception) {
-                Log.e("WebSocket", "Verbindung fehlgeschlagen: ${e.message}")
+                Log.e("WebSocket", " Verbindung fehlgeschlagen: ${e.message}")
             }
         }
     }
-
-
-
 
     fun send(destination: String, message: String) {
         scope.launch {
             session?.sendText(destination, message)
         }
     }
-
-
 }

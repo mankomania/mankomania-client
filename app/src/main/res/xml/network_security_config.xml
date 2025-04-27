@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <!-- Erlaube Cleart­ext (ws://) für localhost und Emulator-IP -->
     <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="false">localhost</domain>
+        <domain includeSubdomains="true">se2-demo.aau.at</domain>
     </domain-config>
-    <!-- Debug-Fallback: globale Cleart­ext-Erlaubnis -->
-    <base-config cleartextTrafficPermitted="true"/>
 </network-security-config>
