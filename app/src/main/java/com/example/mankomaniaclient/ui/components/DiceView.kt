@@ -15,7 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.mankomaniaclient.viewmodel.DiceResult
+import com.example.mankomaniaclient.model.DiceResult
 
 
 /**
