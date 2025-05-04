@@ -5,7 +5,7 @@ package com.example.mankomaniaclient.model
  * @since 3.5.2025
  * @description
  * Data class representing the result of a dice roll.
- * Stores both dice values and automatically calculates the sum.
+ * Holds both dice values and calculates the sum.
  **/
 
 data class DiceResult(val die1: Int, val die2: Int) {
