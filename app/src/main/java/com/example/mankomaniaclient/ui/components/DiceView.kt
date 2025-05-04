@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mankomaniaclient.model.DiceResult
@@ -29,12 +30,11 @@ fun DiceView(result: DiceResult?) {
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ){
-        if(result != null){
-            Text("Die 1: ${result.die1}", fontSize = 20.sp)
-            Text("Die 2: ${result.die2}", fontSize = 20.sp)
-            Text("Total: ${result.sum}", fontSize = 22.sp)
-        } else {
-            Text("No roll yet", fontSize = 20.sp)
-        }
+        DiceView(result = diceResult)
     }
+}
+@Preview(showBackground = true)
+@Composable
+fun PreviewDiceView() {
+    DiceView(result = DiceResult(3, 4))
 }
