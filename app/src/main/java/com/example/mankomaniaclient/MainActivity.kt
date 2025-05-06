@@ -18,6 +18,9 @@ import android.widget.Toast
 
 
 import com.example.mankomaniaclient.network.WebSocketService
+import okhttp3.OkHttpClient
+import org.hildan.krossbow.stomp.StompClient
+import org.hildan.krossbow.websocket.okhttp.OkHttpWebSocketClient
 
 /**
  * # MainActivity
@@ -30,7 +33,12 @@ import com.example.mankomaniaclient.network.WebSocketService
  */
 class MainActivity : ComponentActivity() {
 
-    private val webSocketService = WebSocketService()
+    private val webSocketService by lazy {
+        val okHttp = OkHttpClient()
+        val webSocketClient = OkHttpWebSocketClient(okHttp)
+        val stomp = StompClient(webSocketClient)
+        WebSocketService(stomp)          // hand over the stomp client
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
