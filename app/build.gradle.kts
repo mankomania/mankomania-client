@@ -103,6 +103,14 @@ sonar {
         property("sonar.sources", "src/main/java/com/example/mankomaniaclient")
         property("sonar.tests", "src/test/java/com/example/mankomaniaclient")
         property("sonar.coverage.jacoco.xmlReportPaths", "${layout.buildDirectory.get().asFile}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+
+        property(
+            "sonar.coverage.exclusions",
+            // alle Composables + MainActivity
+            "src/main/java/com/example/mankomaniaclient/ui/**," +
+                    "src/main/java/com/example/mankomaniaclient/MainActivity.kt"
+        )
+
         property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties")
     }
 }
@@ -124,6 +132,9 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter.api)
+    testImplementation(libs.junit.jupiter.engine)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
     testRuntimeOnly(libs.junit.jupiter.engine)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
