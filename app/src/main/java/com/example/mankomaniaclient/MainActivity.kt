@@ -98,11 +98,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onPause() {
         super.onPause()
-        webSocketService.disconnect() // Disconnect if the user leaves the MainActivity
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        webSocketService.disconnect()
     }
 }
