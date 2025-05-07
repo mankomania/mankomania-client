@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import com.example.mankomaniaclient.ui.screens.GameBoardScreen
+import com.example.mankomaniaclient.ui.screens.WelcomeScreen
 
 class GameActivity : ComponentActivity() {
 
@@ -12,7 +13,14 @@ class GameActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MaterialTheme {
-                GameBoardScreen() // TO DO: Logik
+                WelcomeScreen(
+                    onStartGame = {
+                        // Replace content with the actual board
+                        setContent {
+                            MaterialTheme { GameBoardScreen() }
+                        }
+                    }
+                )
             }
         }
     }
