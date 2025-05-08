@@ -135,6 +135,7 @@ dependencies {
     implementation(libs.junit.jupiter)
     implementation("org.hildan.krossbow:krossbow-stomp-core:0.9.0")
     implementation("org.hildan.krossbow:krossbow-websocket-okhttp:0.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.junit.jupiter.engine)
