@@ -2,9 +2,12 @@ package com.example.mankomaniaclient.api
 
 import com.example.mankomaniaclient.network.WebSocketService
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class HorseRaceApi(private val webSocketService: WebSocketService) {
 
@@ -28,22 +31,26 @@ class HorseRaceApi(private val webSocketService: WebSocketService) {
     }
 
     /**
+     * Set up the WebSocket connection only, without collecting flows.
+     * Extracted for better testability.
+     */
+    fun connectWebSocket() {
+        webSocketService.connect(
+            url = "ws://se2-demo.aau.at:53210/ws",
+            greetingsTopic = "/topic/greetings",
+            clientCountTopic = "/topic/horses"
+        )
+    }
+
+    /**
      * Connect to the WebSocket server and subscribe to horse race-related topics.
      */
     suspend fun connectToServer() {
         // Connect to WebSocket and subscribe to topics
-        webSocketService.connect(
-            url = "ws://your-websocket-server-url", // Replace with actual server URL
-            greetingsTopic = "/topic/greetings", // Example topic, change as needed
-            clientCountTopic = "/topic/horses" // Example topic, change as needed
-        )
+        connectWebSocket()
 
-        // Collect and update the list of horses (or any relevant data)
-        webSocketService.clientCount.collect { horseData ->
-            // If horseData is a list, this will work
-            // Assuming `horseData` is a List<Horse> from the WebSocket server
-            @Suppress("UNCHECKED_CAST")
-            _horsesStateFlow.value = horseData as List<Horse> // Add casting to ensure type safety
+        webSocketService.clientCount.collect { count ->
+            println("Client count updated: $count")
         }
     }
 
