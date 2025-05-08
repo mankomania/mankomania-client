@@ -1,11 +1,10 @@
-import com.example.mankomaniaclient.api.Horse
-import com.example.mankomaniaclient.api.HorseSelectionRequest
+package com.example.mankomaniaclient.api
+
 import com.example.mankomaniaclient.network.WebSocketService
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 class HorseRaceApi(private val webSocketService: WebSocketService) {
 
@@ -13,13 +12,16 @@ class HorseRaceApi(private val webSocketService: WebSocketService) {
     private val _horsesStateFlow = MutableStateFlow<List<Horse>>(emptyList())
     val horsesStateFlow: StateFlow<List<Horse>> = _horsesStateFlow
 
+    // Gson instance for JSON serialization and deserialization
+    private val gson = Gson()
+
     /**
      * Sends a horse selection request to the server to place a bet.
      * @param horseSelectionRequest the request containing the horse selected by the player.
      */
     suspend fun sendHorseSelectionRequest(horseSelectionRequest: HorseSelectionRequest) {
         val destination = "/topic/selectHorse"
-        val message = Json.encodeToString(horseSelectionRequest) // Convert to JSON string
+        val message = gson.toJson(horseSelectionRequest) // Use Gson to convert to JSON string
 
         // Send the message to the server to register the horse selection
         webSocketService.send(destination, message)
@@ -43,5 +45,15 @@ class HorseRaceApi(private val webSocketService: WebSocketService) {
             @Suppress("UNCHECKED_CAST")
             _horsesStateFlow.value = horseData as List<Horse> // Add casting to ensure type safety
         }
+    }
+
+    /**
+     * Parse horse data from JSON response
+     * @param json The JSON string containing horse data
+     * @return List of Horse objects
+     */
+    fun parseHorseData(json: String): List<Horse> {
+        // Use Gson to parse JSON array into list of Horse objects
+        return gson.fromJson(json, Array<Horse>::class.java).toList()
     }
 }

@@ -114,10 +114,7 @@ sonar {
         property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties")
     }
 }
-
-
 dependencies {
-
     implementation(libs.krossbow.websocket.okhttp)
     implementation(libs.krossbow.stomp.core)
     implementation(libs.krossbow.websocket.builtin)
@@ -131,20 +128,16 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.constraintlayout)
     implementation("com.google.code.gson:gson:2.10.1")
-    implementation(libs.junit.junit)
-    implementation(libs.junit.jupiter)
     implementation("org.hildan.krossbow:krossbow-stomp-core:0.9.0")
     implementation("org.hildan.krossbow:krossbow-websocket-okhttp:0.9.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
-    testImplementation(libs.junit)
-    testImplementation(libs.junit.jupiter.api)
-    testImplementation(libs.junit.jupiter.engine)
+    implementation(libs.junit.jupiter)
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.7.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.7.2")
-    testRuntimeOnly(libs.junit.jupiter.engine)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -154,5 +147,6 @@ dependencies {
     implementation(kotlin("test"))
 }
 tasks.withType<Test> {
-    useJUnitPlatform()  //
+    useJUnitPlatform()
 }
+
