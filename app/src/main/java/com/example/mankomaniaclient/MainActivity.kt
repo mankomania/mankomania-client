@@ -42,12 +42,10 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-
 import android.content.Intent
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
-import com.example.mankomaniaclient.com.example.mankomaniaclient.GameActivity
 
 
 import com.example.mankomaniaclient.network.WebSocketService

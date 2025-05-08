@@ -1,4 +1,4 @@
-package com.example.mankomaniaclient.com.example.mankomaniaclient
+package com.example.mankomaniaclient
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
