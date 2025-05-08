@@ -47,6 +47,7 @@ import android.content.Intent
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import com.example.mankomaniaclient.com.example.mankomaniaclient.GameActivity
 
 
 import com.example.mankomaniaclient.network.WebSocketService
@@ -82,7 +83,7 @@ class MainActivity : ComponentActivity() {
                     webSocketService.send("/app/greetings", "hello local")
                 },
                 onPlay = {
-                    startActivity(Intent(this, GameActivity::class.java))
+                    startActivity(Intent(this, LoadingActivity::class.java))
                 }
             )
         }
