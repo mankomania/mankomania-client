@@ -130,12 +130,17 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.constraintlayout)
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation(libs.junit.junit)
+    implementation(libs.junit.jupiter)
+    implementation("org.hildan.krossbow:krossbow-stomp-core:0.9.0")
+    implementation("org.hildan.krossbow:krossbow-websocket-okhttp:0.9.0")
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.junit.jupiter.engine)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.2")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.7.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.7.2")
     testRuntimeOnly(libs.junit.jupiter.engine)
@@ -145,6 +150,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(kotlin("test"))
 }
 tasks.withType<Test> {
     useJUnitPlatform()  //
