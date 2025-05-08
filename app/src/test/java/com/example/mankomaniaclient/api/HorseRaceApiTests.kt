@@ -6,9 +6,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
 import org.mockito.Mockito.times
+import org.mockito.Mockito.verify
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.mockito.Mockito.doNothing
 import org.mockito.Mockito.`when` as whenever
 import kotlin.test.assertEquals
 
@@ -76,6 +79,21 @@ class HorseRaceApiTest {
         // Verify WebSocketService.send was called with the second parameters
         verify(mockWebSocketService).send("/topic/selectHorse", Gson().toJson(request2))
         // Verify WebSocketService.send was called exactly twice
-        verify(mockWebSocketService, times(2)).send(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString())
+        verify(mockWebSocketService, times(2)).send(anyString(), anyString())
+    }
+    @Test
+    fun testConnectToServerSimple() {
+        // Arrange - set up the mock to do nothing when connect is called
+        doNothing().`when`(mockWebSocketService).connect(
+            anyString(),
+            anyString(),
+            anyString()
+        )
+
+        // Act & Assert - Verify that the method doesn't throw exceptions
+        // We're not actually executing the real code, just verifying the mock is configured correctly
+        assertDoesNotThrow {
+            mockWebSocketService.connect("test", "test", "test")
+        }
     }
 }

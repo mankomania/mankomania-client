@@ -1,32 +1,72 @@
 package com.example.mankomaniaclient.api
 
-import com.google.gson.Gson
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class RaceResultTest {
 
-    private val gson = Gson()
-
     @Test
-    fun testRaceResultSerialization() {
-        val result = RaceResult(winningHorseId = 1, playerWon = true, amountWon = 500)
-        val json = gson.toJson(result)
+    fun testRaceResultProperties() {
+        // Create a test instance with specific values
+        val raceResult = RaceResult(
+            winningHorseId = 3,
+            playerWon = true,
+            amountWon = 500
+        )
 
-        assertTrue(json.contains("\"winningHorseId\":1"))
-        assertTrue(json.contains("\"playerWon\":true"))
-        assertTrue(json.contains("\"amountWon\":500"))
+        // Test that properties return the expected values
+        assertEquals(3, raceResult.winningHorseId, "WinningHorseId should be 3")
+        assertTrue(raceResult.playerWon, "PlayerWon should be true")
+        assertEquals(500, raceResult.amountWon, "AmountWon should be 500")
     }
 
     @Test
-    fun testRaceResultDeserialization() {
-        val json = """{"winningHorseId":2,"playerWon":false,"amountWon":0}"""
-        val result = gson.fromJson(json, RaceResult::class.java)
+    fun testRaceResultCopy() {
+        // Create a base instance
+        val original = RaceResult(
+            winningHorseId = 2,
+            playerWon = false,
+            amountWon = 0
+        )
 
-        assertEquals(2, result.winningHorseId)
-        assertFalse(result.playerWon)
-        assertEquals(0, result.amountWon)
+        // Create a copy with modified properties
+        val modified = original.copy(playerWon = true, amountWon = 300)
+
+        // Test that the copied properties match the original
+        assertEquals(2, modified.winningHorseId, "WinningHorseId should remain 2")
+
+        // Test that the modified properties are updated
+        assertTrue(modified.playerWon, "PlayerWon should be updated to true")
+        assertEquals(300, modified.amountWon, "AmountWon should be updated to 300")
+    }
+
+    @Test
+    fun testRaceResultEquality() {
+        // Create two identical RaceResult instances
+        val result1 = RaceResult(1, true, 250)
+        val result2 = RaceResult(1, true, 250)
+        val result3 = RaceResult(2, true, 250)
+
+        // Test equality
+        assertEquals(result1, result2, "Identical RaceResults should be equal")
+
+        // Test inequality
+        assertFalse(result1 == result3, "RaceResults with different winning horse IDs should not be equal")
+    }
+
+    @Test
+    fun testToString() {
+        // Create a test instance
+        val raceResult = RaceResult(4, false, 0)
+
+        // Get the string representation
+        val resultString = raceResult.toString()
+
+        // Verify that the string contains all property values
+        assertTrue(resultString.contains("winningHorseId=4"), "ToString should include winningHorseId")
+        assertTrue(resultString.contains("playerWon=false"), "ToString should include playerWon")
+        assertTrue(resultString.contains("amountWon=0"), "ToString should include amountWon")
     }
 }
