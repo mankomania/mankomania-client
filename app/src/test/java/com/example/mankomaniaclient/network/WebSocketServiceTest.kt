@@ -9,6 +9,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
@@ -129,4 +130,54 @@ class WebSocketServiceTest {
         coVerify { stompClient.connect(customUrl) }
         coVerify { session.subscribeText(customTopic) }
     }
+
+    @Test
+    fun connect_returnsEarlyWhenAlreadyConnected() = runTest(dispatcher.scheduler) {
+        // first connect succeeds
+        coEvery { stompClient.connect(any()) } returns session
+        service.connect()
+        advanceUntilIdle()
+
+        // second connect() must NOT hit the client again
+        service.connect()
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { stompClient.connect(any()) }
+    }
+
+    @Test
+    fun send_logsErrorWhenSessionThrows() = runTest(dispatcher.scheduler) {
+        mockkStatic(StompSession::sendText)
+        coEvery { session.sendText(any(), any()) } throws RuntimeException("fail")
+
+        WebSocketService::class.java.getDeclaredField("session").apply {
+            isAccessible = true
+            set(service, session)
+        }
+
+        service.send("/app/foo", "bar")
+        advanceUntilIdle()
+
+        coVerify { Log.e("WebSocket", match { it.contains("Send error") }) }
+    }
+
+    @Test
+    fun disconnect_closesSessionAndResetsState() = runTest(dispatcher.scheduler) {
+        WebSocketService::class.java.getDeclaredField("session").apply {
+            isAccessible = true
+            set(service, session)
+        }
+        service.connect()            // mark as connected
+        advanceUntilIdle()
+
+        service.disconnect()
+        advanceUntilIdle()
+
+        coVerify { session.disconnect() }
+        assertEquals(0, service.clientCount.value)
+    }
+
+
+
+
 }
