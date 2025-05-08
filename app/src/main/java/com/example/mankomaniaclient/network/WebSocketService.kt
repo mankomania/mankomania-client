@@ -6,6 +6,7 @@ import org.hildan.krossbow.stomp.StompSession
 import org.hildan.krossbow.stomp.sendText
 import org.hildan.krossbow.stomp.subscribeText
 import org.hildan.krossbow.websocket.okhttp.OkHttpWebSocketClient
+import kotlinx.coroutines.Dispatchers
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,47 +19,45 @@ import kotlinx.coroutines.flow.asStateFlow
  *  – exposes a StateFlow with the current lobby size
  *  – offers helper functions connect / send / disconnect
  */
-class WebSocketService {
+class WebSocketService(
+    private val stompClient: StompClient = StompClient(OkHttpWebSocketClient()),
+    private val scope: CoroutineScope   = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+    private val uiDispatcher: CoroutineDispatcher = Dispatchers.Main          // <-- NEW
+) {
 
-    private val stompClient = StompClient(OkHttpWebSocketClient())
     private var session: StompSession? = null
-
-    /** extra guard so we never open a second socket */
     private var connected = false
 
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-
-    /* ---------- live lobby size ---------------------------------------- */
     private val _clientCount = MutableStateFlow(0)
     val clientCount: StateFlow<Int> = _clientCount.asStateFlow()
 
-    /* ---------- connect ------------------------------------------------- */
-    fun connect() {
-        if (connected) return         // already online
+    fun connect(
+        url: String            = "ws://se2-demo.aau.at:53210/ws",
+        greetingsTopic: String = "/topic/greetings",
+        clientCountTopic: String = "/topic/clientCount"
+    ) {
+        if (connected) return
 
         scope.launch {
             try {
-                val stomp = stompClient.connect("ws://se2-demo.aau.at:53210/ws")
+                val stomp = stompClient.connect(url)
                 session = stomp
                 connected = true
                 Log.d("WebSocket", "Connection established")
 
-                /* greetings --------------------------------------------- */
                 launch {
-                    stomp.subscribeText("/topic/greetings").collect { msg ->
-                        Log.d("WebSocket", "Greeting received: $msg")
+                    stomp.subscribeText(greetingsTopic).collect {
+                        Log.d("WebSocket", "Greeting received: $it")
                     }
                 }
 
-                /* client counter ---------------------------------------- */
                 launch {
-                    stomp.subscribeText("/topic/clientCount").collect { raw ->
+                    stomp.subscribeText(clientCountTopic).collect { raw ->
                         val value = raw.toIntOrNull() ?: 0
                         _clientCount.value = value
                         Log.d("WebSocket", "Active clients: $value")
                     }
                 }
-
             } catch (e: Exception) {
                 connected = false
                 Log.e("WebSocket", "Connection failed: ${e.message}")
@@ -66,23 +65,21 @@ class WebSocketService {
         }
     }
 
-    /* ---------- send ---------------------------------------------------- */
     fun send(destination: String, message: String) {
         scope.launch {
             try {
                 session?.sendText(destination, message)
-                withContext(Dispatchers.Main) {
+                withContext(uiDispatcher) {
                     Log.d("WebSocket", "Message sent: $message")
                 }
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
+                withContext(uiDispatcher) {
                     Log.e("WebSocket", "Send error: ${e.message}")
                 }
             }
         }
     }
 
-    /* ---------- disconnect --------------------------------------------- */
     fun disconnect() {
         scope.launch {
             session?.disconnect()
