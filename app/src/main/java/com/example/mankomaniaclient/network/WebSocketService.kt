@@ -12,73 +12,84 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+/**
+ * Handles all STOMP communication with the game server.
+ *  – keeps a single socket per app instance
+ *  – exposes a StateFlow with the current lobby size
+ *  – offers helper functions connect / send / disconnect
+ */
 class WebSocketService {
 
     private val stompClient = StompClient(OkHttpWebSocketClient())
     private var session: StompSession? = null
+
+    /** extra guard so we never open a second socket */
+    private var connected = false
+
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    // ---------- NEW: StateFlow for active‑client metric ----------
+    /* ---------- live lobby size ---------------------------------------- */
     private val _clientCount = MutableStateFlow(0)
-    val clientCount: StateFlow<Int> get() = _clientCount.asStateFlow()
+    val clientCount: StateFlow<Int> = _clientCount.asStateFlow()
 
-
+    /* ---------- connect ------------------------------------------------- */
     fun connect() {
+        if (connected) return         // already online
+
         scope.launch {
             try {
-                session = stompClient.connect("ws://se2-demo.aau.at:53210/ws")
+                val stomp = stompClient.connect("ws://se2-demo.aau.at:53210/ws")
+                session = stomp
+                connected = true
+                Log.d("WebSocket", "Connection established")
 
-                withContext(Dispatchers.Main) {
-                    Log.d("WebSocket", "Verbindung hergestellt")
-                }
-
-                // A) /topic/greetings
-                session?.subscribeText("/topic/greetings")?.collect { msg ->
-                    withContext(Dispatchers.Main) {
-                        Log.d("WebSocket", "Nachricht empfangen: $msg")
+                /* greetings --------------------------------------------- */
+                launch {
+                    stomp.subscribeText("/topic/greetings").collect { msg ->
+                        Log.d("WebSocket", "Greeting received: $msg")
                     }
                 }
 
-                // --------- NEW: subscribe to /topic/clientCount ----------
+                /* client counter ---------------------------------------- */
                 launch {
-                    session?.subscribeText("/topic/clientCount")?.collect { countStr ->
-                        val value = countStr.toIntOrNull() ?: 0
+                    stomp.subscribeText("/topic/clientCount").collect { raw ->
+                        val value = raw.toIntOrNull() ?: 0
                         _clientCount.value = value
-                        withContext(Dispatchers.Main) {
-                            Log.d("WebSocket", "Aktive Clients: $value")
-                        }
+                        Log.d("WebSocket", "Active clients: $value")
                     }
                 }
 
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    Log.e("WebSocket", "Verbindung fehlgeschlagen: ${e.message}")
-                }
+                connected = false
+                Log.e("WebSocket", "Connection failed: ${e.message}")
             }
         }
     }
 
+    /* ---------- send ---------------------------------------------------- */
     fun send(destination: String, message: String) {
         scope.launch {
             try {
                 session?.sendText(destination, message)
                 withContext(Dispatchers.Main) {
-                    Log.d("WebSocket", "Nachricht gesendet: $message")
+                    Log.d("WebSocket", "Message sent: $message")
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Log.e("WebSocket", "Fehler beim Senden: ${e.message}")
+                    Log.e("WebSocket", "Send error: ${e.message}")
                 }
             }
         }
     }
 
-    // Close function for client counter
+    /* ---------- disconnect --------------------------------------------- */
     fun disconnect() {
         scope.launch {
             session?.disconnect()
             session = null
+            connected = false
             _clientCount.value = 0
+            Log.d("WebSocket", "Disconnected")
         }
     }
 }
