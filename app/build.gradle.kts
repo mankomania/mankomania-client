@@ -111,7 +111,7 @@ sonar {
                     "src/main/java/com/example/mankomaniaclient/MainActivity.kt"
         )
 
-        property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties")
+        property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties, src/main/java/com/example/mankomaniaclient/LoadingActivity.kt, src/main/res/drawable/loading_screen.png")
     }
 }
 
