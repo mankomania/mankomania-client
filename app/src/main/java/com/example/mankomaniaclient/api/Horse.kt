@@ -1,6 +1,8 @@
 package com.example.mankomaniaclient.api
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 /**
@@ -20,7 +22,7 @@ data class Horse(
      * @return The JSON string representation of this horse.
      */
     fun toJson(): String {
-        return Json.encodeToString(serializer(), this)
+        return Json.encodeToString(this)
     }
 
     companion object {
@@ -30,7 +32,7 @@ data class Horse(
          * @return A Horse instance.
          */
         fun fromJson(json: String): Horse {
-            return Json.decodeFromString(serializer(), json)
+            return Json.decodeFromString(json)
         }
     }
 }
