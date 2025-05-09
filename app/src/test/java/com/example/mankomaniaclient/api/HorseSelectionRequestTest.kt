@@ -1,6 +1,5 @@
 package com.example.mankomaniaclient.api
 
-import com.google.gson.Gson
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 
@@ -14,32 +13,6 @@ class HorseSelectionRequestTest {
         // Assert
         assertEquals("player123", request.playerId)
         assertEquals(5, request.horseId)
-    }
-
-    @Test
-    fun testToJson() {
-        // Arrange
-        val request = HorseSelectionRequest("player123", 5)
-        val expectedJson = """{"playerId":"player123","horseId":5}"""
-
-        // Act
-        val resultJson = request.toJson()
-
-        // Assert
-        assertEquals(expectedJson, resultJson)
-    }
-
-    @Test
-    fun testFromJson() {
-        // Arrange
-        val json = """{"playerId":"player456","horseId":7}"""
-
-        // Act
-        val request = HorseSelectionRequest.fromJson(json)
-
-        // Assert
-        assertEquals("player456", request.playerId)
-        assertEquals(7, request.horseId)
     }
 
     @Test
@@ -68,44 +41,52 @@ class HorseSelectionRequestTest {
     }
 
     @Test
-    fun testRoundTripJsonSerialization() {
-        // Arrange
-        val original = HorseSelectionRequest("player789", 3)
-
-        // Act
-        val json = original.toJson()
-        val deserialized = HorseSelectionRequest.fromJson(json)
-
-        // Assert
-        assertEquals(original, deserialized)
-    }
-
-    @Test
     fun testEmptyValues() {
         // Arrange & Act
         val request = HorseSelectionRequest("", 0)
-        val json = request.toJson()
-        val deserialized = HorseSelectionRequest.fromJson(json)
 
         // Assert
-        assertEquals("", deserialized.playerId)
-        assertEquals(0, deserialized.horseId)
-        assertEquals(request, deserialized)
+        assertEquals("", request.playerId)
+        assertEquals(0, request.horseId)
     }
 
     @Test
     fun testLongValues() {
-        // Arrange
+        // Arrange & Act
         val longPlayerId = "a".repeat(1000)
         val largeHorseId = Int.MAX_VALUE
-
-        // Act
         val request = HorseSelectionRequest(longPlayerId, largeHorseId)
-        val json = request.toJson()
-        val deserialized = HorseSelectionRequest.fromJson(json)
 
         // Assert
-        assertEquals(longPlayerId, deserialized.playerId)
-        assertEquals(largeHorseId, deserialized.horseId)
+        assertEquals(longPlayerId, request.playerId)
+        assertEquals(largeHorseId, request.horseId)
+    }
+
+    @Test
+    fun testToString() {
+        // Arrange
+        val request = HorseSelectionRequest("player123", 5)
+
+        // Act
+        val stringRepresentation = request.toString()
+
+        // Assert
+        assertTrue(stringRepresentation.contains("playerId=player123"))
+        assertTrue(stringRepresentation.contains("horseId=5"))
+    }
+
+    @Test
+    fun testComponentFunctions() {
+        // Arrange
+        val request = HorseSelectionRequest("player123", 5)
+
+        // Act & Assert
+        assertEquals("player123", request.component1())
+        assertEquals(5, request.component2())
+
+        // Test destructuring
+        val (playerId, horseId) = request
+        assertEquals("player123", playerId)
+        assertEquals(5, horseId)
     }
 }

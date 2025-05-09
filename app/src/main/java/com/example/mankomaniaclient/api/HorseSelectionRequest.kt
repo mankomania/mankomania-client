@@ -1,27 +1,11 @@
 package com.example.mankomaniaclient.api
 
-import com.google.gson.Gson
-
+/**
+ * Represents a horse selection request in the horse race game.
+ * @property playerId The ID of the player making the selection.
+ * @property horseId The ID of the horse being selected.
+ */
 data class HorseSelectionRequest(
     val playerId: String,
     val horseId: Int
-) {
-    companion object {
-        private val gson = Gson()
-
-        /**
-         * Deserializes a JSON string into a HorseSelectionRequest object
-         */
-        fun fromJson(json: String): HorseSelectionRequest {
-            return gson.fromJson(json, HorseSelectionRequest::class.java)
-        }
-    }
-
-    /**
-     * Converts this request object to a JSON string using Gson.
-     * @return The JSON string representation of this request.
-     */
-    fun toJson(): String {
-        return Gson().toJson(this)
-    }
-}
+)

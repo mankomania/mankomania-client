@@ -1,9 +1,10 @@
 package com.example.mankomaniaclient.api
 
 import com.example.mankomaniaclient.network.WebSocketService
-import com.google.gson.Gson
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class HorseRaceApi(private val webSocketService: WebSocketService) {
 
@@ -11,8 +12,12 @@ class HorseRaceApi(private val webSocketService: WebSocketService) {
     private val _horsesStateFlow = MutableStateFlow<List<Horse>>(emptyList())
     val horsesStateFlow: StateFlow<List<Horse>> = _horsesStateFlow
 
-    // Gson instance for JSON serialization and deserialization
-    private val gson = Gson()
+    // Json formatter with lenient configuration for more forgiving parsing
+    private val json = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+        coerceInputValues = true
+    }
 
     /**
      * Sends a horse selection request to the server to place a bet.
@@ -20,7 +25,7 @@ class HorseRaceApi(private val webSocketService: WebSocketService) {
      */
     suspend fun sendHorseSelectionRequest(horseSelectionRequest: HorseSelectionRequest) {
         val destination = "/topic/selectHorse"
-        val message = gson.toJson(horseSelectionRequest) // Use Gson to convert to JSON string
+        val message = Json.encodeToString(horseSelectionRequest) // Use Kotlinx serialization to convert to JSON string
 
         // Send the message to the server to register the horse selection
         webSocketService.send(destination, message)
@@ -56,7 +61,11 @@ class HorseRaceApi(private val webSocketService: WebSocketService) {
      * @return List of Horse objects
      */
     fun parseHorseData(json: String): List<Horse> {
-        // Use Gson to parse JSON array into list of Horse objects
-        return gson.fromJson(json, Array<Horse>::class.java).toList()
+        return try {
+            // Use Kotlinx serialization to parse JSON array into list of Horse objects
+            Json.decodeFromString<List<Horse>>(json)
+        } catch (e: Exception) {
+            throw e // Re-throw to maintain same error behavior as original
+        }
     }
 }

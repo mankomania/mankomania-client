@@ -144,4 +144,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.kotlinx.serialization.json)
+    testImplementation(kotlin("test"))
+    testImplementation ("org.jetbrains.kotlin:kotlin-test-junit5:1.9.0")
+    testImplementation ("org.jetbrains.kotlin:kotlin-test:1.9.0")
+    testImplementation ("io.mockk:mockk:1.13.8")
 }

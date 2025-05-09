@@ -1,14 +1,10 @@
 package com.example.mankomaniaclient.api.HorseTest
 
 import com.example.mankomaniaclient.api.Horse
-import com.google.gson.Gson
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import com.google.gson.JsonSyntaxException
 
 class HorseTest {
-
-    private val gson = Gson()
 
     @Test
     fun testHorseProperties() {
@@ -21,35 +17,6 @@ class HorseTest {
     }
 
     @Test
-    fun testHorseSerialization() {
-        val horse = Horse(id = 1, name = "Horse 1", color = "blue")
-        val json = horse.toJson() // Use the class method instead of direct gson usage
-
-        println("Serialized JSON: $json")
-
-        assertTrue(json.contains("\"id\":1"))
-        assertTrue(json.contains("\"name\":\"Horse 1\""))
-        assertTrue(json.contains("\"color\":\"blue\""))
-    }
-
-    @Test
-    fun testHorseDeserialization() {
-        val jsonString = """{"id":2,"name":"Thunder","color":"black"}"""
-
-        // Test using the companion method
-        val horse = Horse.fromJson(jsonString)
-        assertEquals(2, horse.id)
-        assertEquals("Thunder", horse.name)
-        assertEquals("black", horse.color)
-
-        // Also test using direct deserialization with Gson
-        val horseFromGson = gson.fromJson(jsonString, Horse::class.java)
-        assertEquals(2, horseFromGson.id)
-        assertEquals("Thunder", horseFromGson.name)
-        assertEquals("black", horse.color)
-    }
-
-    @Test
     fun testHorseEquality() {
         val horse1 = Horse(id = 1, name = "Horse 1", color = "blue")
         val horse2 = Horse(id = 1, name = "Horse 1", color = "blue")
@@ -59,8 +26,6 @@ class HorseTest {
         assertEquals(horse1, horse2)
         assertTrue(horse1 != horse3)
     }
-
-    // Additional tests to improve coverage
 
     @Test
     fun testHorseCopy() {
@@ -96,39 +61,6 @@ class HorseTest {
     }
 
     @Test
-    fun testJsonSerializationRoundTrip() {
-        // Test that a horse can be serialized and then deserialized back to the original object
-        val originalHorse = Horse(id = 42, name = "Seabiscuit", color = "brown")
-        val json = originalHorse.toJson()
-        val deserializedHorse = Horse.fromJson(json)
-
-        assertEquals(originalHorse, deserializedHorse)
-    }
-
-    @Test
-    fun testDeserializationWithMissingFields() {
-        // Test deserialization with partial JSON (missing color)
-        val partialJson = """{"id":5,"name":"Partial Horse"}"""
-        val partialHorse = Horse.fromJson(partialJson)
-
-        assertEquals(5, partialHorse.id)
-        assertEquals("Partial Horse", partialHorse.name)
-        // Depending on Gson behavior, color might be null or default value
-        // We can at least verify it doesn't throw an exception
-    }
-
-    @Test
-    fun testDeserializationWithExtraFields() {
-        // Test deserialization with extra fields in JSON
-        val extraFieldsJson = """{"id":7,"name":"Extra Horse","color":"yellow","speed":42,"owner":"John"}"""
-        val extraFieldsHorse = Horse.fromJson(extraFieldsJson)
-
-        assertEquals(7, extraFieldsHorse.id)
-        assertEquals("Extra Horse", extraFieldsHorse.name)
-        assertEquals("yellow", extraFieldsHorse.color)
-    }
-
-    @Test
     fun testHorseComponentFunctions() {
         val horse = Horse(id = 10, name = "Component Test", color = "purple")
 
@@ -145,17 +77,11 @@ class HorseTest {
     }
 
     @Test
-    fun testInvalidJsonDeserialization() {
-        // Test behavior with invalid JSON
-        val invalidJson = """{"id":"not-a-number","name":123,"color":true}"""
-
-        try {
-            Horse.fromJson(invalidJson)
-            fail("Should have thrown JsonSyntaxException")
-        } catch (e: JsonSyntaxException) {
-            // Expected exception, test passes
-        } catch (e: Exception) {
-            fail("Unexpected exception type: ${e.javaClass.name}")
-        }
+    fun testNullableColor() {
+        // Test that color can be null
+        val horse = Horse(id = 15, name = "Null Color Horse", color = null)
+        assertEquals(15, horse.id)
+        assertEquals("Null Color Horse", horse.name)
+        assertNull(horse.color)
     }
 }

@@ -1,22 +1,26 @@
 package com.example.mankomaniaclient.api
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+
 /**
  * Represents a horse in the horse race game.
  * @property id The unique identifier of the horse.
  * @property name The name of the horse.
  * @property color The color of the horse.
  */
+@Serializable
 data class Horse(
     val id: Int,
     val name: String,
-    val color: String
+    val color: String? = null
 ) {
     /**
-     * Converts this horse object to a JSON string using GSON.
+     * Converts this horse object to a JSON string using Kotlinx Serialization.
      * @return The JSON string representation of this horse.
      */
     fun toJson(): String {
-        return com.google.gson.Gson().toJson(this)
+        return Json.encodeToString(serializer(), this)
     }
 
     companion object {
@@ -26,7 +30,7 @@ data class Horse(
          * @return A Horse instance.
          */
         fun fromJson(json: String): Horse {
-            return com.google.gson.Gson().fromJson(json, Horse::class.java)
+            return Json.decodeFromString(serializer(), json)
         }
     }
 }
