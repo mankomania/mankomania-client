@@ -19,11 +19,10 @@ import kotlinx.coroutines.flow.asStateFlow
  *  – exposes a StateFlow with the current lobby size
  *  – offers helper functions connect / send / disconnect
  */
-class WebSocketService(
-    private val stompClient: StompClient = StompClient(OkHttpWebSocketClient()),
-    private val scope: CoroutineScope   = CoroutineScope(Dispatchers.IO + SupervisorJob()),
-    private val uiDispatcher: CoroutineDispatcher = Dispatchers.Main          // <-- NEW
-) {
+object WebSocketService{
+    private val stompClient: StompClient = StompClient(OkHttpWebSocketClient())
+    private val scope: CoroutineScope   = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val uiDispatcher: CoroutineDispatcher = Dispatchers.Main
 
     private var session: StompSession? = null
     private var connected = false
@@ -48,6 +47,11 @@ class WebSocketService(
                 launch {
                     stomp.subscribeText(greetingsTopic).collect {
                         Log.d("WebSocket", "Greeting received: $it")
+                    }
+                }
+                launch {
+                    stomp.subscribeText("/user/queue/register-response").collect {
+                        Log.d("WebSocket", "Register response: $it")
                     }
                 }
 
