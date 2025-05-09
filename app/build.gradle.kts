@@ -148,4 +148,8 @@ dependencies {
     testImplementation ("org.jetbrains.kotlin:kotlin-test-junit5:1.9.0")
     testImplementation ("org.jetbrains.kotlin:kotlin-test:1.9.0")
     testImplementation ("io.mockk:mockk:1.13.8")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("io.mockk:mockk:1.13.5")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
 }

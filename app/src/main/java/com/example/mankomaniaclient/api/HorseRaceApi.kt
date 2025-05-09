@@ -3,8 +3,10 @@ package com.example.mankomaniaclient.api
 import com.example.mankomaniaclient.network.WebSocketService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
 
 class HorseRaceApi(private val webSocketService: WebSocketService) {
 
@@ -25,7 +27,7 @@ class HorseRaceApi(private val webSocketService: WebSocketService) {
      */
     suspend fun sendHorseSelectionRequest(horseSelectionRequest: HorseSelectionRequest) {
         val destination = "/topic/selectHorse"
-        val message = Json.encodeToString(horseSelectionRequest) // Use Kotlinx serialization to convert to JSON string
+        val message = Json.encodeToString(HorseSelectionRequest.serializer, horseSelectionRequest)
 
         // Send the message to the server to register the horse selection
         webSocketService.send(destination, message)
