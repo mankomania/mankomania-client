@@ -108,7 +108,7 @@ sonar {
             "sonar.coverage.exclusions",
             // alle Composables + MainActivity
             "src/main/java/com/example/mankomaniaclient/ui/**," +
-                    "src/main/java/com/example/mankomaniaclient/MainActivity.kt" +
+                    "src/main/java/com/example/mankomaniaclient/MainActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/api/LotteryApi.kt"
         )
 
