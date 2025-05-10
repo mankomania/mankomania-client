@@ -1,5 +1,6 @@
 package com.example.mankomaniaclient.api
 
+import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 
@@ -13,6 +14,14 @@ class HorseSelectionRequestTest {
         // Assert
         assertEquals("player123", request.playerId)
         assertEquals(5, request.horseId)
+    }
+    @Test
+    fun testJsonRoundTrip() {
+        val original = HorseSelectionRequest("abc123", 2)
+        val json = Json.encodeToString(HorseSelectionRequest.serializer(), original)
+        val result = Json.decodeFromString(HorseSelectionRequest.serializer(), json)
+
+        assertEquals(original, result)
     }
 
     @Test
@@ -90,3 +99,4 @@ class HorseSelectionRequestTest {
         assertEquals(5, horseId)
     }
 }
+
