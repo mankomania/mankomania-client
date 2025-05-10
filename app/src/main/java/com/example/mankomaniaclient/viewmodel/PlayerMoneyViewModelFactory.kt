@@ -2,17 +2,18 @@ package com.example.mankomaniaclient.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import kotlinx.coroutines.CoroutineScope
 import org.hildan.krossbow.stomp.StompClient
 
 class PlayerMoneyViewModelFactory(
-    private val stompClient: StompClient
+    private val stompClient: StompClient,
+    private val playerId: String
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(PlayerMoneyViewModel::class.java)) {
-            // We're only passing stompClient now, since that's what the constructor expects
-            return PlayerMoneyViewModel(stompClient) as T
+            return PlayerMoneyViewModel(stompClient, playerId) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
