@@ -2,7 +2,6 @@ package com.example.mankomaniaclient.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,7 +13,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mankomaniaclient.viewmodel.PlayerMoneyViewModel
 import com.example.mankomaniaclient.viewmodel.PlayerMoneyViewModelFactory
-import kotlinx.coroutines.MainScope
 import org.hildan.krossbow.stomp.StompClient
 import org.hildan.krossbow.websocket.okhttp.OkHttpWebSocketClient
 
@@ -30,60 +28,93 @@ fun StartingMoneyScreen(playerId: String) {
     val viewModel: PlayerMoneyViewModel = viewModel(factory = factory)
     val state by viewModel.financialState.collectAsState()
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text(
-            text = "Starting Money",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        DenominationRow("€5,000", state.bills5000, Color(0xFFE0F7FA))
-        DenominationRow("€10,000", state.bills10000, Color(0xFFD1C4E9))
-        DenominationRow("€50,000", state.bills50000, Color(0xFFFFF59D))
-        DenominationRow("€100,000", state.bills100000, Color(0xFFFFCCBC))
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        val total = state.bills5000 * 5_000 +
+    val totalAmount = remember(state) {
+        state.bills5000 * 5000 +
                 state.bills10000 * 10_000 +
                 state.bills50000 * 50_000 +
                 state.bills100000 * 100_000
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            // Pass the modifier with weight directly from the parent Row
+            DenominationBox(
+                label = "€5,000",
+                count = state.bills5000,
+                color = Color(0xFFE0F7FA),
+                modifier = Modifier.weight(1f)
+            )
+            DenominationBox(
+                label = "€10,000",
+                count = state.bills10000,
+                color = Color(0xFFD1C4E9),
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            DenominationBox(
+                label = "€50,000",
+                count = state.bills50000,
+                color = Color(0xFFFFF59D),
+                modifier = Modifier.weight(1f)
+            )
+            DenominationBox(
+                label = "€100,000",
+                count = state.bills100000,
+                color = Color(0xFFFFCCBC),
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Total: €%,d".format(total),
+            text = "Total: €${"%,d".format(totalAmount)}",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .align(Alignment.End)
-                .padding(end = 8.dp)
+            color = Color(0xFF388E3C),
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
     }
 }
+
 @Composable
-fun DenominationRow(
-    denominationText: String,
+fun DenominationBox(
+    label: String,
     count: Int,
-    backgroundColor: Color
+    color: Color,
+    modifier: Modifier = Modifier // Add a modifier parameter with default value
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(backgroundColor)
-            .padding(vertical = 12.dp, horizontal = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+    Box(
+        modifier = modifier // Use the modifier passed from the parent
+            .padding(8.dp)
+            .background(color)
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = denominationText,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = "x$count",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium
-        )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = label,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "x$count",
+                fontSize = 16.sp
+            )
+        }
     }
 }
