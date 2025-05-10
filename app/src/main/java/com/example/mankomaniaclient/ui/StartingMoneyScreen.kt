@@ -26,7 +26,7 @@ fun StartingMoneyScreen(viewModel: PlayerMoneyViewModel = viewModel()) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        DenominationRow("€5,000", state.bills5000, Color(0xFFE0F7FA))
+        DenominationRow("€5,000", state?.bills5000 ?: , Color(0xFFE0F7FA))
         DenominationRow("€10,000", state.bills10000, Color(0xFFD1C4E9))
         DenominationRow("€50,000", state.bills50000, Color(0xFFFFF59D))
         DenominationRow("€100,000", state.bills100000, Color(0xFFFFCCBC))

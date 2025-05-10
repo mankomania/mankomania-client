@@ -4,24 +4,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mankomaniaclient.network.PlayerSocketService
 import com.example.mankomaniaclient.ui.model.PlayerFinancialState
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.hildan.krossbow.stomp.StompClient
 
-class PlayerMoneyViewModel(
-    private val stompClient: StompClient,
-    private val externalScope: CoroutineScope
-) : ViewModel() {
+class PlayerMoneyViewModel(private val stompClient: StompClient) : ViewModel() {
 
-    // Initialize PlayerSocketService with the stompClient and externalScope
-    private val socketService = PlayerSocketService(stompClient, externalScope)
-
-    // Player ID (you might want to make this configurable)
+    // Define the player ID
     private val playerId = "player1"
 
-    // Get the state flow from the service
+    // Initialize the socket service with stompClient and viewModelScope
+    // Pass viewModelScope directly, not as a function call
+    private val socketService = PlayerSocketService(stompClient, viewModelScope)
+
+    // Get the financial state from the service
     val financialState: StateFlow<PlayerFinancialState?> = socketService.playerStateFlow
 
     init {
@@ -34,7 +30,6 @@ class PlayerMoneyViewModel(
         }
     }
 
-    // Function to update player's money
     fun updateMoney(updatedState: PlayerFinancialState) {
         viewModelScope.launch {
             socketService.sendMoneyUpdate(playerId, updatedState)
