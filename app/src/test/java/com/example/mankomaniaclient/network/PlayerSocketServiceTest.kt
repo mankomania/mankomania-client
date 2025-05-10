@@ -2,72 +2,62 @@ package com.example.mankomaniaclient.network
 
 import com.example.mankomaniaclient.ui.model.PlayerFinancialState
 import com.example.mankomaniaclient.ui.model.PlayerMoneyUpdate
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.slot
+import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import org.hildan.krossbow.stomp.StompClient
-import org.hildan.krossbow.stomp.StompReceipt
 import org.hildan.krossbow.stomp.StompSession
+import org.hildan.krossbow.stomp.frame.FrameBody
 import org.hildan.krossbow.stomp.frame.StompFrame
+import org.hildan.krossbow.stomp.headers.StompSendHeaders
 import org.hildan.krossbow.stomp.headers.StompSubscribeHeaders
-import org.hildan.krossbow.stomp.sendText
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.*
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
-// Helper function to access private field for testing (MUST be at the top-level or in a companion object if restricted)
-// Ensure this is OUTSIDE the PlayerSocketServiceTest class
-private operator fun <T> Any.get(propertyName: String): T? {
-    return try {
-        val property = this::class.java.getDeclaredField(propertyName)
-        property.isAccessible = true
-        @Suppress("UNCHECKED_CAST")
-        property.get(this) as? T
-    } catch (e: NoSuchFieldException) {
-        null // Or throw an error if the field is expected to always exist
-    }
-}
-
-@ExperimentalCoroutinesApi
+@OptIn(ExperimentalCoroutinesApi::class)
 class PlayerSocketServiceTest {
 
-    private lateinit var stompClient: StompClient
-    private lateinit var stompSession: StompSession
-    private lateinit var playerSocketService: PlayerSocketService
     private val testScheduler = TestCoroutineScheduler()
     private val testDispatcher = StandardTestDispatcher(testScheduler)
     private val testScope = TestScope(testDispatcher)
 
+    private lateinit var stompClient: StompClient
+    private lateinit var stompSession: StompSession
+    private lateinit var socketService: PlayerSocketService
     private lateinit var messageFlow: MutableSharedFlow<StompFrame.Message>
 
-
     @BeforeEach
-    fun setUp() {
+    fun setup() {
         stompClient = mockk()
         stompSession = mockk(relaxUnitFun = true)
-
         messageFlow = MutableSharedFlow()
 
         coEvery { stompClient.connect(any()) } returns stompSession
         coEvery { stompSession.subscribe(any<StompSubscribeHeaders>()) } returns messageFlow
+        coEvery { stompSession.send(any<StompSendHeaders>(), any<FrameBody>()) } returns mockk()
 
-        playerSocketService = PlayerSocketService(stompClient, testScope)
+        socketService = PlayerSocketService(stompClient, testScope)
     }
 
     @AfterEach
-    fun tearDown() = testScope.runTest {
-        playerSocketService.disconnect()
+    fun tearDown() {
+        runBlocking(testDispatcher) {
+            socketService.disconnect()
+        }
+        testScheduler.advanceUntilIdle()
+    }
+
+    @Test
+    fun `playerStateFlow emits initial default state`() = testScope.runTest {
+        val expectedInitialState = PlayerFinancialState(0, 0, 0, 0)
+        assertEquals(expectedInitialState, socketService.playerStateFlow.value)
     }
 
     @Test
@@ -76,85 +66,82 @@ class PlayerSocketServiceTest {
         val topic = "/topic/testMoney"
         val headersSlot = slot<StompSubscribeHeaders>()
 
-        playerSocketService.connect(url, topic)
+        coEvery { stompSession.subscribe(capture(headersSlot)) } returns messageFlow
+
+        socketService.connect(url, topic)
         testScheduler.advanceUntilIdle()
 
         coVerify { stompClient.connect(url) }
-        coVerify { stompSession.subscribe(capture(headersSlot)) }
+        coVerify { stompSession.subscribe(headersSlot.captured) }
         assertEquals(topic, headersSlot.captured.destination)
-        assertNotNull(playerSocketService.playerStateFlow)
 
-        val initialState = playerSocketService.playerStateFlow.value
-        val financialStateUpdate = PlayerFinancialState(1, 2, 3, 4)
-        val jsonUpdate = Json.encodeToString(PlayerFinancialState.serializer(), financialStateUpdate)
-
-        val mockFrame = mockk<StompFrame.Message>()
-        every { mockFrame.bodyAsText } returns jsonUpdate
-
-        messageFlow.emit(mockFrame)
-        testScheduler.advanceUntilIdle()
-
-        assertEquals(financialStateUpdate, playerSocketService.playerStateFlow.value)
-        if (financialStateUpdate != PlayerFinancialState(0,0,0,0)) {
-            assertEquals(false, initialState == playerSocketService.playerStateFlow.value)
+        val update = PlayerFinancialState(1, 2, 3, 4)
+        val updateJson = Json.encodeToString(PlayerFinancialState.serializer(), update)
+        val mockMessage = mockk<StompFrame.Message> {
+            every { bodyAsText } returns updateJson
         }
+
+        messageFlow.emit(mockMessage)
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(update, socketService.playerStateFlow.value)
     }
 
     @Test
-    fun `sendMoneyUpdate sends correct JSON to the server`() = testScope.runTest {
-        playerSocketService.connect()
+    fun `sendMoneyUpdate sends JSON with correct headers and body`() = testScope.runTest {
+        val playerId = "valentina"
+        val expectedJson = Json.encodeToString(PlayerMoneyUpdate.serializer(), PlayerMoneyUpdate(playerId))
+
+        val headerSlot = slot<StompSendHeaders>()
+        val bodySlot = slot<FrameBody>()
+
+        coEvery {
+            stompSession.send(capture(headerSlot), capture(bodySlot))
+        } returns mockk()
+
+        socketService.connect()
+        socketService.sendMoneyUpdate(playerId)
         testScheduler.advanceUntilIdle()
 
-        val playerId = "player123"
-        val expectedUpdate = PlayerMoneyUpdate(playerId)
-        val expectedJson = Json.encodeToString(PlayerMoneyUpdate.serializer(), expectedUpdate)
-        val jsonSlot = slot<String>()
+        coVerify { stompSession.send(any(), any()) }
 
-        coEvery { stompSession.sendText(eq("/app/updateMoney"), capture(jsonSlot)) } returns null
-
-        playerSocketService.sendMoneyUpdate(playerId)
-        testScheduler.advanceUntilIdle()
-
-        coVerify { stompSession.sendText("/app/updateMoney", expectedJson) }
-        assertEquals(expectedJson, jsonSlot.captured)
+        assertEquals("/app/updateMoney", headerSlot.captured.destination)
+        assertNotNull(bodySlot.captured)
+        assertEquals(expectedJson, (bodySlot.captured as FrameBody.Text).text)
     }
 
-
     @Test
-    fun `connectAndSubscribe connects and then sends money update`() = testScope.runTest {
-        coEvery { stompSession.sendText(any(), any()) } returns null
-        val headersSlot = slot<StompSubscribeHeaders>()
+    fun `connectAndSubscribe connects and sends update`() = testScope.runTest {
+        val playerId = "test-player"
+        val expectedJson = Json.encodeToString(PlayerMoneyUpdate.serializer(), PlayerMoneyUpdate(playerId))
 
-        val playerId = "playerConnectSub"
+        val subscribeHeadersSlot = slot<StompSubscribeHeaders>()
+        val sendHeadersSlot = slot<StompSendHeaders>()
+        val frameBodySlot = slot<FrameBody>()
 
-        playerSocketService.connectAndSubscribe(playerId)
+        coEvery { stompSession.subscribe(capture(subscribeHeadersSlot)) } returns messageFlow
+        coEvery { stompSession.send(capture(sendHeadersSlot), capture(frameBodySlot)) } returns mockk()
+
+        socketService.connectAndSubscribe(playerId)
         testScheduler.advanceUntilIdle()
 
         coVerify { stompClient.connect(any()) }
-        coVerify { stompSession.subscribe(capture(headersSlot)) }
-        assertEquals("/topic/playerMoney", headersSlot.captured.destination)
-        coVerify { stompSession.sendText(eq("/app/updateMoney"), any()) }
+        coVerify { stompSession.subscribe(subscribeHeadersSlot.captured) }
+        assertEquals("/topic/playerMoney", subscribeHeadersSlot.captured.destination)
+
+        coVerify { stompSession.send(sendHeadersSlot.captured, frameBodySlot.captured) }
+        assertEquals("/app/updateMoney", sendHeadersSlot.captured.destination)
+        assertEquals(expectedJson, (frameBodySlot.captured as FrameBody.Text).text)
     }
 
     @Test
-    fun `disconnect closes the session`() = testScope.runTest { // Line 141 in your screenshot
-        playerSocketService.connect()
+    fun `disconnect closes the session`() = testScope.runTest {
+        socketService.connect()
         testScheduler.advanceUntilIdle()
 
-        // This line uses the helper. Ensure playerSocketService is initialized.
-        assertNotNull(playerSocketService["session"]) // Line 146 in your screenshot
-
-        playerSocketService.disconnect() // Line 148 in your screenshot
+        socketService.disconnect()
         testScheduler.advanceUntilIdle()
 
         coVerify { stompSession.disconnect() }
-        // Optionally, assert that the session is now null using the helper again
-        // assertNull(playerSocketService["session"]) // If you want to be explicit
-    }
-
-    @Test
-    fun `playerStateFlow emits initial default state`() {
-        val expectedInitialState = PlayerFinancialState(0, 0, 0, 0)
-        assertEquals(expectedInitialState, playerSocketService.playerStateFlow.value)
     }
 }
