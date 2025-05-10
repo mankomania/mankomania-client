@@ -58,8 +58,8 @@
             android:label="Mankomania" />
 
         <activity
-            android:name="com.example.mankomaniaclient.StartingMoneyActivity"
-            android:exported="false"
+            android:name=".StartingMoneyActivity"
+            android:exported="true"
             android:label="Mankomania"
             android:theme="@style/Theme.Mankomaniaclient" />
     </application>
