@@ -1,59 +1,67 @@
-package com.example.mankomaniaclient.viewmodel
+package com.example.mankomaniaclient.network
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.mankomaniaclient.ui.model.PlayerFinancialState
+import android.util.Log
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.decodeFromString
 import org.hildan.krossbow.stomp.StompClient
+import org.hildan.krossbow.stomp.sendText
+import org.hildan.krossbow.stomp.subscribeText
+import org.hildan.krossbow.stomp.StompSession
 
-class PlayerMoneyViewModel(private val stompClient: StompClient) : ViewModel() {
+class PlayerSocketService(
+    private val stompClient: StompClient,
+    private val coroutineScope: CoroutineScope
+) {
 
-    // Initialize PlayerSocketService with the stompClient and viewModelScope
-    private val socketService = PlayerSocketService(stompClient, viewModelScope)
+    private var session: StompSession? = null
 
-    // Player ID (you might want to make this configurable)
-    private val playerId = "player1"
+    private val _moneyStateFlow = MutableStateFlow(PlayerMoneyState())
+    val moneyStateFlow: StateFlow<PlayerMoneyState> = _moneyStateFlow
 
-    private val _financialState = MutableStateFlow(PlayerFinancialState())
-    val financialState: StateFlow<PlayerFinancialState> = _financialState
-
-    init {
-        connectToServer()
-        observeMoneyUpdates()
-    }
-
-    private fun observeMoneyUpdates() {
-        viewModelScope.launch {
-            socketService.playerStateFlow.collectLatest { playerState ->
-                // Only update if we received a non-null state
-                playerState?.let { state ->
-                    _financialState.value = state
+    fun connect() {
+        coroutineScope.launch {
+            try {
+                session = stompClient.connect("ws://se2-demo.aau.at:53210/ws")
+                session?.subscribeText("/topic/player-money")?.collect { jsonMessage ->
+                    val newState = Json.decodeFromString<PlayerMoneyState>(jsonMessage)
+                    _moneyStateFlow.value = newState
                 }
+                Log.d("WebSocket", "Connected to /topic/player-money")
+            } catch (e: Exception) {
+                Log.e("WebSocket", "Connection error: ${e.message}", e)
             }
         }
     }
 
-    private fun connectToServer() {
-        viewModelScope.launch {
-            socketService.connectAndSubscribe(playerId)
+    fun sendMoneyRequest(playerId: String) {
+        coroutineScope.launch {
+            try {
+                val json = """{"playerId":"$playerId"}"""
+                session?.sendText("/app/request-money", json)
+            } catch (e: Exception) {
+                Log.e("WebSocket", "Send error: ${e.message}", e)
+            }
         }
     }
 
-    // Function to update player's money
-    fun updateMoney(updatedState: PlayerFinancialState) {
-        viewModelScope.launch {
-            socketService.sendMoneyUpdate(playerId, updatedState)
-        }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelScope.launch {
-            socketService.disconnect()
+    suspend fun disconnect() {
+        try {
+            session?.disconnect()
+        } catch (e: Exception) {
+            Log.e("WebSocket", "Disconnect error: ${e.message}", e)
         }
     }
 }
+
+@Serializable
+data class PlayerMoneyState(
+    val bills5000: Int = 0,
+    val bills10000: Int = 0,
+    val bills50000: Int = 0,
+    val bills100000: Int = 0
+)

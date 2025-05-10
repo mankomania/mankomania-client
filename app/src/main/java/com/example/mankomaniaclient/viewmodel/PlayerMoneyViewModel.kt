@@ -4,51 +4,47 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mankomaniaclient.network.PlayerSocketService
 import com.example.mankomaniaclient.ui.model.PlayerFinancialState
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.hildan.krossbow.stomp.StompClient
 
-class PlayerMoneyViewModel(private val stompClient: StompClient) : ViewModel() {
+class PlayerMoneyViewModel(
+    private val stompClient: StompClient,
+    private val externalScope: CoroutineScope
+) : ViewModel() {
 
-    // Create the socket service with the stompClient
-    private val socketService = PlayerSocketService(stompClient)
+    // Initialize PlayerSocketService with the stompClient and externalScope
+    private val socketService = PlayerSocketService(stompClient, externalScope)
 
-    private val _financialState = MutableStateFlow(PlayerFinancialState())
-    val financialState: StateFlow<PlayerFinancialState> = _financialState
+    // Player ID (you might want to make this configurable)
+    private val playerId = "player1"
+
+    // Get the state flow from the service
+    val financialState: StateFlow<PlayerFinancialState?> = socketService.playerStateFlow
 
     init {
-        observeMoneyUpdates()
         connectToServer()
-    }
-
-    private fun observeMoneyUpdates() {
-        viewModelScope.launch {
-            // Use socketService.getMoneyUpdates() which should return a Flow
-            socketService.getMoneyUpdates().collect { received ->
-                _financialState.update {
-                    PlayerFinancialState(
-                        bills5000 = received.bills5000,
-                        bills10000 = received.bills10000,
-                        bills50000 = received.bills50000,
-                        bills100000 = received.bills100000
-                    )
-                }
-            }
-        }
     }
 
     private fun connectToServer() {
         viewModelScope.launch {
-            socketService.establishConnection()
+            socketService.connectAndSubscribe(playerId)
+        }
+    }
+
+    // Function to update player's money
+    fun updateMoney(updatedState: PlayerFinancialState) {
+        viewModelScope.launch {
+            socketService.sendMoneyUpdate(playerId, updatedState)
         }
     }
 
     override fun onCleared() {
         super.onCleared()
         viewModelScope.launch {
-            socketService.closeConnection()
+            socketService.disconnect()
         }
     }
 }
