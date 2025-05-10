@@ -62,8 +62,6 @@
             android:exported="false"
             android:label="Mankomania"
             android:theme="@style/Theme.Mankomaniaclient" />
-
-
     </application>
 
 </manifest>
