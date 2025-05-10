@@ -12,7 +12,7 @@ import org.hildan.krossbow.stomp.StompClient
 
 class PlayerMoneyViewModel(private val stompClient: StompClient) : ViewModel() {
 
-    // Pass the stompClient to the service
+    // Create the socket service with the stompClient
     private val socketService = PlayerSocketService(stompClient)
 
     private val _financialState = MutableStateFlow(PlayerFinancialState())
@@ -25,9 +25,10 @@ class PlayerMoneyViewModel(private val stompClient: StompClient) : ViewModel() {
 
     private fun observeMoneyUpdates() {
         viewModelScope.launch {
-            socketService.moneyStateFlow.collect { received ->
+            // Use socketService.getMoneyUpdates() which should return a Flow
+            socketService.getMoneyUpdates().collect { received ->
                 _financialState.update {
-                    it.copy(
+                    PlayerFinancialState(
                         bills5000 = received.bills5000,
                         bills10000 = received.bills10000,
                         bills50000 = received.bills50000,
@@ -40,14 +41,14 @@ class PlayerMoneyViewModel(private val stompClient: StompClient) : ViewModel() {
 
     private fun connectToServer() {
         viewModelScope.launch {
-            socketService.connect()
+            socketService.establishConnection()
         }
     }
 
     override fun onCleared() {
         super.onCleared()
         viewModelScope.launch {
-            socketService.disconnect()
+            socketService.closeConnection()
         }
     }
 }
