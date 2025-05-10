@@ -49,9 +49,10 @@ object WebSocketService{
                         Log.d("WebSocket", "Greeting received: $it")
                     }
                 }
+
                 launch {
-                    stomp.subscribeText("/user/queue/register-response").collect {
-                        Log.d("WebSocket", "Register response: $it")
+                    stomp.subscribeText("/topic/register").collect {
+                        Log.d("WebSocket", "Register broadcast: $it")
                     }
                 }
 
