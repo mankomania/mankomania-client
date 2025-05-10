@@ -74,6 +74,24 @@ class HorseRaceApiTests {
         }
     }
     @Test
+    @DisplayName("Test sendHorseSelectionRequest sends correct WebSocket message")
+    fun testSendHorseSelectionRequest() = runTest {
+        // Arrange
+        val request = HorseSelectionRequest(playerId = "player123", horseId = 7)
+        coEvery { mockWebSocketService.send(any(), any()) } just runs
+
+        // Act
+        horseRaceApi.sendHorseSelectionRequest(request)
+
+        // Assert
+        coVerify {
+            mockWebSocketService.send(
+                eq("/topic/selectHorse"),
+                match { it.contains("\"playerId\":\"player123\"") && it.contains("\"horseId\":7") }
+            )
+        }
+    }
+    @Test
     @DisplayName("Test parsing valid horse data JSON")
     fun testParseHorseDataValid() {
         // Arrange
