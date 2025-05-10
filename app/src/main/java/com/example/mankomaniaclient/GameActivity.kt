@@ -1,4 +1,4 @@
-package com.example.mankomaniaclient.com.example.mankomaniaclient
+package com.example.mankomaniaclient
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -39,23 +39,13 @@ class GameActivity : ComponentActivity() {
                     else -> {
                         WelcomeScreen(
                             onStartGame = {
+                                // Replace content with the actual board
                                 setContent {
-                                    MaterialTheme {
-                                        GameBoardScreen()
-                                    }
+                                    MaterialTheme { GameBoardScreen() }
                                 }
                             }
                         )
                     }
-                    /*
-                WelcomeScreen(
-                    onStartGame = {
-                        // Replace content with the actual board
-                        setContent {
-                            MaterialTheme { GameBoardScreen() }
-                        }
-                    }
-                )*/
                 }
             }
         }
