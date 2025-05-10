@@ -13,13 +13,15 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mankomaniaclient.viewmodel.PlayerMoneyViewModel
 import com.example.mankomaniaclient.viewmodel.PlayerMoneyViewModelFactory
-import org.hildan.krossbow.stomp.DefaultStompClient
+import org.hildan.krossbow.stomp.StompClient
+import org.hildan.krossbow.websocket.okhttp.OkHttpWebSocketClient
+
 
 @Composable
 fun StartingMoneyScreen(playerId: String) {
     val factory = remember {
         PlayerMoneyViewModelFactory(
-            stompClient = DefaultStompClient(),
+            stompClient = StompClient(OkHttpWebSocketClient()),
             playerId = playerId
         )
     }
