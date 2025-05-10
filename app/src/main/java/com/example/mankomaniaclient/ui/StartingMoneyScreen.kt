@@ -1,10 +1,21 @@
 package com.example.mankomaniaclient.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mankomaniaclient.viewmodel.PlayerMoneyViewModel
 
@@ -29,6 +40,29 @@ fun StartingMoneyScreen(viewModel: PlayerMoneyViewModel = viewModel()) {
 }
 
 @Composable
-fun DenominationRow(x0: String, x1: Int, x2: Color) {
-    TODO("Not yet implemented")
+fun DenominationRow(
+    denominationText: String,
+    count: Int,
+    backgroundColor: Color
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(backgroundColor)
+            .padding(vertical = 12.dp, horizontal = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = denominationText,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Text(
+            text = count.toString(),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Medium
+        )
+    }
 }
