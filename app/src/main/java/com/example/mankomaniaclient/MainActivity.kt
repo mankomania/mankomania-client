@@ -84,6 +84,11 @@ class MainActivity : ComponentActivity() {
                 },
                 onPlay = {
                     startActivity(Intent(this, GameActivity::class.java))
+                },
+                onOpenLottery = {
+                    val intent = Intent(this, GameActivity::class.java)
+                    intent.putExtra(GameActivity.EXTRA_SCREEN, GameActivity.SCREEN_LOTTERY)
+                    startActivity(intent)
                 }
             )
         }
@@ -111,7 +116,8 @@ private fun MainScreen(
     clientCount: Int,
     onConnect: () -> Unit,
     onSendHello: () -> Unit,
-    onPlay: () -> Unit
+    onPlay: () -> Unit,
+    onOpenLottery: () -> Unit
 ) {
     MaterialTheme {
         Column(
@@ -137,6 +143,8 @@ private fun MainScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(onClick = onPlay) { Text("Play Mankomania") }
+
+            Button(onClick = onOpenLottery) { Text("Open Lottery") }
         }
     }
 }
