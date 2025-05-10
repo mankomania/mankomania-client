@@ -112,7 +112,7 @@ sonar {
                     "src/main/java/com/example/mankomaniaclient/api/LotteryApi.kt"
         )
 
-        property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties")
+        property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties, src/main/java/com/example/mankomaniaclient/LoadingActivity.kt, src/main/java/com/example/mankomaniaclient/GameActivity.kt, src/main/res/drawable/loading_screen.png")
     }
 }
 

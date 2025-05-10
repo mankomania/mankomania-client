@@ -82,15 +82,7 @@ class MainActivity : ComponentActivity() {
                     webSocketService.send("/app/greetings", "hello local")
                 },
                 onPlay = {
-                    //startActivity(Intent(this, GameActivity::class.java))
-                    val intent = Intent(this, GameActivity::class.java)
-                    intent.putExtra(GameActivity.EXTRA_SCREEN, GameActivity.SCREEN_WELCOME)
-                    startActivity(intent)
-                },
-                onOpenLottery = {
-                    val intent = Intent(this, GameActivity::class.java)
-                    intent.putExtra(GameActivity.EXTRA_SCREEN, GameActivity.SCREEN_LOTTERY)
-                    startActivity(intent)
+                    startActivity(Intent(this, GameActivity::class.java))
                 }
             )
         }
@@ -118,8 +110,7 @@ private fun MainScreen(
     clientCount: Int,
     onConnect: () -> Unit,
     onSendHello: () -> Unit,
-    onPlay: () -> Unit,
-    onOpenLottery: () -> Unit
+    onPlay: () -> Unit
 ) {
     MaterialTheme {
         Column(
@@ -145,9 +136,6 @@ private fun MainScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(onClick = onPlay) { Text("Play Mankomania") }
-
-            Button(onClick = onOpenLottery) { Text("Open Lottery") }
-
         }
     }
 }
