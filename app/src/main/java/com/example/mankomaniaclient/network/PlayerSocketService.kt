@@ -1,8 +1,10 @@
 package com.example.mankomaniaclient.network
 
+
 import com.example.mankomaniaclient.ui.model.PlayerFinancialState
 import com.example.mankomaniaclient.ui.model.PlayerMoneyUpdate
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job // Import Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -15,10 +17,11 @@ import org.hildan.krossbow.stomp.subscribeText
 
 class PlayerSocketService(
     private val stompClient: StompClient,
-    private val coroutineScope: CoroutineScope
+    private val coroutineScope: CoroutineScope // This scope is for launching collection
 ) {
 
     private var session: StompSession? = null
+    private var moneySubscriptionJob: Job? = null // To hold the subscription job
 
     private val _moneyState = MutableStateFlow(
         PlayerFinancialState(
@@ -34,13 +37,21 @@ class PlayerSocketService(
         url: String = "ws://se2-demo.aau.at:53210/ws",
         topic: String = "/topic/playerMoney"
     ) {
+        // Cancel any existing job before starting a new one or if reconnecting
+        moneySubscriptionJob?.cancel()
+
         session = stompClient.connect(url)
         val moneyUpdates = session!!.subscribeText(topic)
 
-        coroutineScope.launch {
+        moneySubscriptionJob = coroutineScope.launch { // Assign the launched job
             moneyUpdates.collect { json ->
-                val update = Json.decodeFromString(PlayerFinancialState.serializer(), json)
-                _moneyState.value = update
+                try {
+                    val update = Json.decodeFromString(PlayerFinancialState.serializer(), json)
+                    _moneyState.value = update
+                } catch (e: Exception) {
+                    // Optional: Log or handle deserialization errors
+                    // e.g., println("Error deserializing PlayerFinancialState: ${e.message}")
+                }
             }
         }
     }
@@ -52,11 +63,13 @@ class PlayerSocketService(
     }
 
     suspend fun connectAndSubscribe(playerId: String) {
-        connect()
+        connect() // Defaults will be used for url and topic
         sendMoneyUpdate(playerId)
     }
 
     suspend fun disconnect() {
+        moneySubscriptionJob?.cancel() // Cancel the subscription job
+        moneySubscriptionJob = null   // Clear the reference
         session?.disconnect()
         session = null
     }
