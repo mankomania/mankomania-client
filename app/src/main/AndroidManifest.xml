@@ -42,6 +42,20 @@
             android:exported="false"
             android:theme="@style/Theme.Mankomaniaclient"/>
 
+        <activity
+            android:name=".NameActivity"
+            android:exported="false"
+            android:label="Mankomania" />
+
+        <activity
+            android:name=".CreateLobbyActivity"
+            android:exported="false"
+            android:label="Mankomania" />
+
+        <activity
+            android:name=".JoinLobbyActivity"
+            android:exported="false"
+            android:label="Mankomania" />
 
     </application>
 
