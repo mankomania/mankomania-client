@@ -14,8 +14,9 @@ import kotlinx.serialization.json.Json
 data class Horse(
     val id: Int,
     val name: String,
-    val color: String? = null
-) {
+    val color: String? = null)
+
+{
     /**
      * Converts this horse object to a JSON string using Kotlinx Serialization.
      * @return The JSON string representation of this horse.
