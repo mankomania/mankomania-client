@@ -28,6 +28,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.ui.res.painterResource
 import com.example.mankomaniaclient.R
+import android.content.Intent
+import androidx.compose.ui.platform.LocalContext
+import com.example.mankomaniaclient.RulesActivity
 
 
 @Composable
@@ -86,6 +89,17 @@ fun NameEntryScreen(
                 ),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
             )
+            val context = LocalContext.current
+
+            StyledButton(
+                text = "Rules",
+                onClick = {
+                    val intent = Intent(context, RulesActivity::class.java)
+                    context.startActivity(intent)
+                }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             if (nameConfirmed) {
                 StyledButton(text = "Create Lobby", onClick = onCreateLobby)
