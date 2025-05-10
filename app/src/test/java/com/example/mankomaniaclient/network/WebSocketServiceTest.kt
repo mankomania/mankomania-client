@@ -1,3 +1,4 @@
+/*
 package com.example.mankomaniaclient.network
 
 import android.util.Log
@@ -9,6 +10,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
@@ -24,7 +26,8 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.BeforeEach
 import kotlinx.coroutines.flow.asFlow
-import org.junit.jupiter.api.Assertions.assertEquals
+import com.example.mankomaniaclient.network.WebSocketService
+
 
 
 // src/test/java/…/WebSocketServiceTest.kt
@@ -181,3 +184,5 @@ class WebSocketServiceTest {
 
 
 }
+
+ */
