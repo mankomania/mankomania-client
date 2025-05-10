@@ -8,7 +8,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mankomaniaclient.viewmodel.PlayerMoneyViewModel
 
-
 @Composable
 fun StartingMoneyScreen(viewModel: PlayerMoneyViewModel = viewModel()) {
     val state by viewModel.financialState.collectAsState()
@@ -18,18 +17,29 @@ fun StartingMoneyScreen(viewModel: PlayerMoneyViewModel = viewModel()) {
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Text("💰 Starting Money", style = MaterialTheme.typography.titleLarge)
+        Text(
+            text = "Starting Money",
+            style = MaterialTheme.typography.titleLarge
+        )
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         DenominationRow("€5,000", state.bills5000)
         DenominationRow("€10,000", state.bills10000)
         DenominationRow("€50,000", state.bills50000)
         DenominationRow("€100,000", state.bills100000)
 
-        Spacer(Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        Text("Totale: €${state.total}", style = MaterialTheme.typography.headlineSmall)
+        val total = state.bills5000 * 5000 +
+                state.bills10000 * 10000 +
+                state.bills50000 * 50000 +
+                state.bills100000 * 100000
+
+        Text(
+            text = "Total: €%,d".format(total),
+            style = MaterialTheme.typography.bodyLarge
+        )
     }
 }
 
@@ -41,7 +51,7 @@ fun DenominationRow(label: String, quantity: Int) {
             .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = label)
-        Text(text = "x$quantity")
+        Text(text = label, style = MaterialTheme.typography.bodyMedium)
+        Text(text = "x$quantity", style = MaterialTheme.typography.bodyMedium)
     }
 }
