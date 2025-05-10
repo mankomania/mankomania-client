@@ -57,6 +57,13 @@
             android:exported="false"
             android:label="Mankomania" />
 
+        <activity
+            android:name=".StartingMoneyActivity"
+            android:exported="false"
+            android:label="Mankomania"
+            android:theme="@style/Theme.Mankomaniaclient" />
+
+
     </application>
 
 </manifest>
