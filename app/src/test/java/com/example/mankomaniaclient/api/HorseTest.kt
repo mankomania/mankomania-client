@@ -6,6 +6,20 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 
 class HorseTest {
+    @Test
+    @DisplayName("Direct call to Horse.fromJson")
+    fun testFromJsonDirectly() {
+        // Arrange
+        val json = """{"id":99,"name":"Solo","color":"gold"}"""
+
+        // Act
+        val horse = Horse.fromJson(json)
+
+        // Assert
+        assertEquals(99, horse.id)
+        assertEquals("Solo", horse.name)
+        assertEquals("gold", horse.color)
+    }
 
     @Test
     @DisplayName("Test basic Horse constructor and properties")
