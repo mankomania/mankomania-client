@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.layout.fillMaxSize
-import com.example.mankomaniaclient.com.example.mankomaniaclient.GameActivity
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.ui.Alignment
@@ -26,7 +25,9 @@ class LoadingActivity : ComponentActivity() {
 
         // Start GameActivity after delay
         Handler(Looper.getMainLooper()).postDelayed({
-            startActivity(Intent(this, GameActivity::class.java))
+            val intent = Intent(this, GameActivity::class.java)
+            intent.putExtra(GameActivity.EXTRA_SCREEN, GameActivity.SCREEN_WELCOME)
+            startActivity(intent)
             finish()
         }, 5000) // 3 Sekunden Delay
 
