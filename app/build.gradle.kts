@@ -134,6 +134,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.krossbow.default.stomp.client)
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.junit.jupiter.engine)
