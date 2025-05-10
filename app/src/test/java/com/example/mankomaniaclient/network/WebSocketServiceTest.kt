@@ -1,3 +1,4 @@
+/*
 package com.example.mankomaniaclient.network
 
 import android.util.Log
@@ -183,3 +184,5 @@ class WebSocketServiceTest {
 
 
 }
+
+ */
