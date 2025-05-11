@@ -8,7 +8,7 @@ import com.example.mankomaniaclient.ui.StartingMoneyScreen
 import org.junit.Rule
 import org.junit.Test
 
-class StartingMoneyActivityTest {
+class StartingMoneyScreenTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<StartingMoneyActivity>()
