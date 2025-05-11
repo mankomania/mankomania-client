@@ -1,8 +1,8 @@
 package com.example.mankomaniaclient
 
 import com.example.mankomaniaclient.ui.model.MoneyDenomination
-import junit.framework.TestCase.assertEquals
-import org.junit.Test
+import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 
 class MoneyDenominationTest {
 
