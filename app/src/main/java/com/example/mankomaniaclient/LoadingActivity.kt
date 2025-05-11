@@ -25,9 +25,10 @@ class LoadingActivity : ComponentActivity() {
 
         // Start GameActivity after delay
         Handler(Looper.getMainLooper()).postDelayed({
-            val intent = Intent(this, GameActivity::class.java)
-            intent.putExtra(GameActivity.EXTRA_SCREEN, GameActivity.SCREEN_WELCOME)
+            val intent = Intent(this, NameActivity::class.java)
+            intent.putExtra(NameActivity.EXTRA_SCREEN, Activity.SCREEN_WELCOME)
             startActivity(intent)
+            
             finish()
         }, 5000) // 3 Sekunden Delay
 

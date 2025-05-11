@@ -56,7 +56,8 @@ class MainActivity : ComponentActivity() {
         private const val TAG = "MainActivity"
     }
 
-    private val webSocketService = WebSocketService()
+    val webSocketService = WebSocketService
+
 
     /* --------------------------------------------------------------------- */
     /* Lifecycle                                                             */
@@ -65,6 +66,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate()")
+
+        webSocketService.connect()
 
         setContent {
             val clientCount by webSocketService.clientCount.collectAsState()
@@ -89,18 +92,11 @@ class MainActivity : ComponentActivity() {
             )
         }
     }
-
-    override fun onStart() {
-        super.onStart()
-        Log.d(TAG, "onStart() → connect()")
-        webSocketService.connect()
+    fun onGameExit() {
+        WebSocketService.disconnect()
+        finish()
     }
 
-    override fun onStop() {
-        super.onStop()
-        Log.d(TAG, "onStop() → disconnect()")
-        webSocketService.disconnect()
-    }
 }
 
 /* ------------------------------------------------------------------------- */
