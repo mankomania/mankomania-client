@@ -54,6 +54,12 @@ fun StartingMoneyScreen(playerId: String) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(
+                text = "Player: $playerId",
+                fontSize = 18.sp,
+                color = Color.Gray
+            )
+
             if (hasError) {
                 Card(
                     colors = CardDefaults.cardColors(
