@@ -22,7 +22,7 @@ class LotteryActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    // temporary Player-ID for testing
+                    // temporary player-id for testing
                     val tempPlayerId = UUID.randomUUID().toString()
                     val lotteryViewModel = LotteryViewModel()
 
