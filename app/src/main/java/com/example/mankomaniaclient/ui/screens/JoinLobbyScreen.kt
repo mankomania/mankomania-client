@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun JoinLobbyScreen(
     playerName: String,
+    isJoining: Boolean,
     onJoinLobby: (String) -> Unit
 ) {
     var lobbyId by remember { mutableStateOf("") }
@@ -36,14 +37,15 @@ fun JoinLobbyScreen(
             singleLine = true,
         )
 
-        StyledButton(text = "Join Lobby", onClick = {
-            val joinMessage = LobbyMessage(
-                type = "join",
-                lobbyId = lobbyId,
-                playerName = playerName
-            )
-            WebSocketService.send("/app/lobby", Json.encodeToString(joinMessage))
-        })
+        var isJoining by remember { mutableStateOf(false) }
 
+        StyledButton(
+            text = "Join Lobby",
+            onClick = {
+                isJoining = true
+                onJoinLobby(lobbyId)
+            },
+            enabled = !isJoining && lobbyId.isNotBlank()
+        )
     }
 }

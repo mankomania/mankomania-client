@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.json.Json
+import org.json.JSONObject
 import kotlinx.serialization.encodeToString
 
 
@@ -51,20 +52,6 @@ object WebSocketService {
             try {
                 val stomp = stompClient.connect(url)
                 session = stomp
-                connected = true
-
-                session?.subscribeText("/topic/lobby")?.collect { message ->
-                    val lobbyResponse = Json.decodeFromString<LobbyResponse>(message)
-
-                    if (lobbyResponse.type == "created" || lobbyResponse.type == "joined") {
-                        val name = lobbyResponse.playerName ?: return@collect
-                        val updatedList = _playersInLobby.value.toMutableList()
-                        if (!updatedList.contains(name)) {
-                            updatedList.add(name)
-                            _playersInLobby.value = updatedList
-                        }
-                    }
-                }
 
                 connected = true
                 Log.d("WebSocket", "Connection established")
@@ -140,12 +127,32 @@ object WebSocketService {
 
 
     fun joinLobby(lobbyId: String, playerName: String) {
+        Log.d("WebSocket", "Joining lobby $lobbyId as $playerName")
+        val message = JSONObject()
+        message.put("type", "join")
+        message.put("lobbyId", lobbyId)
+        message.put("playerName", playerName)
+        send(destination = "/topic/lobby", message = message.toString())
+    }
+
+    fun createLobby(lobbyId: String, playerName: String) {
         val message = LobbyMessage(
-            type = "join",
+            type = "create",
             playerName = playerName,
             lobbyId = lobbyId
         )
         val json = Json.encodeToString(message)
         send("/app/lobby", json)
     }
+
+    fun startGame(lobbyId: String, playerName: String) {
+        val message = LobbyMessage(
+            type = "start",
+            playerName = playerName,
+            lobbyId = lobbyId
+        )
+        val json = Json.encodeToString(message)
+        send("/app/lobby", json)
+    }
+
 }

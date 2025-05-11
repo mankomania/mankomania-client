@@ -1,7 +1,8 @@
 package com.example.mankomaniaclient.ui.screens
 
 import com.example.mankomaniaclient.network.WebSocketService
-import androidx.compose.ui.text.font.FontWeight
+import com.example.mankomaniaclient.com.example.mankomaniaclient.GameActivity
+
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.layout.*
@@ -11,6 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.content.Intent
+import androidx.compose.ui.platform.LocalContext
+
 
 @Composable
 fun CreateLobbyScreen(
@@ -37,6 +41,17 @@ fun CreateLobbyScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
         Text(text = "Waiting for other players...")
+
+        val context = LocalContext.current
+
+        if (players.size >= 2) {
+            Button(onClick = {
+                WebSocketService.startGame(lobbyId, playerName)
+            }) {
+                Text("Start Game")
+            }
+        }
+
 
     }
 }

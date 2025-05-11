@@ -2,6 +2,7 @@ package com.example.mankomaniaclient
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -10,9 +11,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mankomaniaclient.network.WebSocketService
 
 class JoinLobbyActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,19 +26,27 @@ class JoinLobbyActivity : ComponentActivity() {
 
         setContent {
             val context = LocalContext.current
-            val lobbyResponse by WebSocketService.lobbyResponse.collectAsState()
+            val lobbyResponse by webSocketService.lobbyResponse.collectAsState(initial = null)
+            val hasNavigated = remember { mutableStateOf(false) }
 
             LaunchedEffect(lobbyResponse) {
-                when (lobbyResponse?.type) {
-                    "joined" -> {
-                        val intent = Intent(context, CreateLobbyActivity::class.java).apply {
-                            putExtra("playerName", playerName)
-                            putExtra("lobbyId", lobbyResponse.lobbyId)
+                if (!hasNavigated.value) {
+                    lobbyResponse?.let { response ->
+                        when (response.type) {
+                            "joined" -> {
+                                hasNavigated.value = true
+                                val intent = Intent(context, CreateLobbyActivity::class.java).apply {
+                                    putExtra("playerName", playerName)
+                                    putExtra("lobbyId", response.lobbyId)
+                                }
+                                context.startActivity(intent)
+                            }
+
+                            "join-failed" -> {
+                                hasNavigated.value = true
+                                Toast.makeText(context, "Join failed – Lobby does not exist!", Toast.LENGTH_SHORT).show()
+                            }
                         }
-                        context.startActivity(intent)
-                    }
-                    "join-failed" -> {
-                        Toast.makeText(context, "Join failed – Lobby existiert nicht!", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -49,7 +60,6 @@ class JoinLobbyActivity : ComponentActivity() {
         }
     }
 }
-
 
 @Composable
 fun JoinLobbyScreen(playerName: String, onJoinLobby: (String) -> Unit) {
