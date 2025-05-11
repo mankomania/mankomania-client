@@ -1,8 +1,8 @@
 package com.example.mankomaniaclient
 
 import android.content.Intent
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import com.example.mankomaniaclient.ui.StartingMoneyScreen
 import org.junit.Rule
@@ -14,17 +14,31 @@ class StartingMoneyActivityTest {
     val composeTestRule = createAndroidComposeRule<StartingMoneyActivity>()
 
     @Test
-    fun startingMoneyScreen_displaysPlayerId() {
-        // Launch the activity with a test playerId
+    fun startingMoneyScreen_displaysPlayerId_andMoneyInfo() {
         val testPlayerId = "test-player-123"
-        composeTestRule.activityRule.scenario.onActivity { activity ->
-            val intent = Intent(activity, StartingMoneyActivity::class.java).apply {
+
+        // Set the intent BEFORE the activity is created
+        composeTestRule.activityRule.scenario.close()
+
+        val scenario = androidx.test.core.app.ActivityScenario.launch<StartingMoneyActivity>(
+            Intent(
+                androidx.test.core.app.ApplicationProvider.getApplicationContext(),
+                StartingMoneyActivity::class.java
+            ).apply {
                 putExtra("playerId", testPlayerId)
             }
-            activity.startActivity(intent)
-        }
+        )
 
-        // Verify that the playerId is displayed on screen
+        composeTestRule.waitForIdle()
+
+        // Assert all visible texts
         composeTestRule.onNodeWithText("Player: $testPlayerId").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Total: €0").assertIsDisplayed()
+        composeTestRule.onNodeWithText("€5,000").assertIsDisplayed()
+        composeTestRule.onNodeWithText("€10,000").assertIsDisplayed()
+        composeTestRule.onNodeWithText("€50,000").assertIsDisplayed()
+        composeTestRule.onNodeWithText("€100,000").assertIsDisplayed()
+
+        scenario.close()
     }
 }
