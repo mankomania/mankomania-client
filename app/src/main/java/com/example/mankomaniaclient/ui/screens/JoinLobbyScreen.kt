@@ -1,5 +1,9 @@
 package com.example.mankomaniaclient.ui.screens
 
+import com.example.mankomaniaclient.network.LobbyMessage
+import com.example.mankomaniaclient.network.WebSocketService
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -32,10 +36,14 @@ fun JoinLobbyScreen(
             singleLine = true,
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
         StyledButton(text = "Join Lobby", onClick = {
-            // TODO: Send WebSocket or REST request to join lobby
+            val joinMessage = LobbyMessage(
+                type = "join",
+                lobbyId = lobbyId,
+                playerName = playerName
+            )
+            WebSocketService.send("/app/lobby", Json.encodeToString(joinMessage))
         })
+
     }
 }

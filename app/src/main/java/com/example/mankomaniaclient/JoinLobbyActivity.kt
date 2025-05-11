@@ -19,12 +19,31 @@ class JoinLobbyActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val playerName = intent.getStringExtra("playerName") ?: "Unknown"
+        val webSocketService = WebSocketService
 
         setContent {
+            val context = LocalContext.current
+            val lobbyResponse by WebSocketService.lobbyResponse.collectAsState()
+
+            LaunchedEffect(lobbyResponse) {
+                when (lobbyResponse?.type) {
+                    "joined" -> {
+                        val intent = Intent(context, CreateLobbyActivity::class.java).apply {
+                            putExtra("playerName", playerName)
+                            putExtra("lobbyId", lobbyResponse.lobbyId)
+                        }
+                        context.startActivity(intent)
+                    }
+                    "join-failed" -> {
+                        Toast.makeText(context, "Join failed – Lobby existiert nicht!", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
             JoinLobbyScreen(
                 playerName = playerName,
                 onJoinLobby = { lobbyId ->
-                    // TODO: Handle join logic
+                    webSocketService.joinLobby(lobbyId, playerName)
                 }
             )
         }
