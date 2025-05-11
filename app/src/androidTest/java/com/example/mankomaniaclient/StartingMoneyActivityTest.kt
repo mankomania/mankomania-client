@@ -1,10 +1,10 @@
+// File: app/src/androidTest/java/com/example/mankomaniaclient/StartingMoneyActivityTest.kt
 package com.example.mankomaniaclient
 
 import android.content.Intent
 import androidx.test.core.app.ActivityScenario
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.mankomaniaclient.ui.StartingMoneyScreen
-import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -12,36 +12,20 @@ import org.junit.runner.RunWith
 class StartingMoneyActivityTest {
 
     @Test
-    fun activity_usesPlayerId_fromIntent() {
-        val intent = Intent(
-            androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().targetContext,
-            StartingMoneyActivity::class.java
-        ).apply {
-            putExtra("playerId", "TestPlayer123")
-        }
+    fun activity_starts_withIntentExtra() {
+        val intent = Intent(ApplicationProvider.getApplicationContext(), StartingMoneyActivity::class.java)
+        intent.putExtra("playerId", "test-player-id")
 
-        ActivityScenario.launch<StartingMoneyActivity>(intent).use { scenario ->
-            scenario.onActivity { activity ->
-                // Using reflection to access the playerId from the Composable parameter is not practical.
-                // So here we only test that activity doesn't crash and is created with the intent.
-                assertEquals("TestPlayer123", intent.getStringExtra("playerId"))
-            }
-        }
+        val scenario = ActivityScenario.launch<StartingMoneyActivity>(intent)
+
+        // Test passa se l'activity si avvia senza crashare
+        scenario.close()
     }
-
     @Test
-    fun activity_defaultsToPlayerId_whenIntentIsMissing() {
-        val intent = Intent(
-            androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().targetContext,
-            StartingMoneyActivity::class.java
-        )
-
-        ActivityScenario.launch<StartingMoneyActivity>(intent).use { scenario ->
-            scenario.onActivity { activity ->
-                // Again, assert that activity runs and uses default when playerId not provided
-                assertEquals(null, intent.getStringExtra("playerId")) // intent should not contain playerId
-                // We cannot directly access the Composable param here without a state holder
-            }
-        }
+    fun activity_starts_withDefaultPlayerId() {
+        val scenario = ActivityScenario.launch(StartingMoneyActivity::class.java)
+        // Test passes if the activity launches and renders without crashing
+        scenario.close()
     }
 }
+
