@@ -34,7 +34,7 @@ class LoadingActivity : ComponentActivity() {
         }
         }
     }
-}
+
 
 @Composable
 fun LoadingScreen() {
