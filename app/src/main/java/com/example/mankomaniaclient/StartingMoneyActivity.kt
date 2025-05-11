@@ -10,7 +10,7 @@ class StartingMoneyActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val playerId = intent.getStringExtra("playerId") ?: "default-player"
+        val playerId = extractPlayerId(intent)
 
         setContent {
             StartingMoneyScreen(playerId = playerId)

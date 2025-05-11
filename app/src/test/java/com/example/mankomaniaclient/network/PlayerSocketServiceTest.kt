@@ -5,13 +5,10 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -48,7 +45,6 @@ class PlayerSocketServiceTest {
 
         playerSocketService = PlayerSocketService(stompClient, this)
     }
-
     @Test
     fun `sendMoneyUpdate should send correct JSON`() = runTest(testDispatcher) {
         val playerId = "valentina"
@@ -81,6 +77,13 @@ class PlayerSocketServiceTest {
             FrameBody.Text(expectedJson)
         ) }
     }
+    @Test
+    fun `should encode PlayerFinancialState into JSON`() {
+        val state = PlayerFinancialState(1, 2, 3, 4)
+        val json = Json.encodeToString(state)
+        val decoded = Json.decodeFromString<PlayerFinancialState>(json)
+        assertEquals(state, decoded)
+    }
 
     @Test
     fun `disconnect should close session`() = runTest(testDispatcher) {
@@ -90,6 +93,30 @@ class PlayerSocketServiceTest {
         playerSocketService.disconnect()
         coVerify { stompSession.disconnect() }
     }
+    @Test
+    fun `should decode JSON into PlayerFinancialState`() {
+        // Arrange
+        val json = """
+            {
+                "bills5000": 2,
+                "bills10000": 3,
+                "bills50000": 1,
+                "bills100000": 4
+            }
+        """.trimIndent()
+
+        // Act
+        val result = Json.decodeFromString<PlayerFinancialState>(json)
+
+        // Assert
+        val expected = PlayerFinancialState(
+            bills5000 = 2,
+            bills10000 = 3,
+            bills50000 = 1,
+            bills100000 = 4
+        )
+        assertEquals(expected, result)
+    }
 
     @Test
     fun `initial state should be zeroed`() = runTest(testDispatcher) {
@@ -97,3 +124,4 @@ class PlayerSocketServiceTest {
         assertEquals(PlayerFinancialState(0, 0, 0, 0), state)
     }
 }
+
