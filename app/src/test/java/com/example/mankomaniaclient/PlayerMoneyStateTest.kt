@@ -2,14 +2,13 @@ package com.example.mankomaniaclient
 
 import com.example.mankomaniaclient.ui.model.MoneyDenomination
 import com.example.mankomaniaclient.ui.model.PlayerMoneyState
-import junit.framework.TestCase.assertEquals
+import org.junit.Assert.assertEquals
 import org.junit.Test
-
 
 class PlayerMoneyStateTest {
 
     @Test
-    fun `totalAmount calculates correct total`() {
+    fun totalAmount_calculatesCorrectTotal() {
         val denominations = listOf(
             MoneyDenomination(5000, 10),
             MoneyDenomination(10000, 5),
@@ -21,7 +20,7 @@ class PlayerMoneyStateTest {
     }
 
     @Test
-    fun `empty denominations return 0 total`() {
+    fun emptyDenominations_returnZeroTotal() {
         val state = PlayerMoneyState(emptyList())
         assertEquals(0, state.totalAmount())
     }
