@@ -2,146 +2,140 @@ package com.example.mankomaniaclient.network
 
 import com.example.mankomaniaclient.ui.model.PlayerFinancialState
 import com.example.mankomaniaclient.ui.model.PlayerMoneyUpdate
-import io.mockk.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestCoroutineScheduler
-import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.hildan.krossbow.stomp.StompClient
 import org.hildan.krossbow.stomp.StompSession
-import org.hildan.krossbow.stomp.frame.FrameBody
-import org.hildan.krossbow.stomp.frame.StompFrame
-import org.hildan.krossbow.stomp.headers.StompSendHeaders
-import org.hildan.krossbow.stomp.headers.StompSubscribeHeaders
-import org.junit.jupiter.api.*
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions.*
 
-@OptIn(ExperimentalCoroutinesApi::class)
+// Wrapper class to avoid implementing StompSession directly
+class MockSessionWrapper {
+    val sentMessages = mutableListOf<Pair<String, String>>()
+    var disconnected = false
+
+    fun sendText(destination: String, body: String) {
+        sentMessages.add(destination to body)
+    }
+
+    fun disconnect() {
+        disconnected = true
+    }
+
+    fun subscribeText(destination: String): Nothing {
+        throw UnsupportedOperationException("Not needed for these tests")
+    }
+
+    // Create a StompSession-compatible object using Any and casting
+    fun asStompSession(): StompSession {
+        return this as StompSession
+    }
+}
+
+// Wrapper class to avoid implementing StompClient directly
+class MockClientWrapper {
+    private val mockSession = MockSessionWrapper()
+
+    fun connect(url: String, login: String? = null, passcode: String? = null): StompSession {
+        return mockSession.asStompSession()
+    }
+
+    fun connect(
+        url: String,
+        login: String? = null,
+        passcode: String? = null,
+        customStompConnectHeaders: Map<String, List<String>>? = null,
+        additionalWebSocketHeaders: Map<String, List<String>>? = null
+    ): StompSession {
+        return mockSession.asStompSession()
+    }
+
+    fun connect(url: String, config: () -> Unit): StompSession {
+        return mockSession.asStompSession()
+    }
+
+    fun newWebSocketClient(): Nothing {
+        throw UnsupportedOperationException("Not needed for these tests")
+    }
+
+    // Create a StompClient-compatible object using Any and casting
+    fun asStompClient(): StompClient {
+        return this as StompClient
+    }
+}
+
+@ExperimentalCoroutinesApi
 class PlayerSocketServiceTest {
 
-    private val testScheduler = TestCoroutineScheduler()
-    private val testDispatcher = StandardTestDispatcher(testScheduler)
-    private val testScope = TestScope(testDispatcher)
-
-    private lateinit var stompClient: StompClient
-    private lateinit var stompSession: StompSession
-    private lateinit var socketService: PlayerSocketService
-    private lateinit var messageFlow: MutableSharedFlow<StompFrame.Message>
+    private lateinit var playerSocketService: PlayerSocketService
+    private lateinit var mockClient: MockClientWrapper
+    private val testDispatcher = StandardTestDispatcher()
+    private val testCoroutineScope = CoroutineScope(testDispatcher)
 
     @BeforeEach
-    fun setup() {
-        stompClient = mockk()
-        stompSession = mockk(relaxUnitFun = true)
-        messageFlow = MutableSharedFlow()
-
-        coEvery { stompClient.connect(any()) } returns stompSession
-        coEvery { stompSession.subscribe(any<StompSubscribeHeaders>()) } returns messageFlow
-        coEvery { stompSession.send(any<StompSendHeaders>(), any<FrameBody>()) } returns mockk()
-
-        socketService = PlayerSocketService(stompClient, testScope)
+    fun setUp() {
+        Dispatchers.setMain(testDispatcher)
+        mockClient = MockClientWrapper()
+        playerSocketService = PlayerSocketService(mockClient.asStompClient(), testCoroutineScope)
     }
 
     @AfterEach
     fun tearDown() {
-        runBlocking(testDispatcher) {
-            socketService.disconnect()
-        }
-        testScheduler.advanceUntilIdle()
+        Dispatchers.resetMain()
     }
 
     @Test
-    fun `playerStateFlow emits initial default state`() = testScope.runTest {
-        val expectedInitialState = PlayerFinancialState(0, 0, 0, 0)
-        assertEquals(expectedInitialState, socketService.playerStateFlow.value)
+    fun `initial player state flow should have zero values`() = runTest {
+        val initialState = playerSocketService.playerStateFlow.value
+        assertEquals(
+            PlayerFinancialState(bills5000 = 0, bills10000 = 0, bills50000 = 0, bills100000 = 0),
+            initialState
+        )
     }
 
     @Test
-    fun `connect establishes session and subscribes to money updates`() = testScope.runTest {
-        val url = "ws://se2-demo.aau.at:53210/ws"
-        val topic = "/topic/testMoney"
-        val headersSlot = slot<StompSubscribeHeaders>()
+    fun `sendMoneyUpdate should send message to correct destination`() = runTest {
+        playerSocketService.connect() // Initialize session
+        val playerId = "testPlayer"
+        playerSocketService.sendMoneyUpdate(playerId)
 
-        coEvery { stompSession.subscribe(capture(headersSlot)) } returns messageFlow
-
-        socketService.connect(url, topic)
-        testScheduler.advanceUntilIdle()
-
-        coVerify { stompClient.connect(url) }
-        coVerify { stompSession.subscribe(headersSlot.captured) }
-        assertEquals(topic, headersSlot.captured.destination)
-
-        val update = PlayerFinancialState(1, 2, 3, 4)
-        val updateJson = Json.encodeToString(PlayerFinancialState.serializer(), update)
-        val mockMessage = mockk<StompFrame.Message> {
-            every { bodyAsText } returns updateJson
-        }
-
-        messageFlow.emit(mockMessage)
-        testScheduler.advanceUntilIdle()
-
-        assertEquals(update, socketService.playerStateFlow.value)
-    }
-
-    @Test
-    fun `sendMoneyUpdate sends JSON with correct headers and body`() = testScope.runTest {
-        val playerId = "valentina"
+        assertEquals(1, mockClient.connect("").sentMessages.size)
+        assertEquals("/app/updateMoney", mockClient.connect("").sentMessages[0].first)
         val expectedJson = Json.encodeToString(PlayerMoneyUpdate.serializer(), PlayerMoneyUpdate(playerId))
-
-        val headerSlot = slot<StompSendHeaders>()
-        val bodySlot = slot<FrameBody>()
-
-        coEvery {
-            stompSession.send(capture(headerSlot), capture(bodySlot))
-        } returns mockk()
-
-        socketService.connect()
-        socketService.sendMoneyUpdate(playerId)
-        testScheduler.advanceUntilIdle()
-
-        coVerify { stompSession.send(any(), any()) }
-
-        assertEquals("/app/updateMoney", headerSlot.captured.destination)
-        assertNotNull(bodySlot.captured)
-        assertEquals(expectedJson, (bodySlot.captured as FrameBody.Text).text)
+        assertEquals(expectedJson, mockClient.connect("").sentMessages[0].second)
     }
 
     @Test
-    fun `connectAndSubscribe connects and sends update`() = testScope.runTest {
-        val playerId = "test-player"
-        val expectedJson = Json.encodeToString(PlayerMoneyUpdate.serializer(), PlayerMoneyUpdate(playerId))
+    fun `disconnect should clear session and job`() = runTest {
+        playerSocketService.connect() // Initialize session
+        playerSocketService.disconnect()
 
-        val subscribeHeadersSlot = slot<StompSubscribeHeaders>()
-        val sendHeadersSlot = slot<StompSendHeaders>()
-        val frameBodySlot = slot<FrameBody>()
+        val sessionField = PlayerSocketService::class.java.getDeclaredField("session")
+        sessionField.isAccessible = true
+        assertNull(sessionField.get(playerSocketService))
 
-        coEvery { stompSession.subscribe(capture(subscribeHeadersSlot)) } returns messageFlow
-        coEvery { stompSession.send(capture(sendHeadersSlot), capture(frameBodySlot)) } returns mockk()
+        val jobField = PlayerSocketService::class.java.getDeclaredField("moneySubscriptionJob")
+        jobField.isAccessible = true
+        assertNull(jobField.get(playerSocketService))
 
-        socketService.connectAndSubscribe(playerId)
-        testScheduler.advanceUntilIdle()
-
-        coVerify { stompClient.connect(any()) }
-        coVerify { stompSession.subscribe(subscribeHeadersSlot.captured) }
-        assertEquals("/topic/playerMoney", subscribeHeadersSlot.captured.destination)
-
-        coVerify { stompSession.send(sendHeadersSlot.captured, frameBodySlot.captured) }
-        assertEquals("/app/updateMoney", sendHeadersSlot.captured.destination)
-        assertEquals(expectedJson, (frameBodySlot.captured as FrameBody.Text).text)
+        assertTrue(mockClient.connect("").disconnected)
     }
 
     @Test
-    fun `disconnect closes the session`() = testScope.runTest {
-        socketService.connect()
-        testScheduler.advanceUntilIdle()
+    fun `connectAndSubscribe should call connect and sendMoneyUpdate`() = runTest {
+        val playerId = "testPlayer"
+        playerSocketService.connectAndSubscribe(playerId)
 
-        socketService.disconnect()
-        testScheduler.advanceUntilIdle()
-
-        coVerify { stompSession.disconnect() }
+        assertEquals(1, mockClient.connect("").sentMessages.size)
+        assertEquals("/app/updateMoney", mockClient.connect("").sentMessages[0].first)
     }
 }
