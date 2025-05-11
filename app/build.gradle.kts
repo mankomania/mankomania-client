@@ -112,17 +112,16 @@ sonar {
 
         property(
             "sonar.coverage.exclusions",
-            // alle Composables + MainActivity + Activities + Netzwerk
+            // All Composables, individual Activities, and WebSocket services
             "src/main/java/com/example/mankomaniaclient/ui/**," +
                     "src/main/java/com/example/mankomaniaclient/MainActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/CreateLobbActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/JoinLobbyActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/LoadingActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/NameActivity.kt," +
-                    "src/main/java/com/example/mankomaniaclient/StartingMoneyActivity.kt"+
-                    "src/main/java/com/example/mankomaniaclient/network/WebSocketService.kt"
-
-
+                    "src/main/java/com/example/mankomaniaclient/StartingMoneyActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/network/WebSocketService.kt," +
+                    "src/main/java/com/example/mankomaniaclient/network/PlayerSocketService.kt"
         )
 
         property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties, **/drawable/**, **/viewmodel/**, **/screens/** ")
