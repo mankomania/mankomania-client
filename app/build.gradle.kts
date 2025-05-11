@@ -116,6 +116,7 @@ sonar {
                     "src/main/java/com/example/mankomaniaclient/MainActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/api/LotteryApi.kt," +
                     "src/main/java/com/example/mankomaniaclient/LotteryActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/GameActivity.kt," +
 
                     "src/main/java/com/example/mankomaniaclient/CreateLobbActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/JoinLobbyActivity.kt," +
