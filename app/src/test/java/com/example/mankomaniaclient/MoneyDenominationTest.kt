@@ -1,3 +1,5 @@
+package com.example.mankomaniaclient
+
 import com.example.mankomaniaclient.ui.model.MoneyDenomination
 import junit.framework.TestCase.assertEquals
 import org.junit.Test

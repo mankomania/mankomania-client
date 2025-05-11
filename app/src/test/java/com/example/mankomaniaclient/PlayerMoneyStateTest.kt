@@ -1,4 +1,4 @@
-package com.example.mankomaniaclient.model
+package com.example.mankomaniaclient
 
 import com.example.mankomaniaclient.ui.model.MoneyDenomination
 import com.example.mankomaniaclient.ui.model.PlayerMoneyState
