@@ -32,6 +32,7 @@ class LoadingActivity : ComponentActivity() {
         setContent {
             LoadingScreen()
         }
+        }
     }
 }
 

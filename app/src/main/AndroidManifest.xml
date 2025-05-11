@@ -4,7 +4,6 @@
 
     <!-- WebSocket / REST -->
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -42,12 +41,6 @@
             android:name=".LoadingActivity"
             android:exported="false"
             android:theme="@style/Theme.Mankomaniaclient"/>
-
-        <activity
-            android:name=".LotteryActivity"
-            android:exported="false"
-            android:label="Lottery"
-            android:theme="@style/Theme.Mankomaniaclient" />
 
         <activity
             android:name=".NameActivity"
