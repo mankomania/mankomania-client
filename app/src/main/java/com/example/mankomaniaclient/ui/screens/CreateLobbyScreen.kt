@@ -1,7 +1,7 @@
 package com.example.mankomaniaclient.ui.screens
 
 import com.example.mankomaniaclient.network.WebSocketService
-import com.example.mankomaniaclient.com.example.mankomaniaclient.GameActivity
+import com.example.mankomaniaclient.GameActivity
 
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
