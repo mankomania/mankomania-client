@@ -29,13 +29,17 @@ class GameActivity : ComponentActivity() {
                     onStartGame = {
                         // Replace content with the actual board
                         setContent {
-                            MaterialTheme { GameBoardScreen(playerName = playerName, lobbyId = lobbyId) }
+                            MaterialTheme {
+                                GameBoardScreen(
+                                    playerName = playerName,
+                                    lobbyId = lobbyId
+                                )
+                            }
                         }
                     }
-                }
+                )
             }
         }
     }
-
 }
 
