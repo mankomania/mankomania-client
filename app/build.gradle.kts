@@ -118,7 +118,9 @@ sonar {
                     "src/main/java/com/example/mankomaniaclient/JoinLobbyActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/LoadingActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/NameActivity.kt," +
-                    "src/main/java/com/example/mankomaniaclient/network/WebSocketService.kt"
+                    "src/main/java/com/example/mankomaniaclient/network/WebSocketService.kt" +
+                    "src/main/java/com/example/mankomaniaclient/RulesActivity.kt,"
+
         )
 
         property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties, **/drawable/**, **/viewmodel/**, **/screens/** ")
@@ -140,7 +142,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.constraintlayout)
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation("androidx.appcompat:appcompat:1.6.1")
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.junit.jupiter.engine)
