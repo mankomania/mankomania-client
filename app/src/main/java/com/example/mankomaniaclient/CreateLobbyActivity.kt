@@ -59,9 +59,10 @@ class CreateLobbyActivity : ComponentActivity() {
 
         LaunchedEffect(lobbyResponse) {
             if (lobbyResponse?.type == "start") {
+                val players = WebSocketService.playersInLobby.value
                 val intent = Intent(context, GameActivity::class.java).apply {
-                    putExtra("playerName", playerName)
                     putExtra("lobbyId", finalLobbyId.value)
+                    putStringArrayListExtra("playerNames", ArrayList(players))
                 }
                 context.startActivity(intent)
                 (context as? ComponentActivity)?.finish()

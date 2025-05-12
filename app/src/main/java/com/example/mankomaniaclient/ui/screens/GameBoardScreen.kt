@@ -67,5 +67,36 @@ fun GameBoardScreen(viewModel: GameViewModel) {
                 BoardCellView(cell = board[i], players = players)
             }
         }
+fun GameBoardScreen(playerNames: List<String>, lobbyId: String) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Text(
+            text = playerNames.getOrNull(0) ?: "",
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(24.dp)
+        )
+
+        Text(
+            text = playerNames.getOrNull(1) ?: "",
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(24.dp)
+        )
+
+        Text(
+            text = playerNames.getOrNull(2) ?: "",
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(24.dp)
+        )
+
+        Text(
+            text = playerNames.getOrNull(3) ?: "",
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(24.dp)
+        )
     }
 }
+
+

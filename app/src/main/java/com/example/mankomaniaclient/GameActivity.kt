@@ -8,16 +8,23 @@ import com.example.mankomaniaclient.ui.screens.GameBoardScreen
 import androidx.compose.runtime.remember
 import com.example.mankomaniaclient.viewmodel.GameViewModel
 
+import com.example.mankomaniaclient.screens.GameBoardScreen
 
 class GameActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val playerName = intent.getStringExtra("playerName") ?: "Unknown"
+
         val lobbyId = intent.getStringExtra("lobbyId") ?: "???"
+        val playerNames = intent.getStringArrayListExtra("playerNames") ?: arrayListOf("P1", "P2")
+
         setContent {
             val viewModel = remember { GameViewModel() }
             MaterialTheme {
+                GameBoardScreen(playerNames = playerNames, lobbyId = lobbyId)
+            }
+        }
+    }
+}
                 GameBoardScreen(viewModel = viewModel)
             }
         }
