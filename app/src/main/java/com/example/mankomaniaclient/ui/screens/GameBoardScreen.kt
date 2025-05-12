@@ -9,17 +9,36 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun GameBoardScreen(playerName: String, lobbyId: String) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(32.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("🎲 Game started!", fontSize = 28.sp)
-        Spacer(modifier = Modifier.height(16.dp))
-        Text("Player: $playerName")
-        Text("Lobby ID: $lobbyId")
+fun GameBoardScreen(playerNames: List<String>, lobbyId: String) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Text(
+            text = playerNames.getOrNull(0) ?: "",
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(24.dp)
+        )
+
+        Text(
+            text = playerNames.getOrNull(1) ?: "",
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(24.dp)
+        )
+
+        Text(
+            text = playerNames.getOrNull(2) ?: "",
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(24.dp)
+        )
+
+        Text(
+            text = playerNames.getOrNull(3) ?: "",
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(24.dp)
+        )
     }
 }
+
+
