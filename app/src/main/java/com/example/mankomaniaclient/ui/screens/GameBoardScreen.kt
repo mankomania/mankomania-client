@@ -24,6 +24,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun GameBoardScreen(gameViewModel: GameViewModel = viewModel()) {
     val diceResult by gameViewModel.diceResult.collectAsState()
+    val isPlayerTurn by gameViewModel.isPlayerTurn.collectAsState()
     val playerId = "blue" // Later should be dynamic when multiplayer is added
 
     // Establish WebSocket connection and collect dice results
@@ -54,7 +55,7 @@ fun GameBoardScreen(gameViewModel: GameViewModel = viewModel()) {
 
         Button(
             onClick = { gameViewModel.rollDice(playerId) },
-            enabled = true // TODO: restrict to player's turn
+            enabled = isPlayerTurn
         ) {
             Text("Roll Dice")
         }
