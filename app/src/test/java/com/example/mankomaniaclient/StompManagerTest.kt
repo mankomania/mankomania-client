@@ -1,9 +1,10 @@
-package com.example.mankomaniaclient.api
+package com.example.mankomaniaclient
 
+import com.example.mankomaniaclient.api.StompManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class StompManagerTest {

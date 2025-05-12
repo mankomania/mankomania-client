@@ -1,8 +1,8 @@
 package com.example.mankomaniaclient
 
 import com.example.mankomaniaclient.model.DiceResult
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions.assertEquals
 
 class DiceResultTest {
     @Test
