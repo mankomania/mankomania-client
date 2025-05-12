@@ -81,6 +81,10 @@ object WebSocketService {
 
                         _lobbyResponse.value = response
 
+                        if (response.players != null) {
+                            _playersInLobby.value = response.players
+                        }
+
                         if (response.type == "joined" || response.type == "created") {
                             Log.d(
                                 "Lobby",
