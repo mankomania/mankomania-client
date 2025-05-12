@@ -2,10 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21"
     id("jacoco")
     id("org.sonarqube") version "5.1.0.4882"
-}
+    alias(libs.plugins.kotlin.serialization)
+    }
 
 android {
     namespace = "com.example.mankomaniaclient"
@@ -115,16 +115,16 @@ sonar {
             // alle Composables + MainActivity + Activities + Netzwerk
             "src/main/java/com/example/mankomaniaclient/ui/**," +
                     "src/main/java/com/example/mankomaniaclient/MainActivity.kt," +
-                    "src/main/java/com/example/mankomaniaclient/CreateLobbActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/CreateLobbyActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/JoinLobbyActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/LoadingActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/NameActivity.kt," +
-                    "src/main/java/com/example/mankomaniaclient/network/WebSocketService.kt" +
-                    "src/main/java/com/example/mankomaniaclient/RulesActivity.kt,"
-
+                    "src/main/java/com/example/mankomaniaclient/RulesActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/GameActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/network/LobbyMessage.kt," +
+                    "src/main/java/com/example/mankomaniaclient/network/LobbyResponse.kt," +
+                    "src/main/java/com/example/mankomaniaclient/network/WebSocketService.kt"
         )
-
-
         property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties, **/drawable/**, **/viewmodel/**, **/screens/** ")
     }
 }
@@ -144,6 +144,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.kotlinx.serialization.json)
     implementation("androidx.appcompat:appcompat:1.6.1")
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter.api)
@@ -157,13 +158,5 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation(libs.kotlinx.serialization.json)
-    testImplementation(kotlin("test"))
-    testImplementation ("org.jetbrains.kotlin:kotlin-test-junit5:1.9.0")
-    testImplementation ("org.jetbrains.kotlin:kotlin-test:1.9.0")
-    testImplementation ("io.mockk:mockk:1.13.8")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    testImplementation("io.mockk:mockk:1.13.5")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
+
 }
