@@ -8,8 +8,6 @@ import com.example.mankomaniaclient.ui.screens.GameBoardScreen
 import androidx.compose.runtime.remember
 import com.example.mankomaniaclient.viewmodel.GameViewModel
 
-import com.example.mankomaniaclient.screens.GameBoardScreen
-
 class GameActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,16 +18,10 @@ class GameActivity : ComponentActivity() {
         setContent {
             val viewModel = remember { GameViewModel() }
             MaterialTheme {
-                GameBoardScreen(playerNames = playerNames, lobbyId = lobbyId)
+                GameBoardScreen(playerNames = playerNames, viewModel = viewModel)
             }
         }
     }
 }
-                GameBoardScreen(viewModel = viewModel)
-            }
-        }
 
-    }
-
-}
 
