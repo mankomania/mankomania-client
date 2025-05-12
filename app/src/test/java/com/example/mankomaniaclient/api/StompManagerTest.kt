@@ -58,4 +58,50 @@ class StompManagerTest {
             StompManager.connectAndSubscribe("nullPlayer")
         }
     }
+
+    /**
+     * Verifies that multiple calls to connectAndSubscribe do not crash.
+     */
+    @Test
+    fun testMultipleConnectionsSafe() = runTest {
+        repeat(3) {
+            Assertions.assertDoesNotThrow {
+                StompManager.connectAndSubscribe("multiPlayer$it")
+            }
+        }
+    }
+
+    /**
+     * Tests sending multiple roll requests with varied player IDs.
+     */
+    @Test
+    fun testMultipleRollRequestsWithDifferentPlayers() = runTest {
+        val players = listOf("player1", "player2", "player3", "")
+        players.forEach {
+            Assertions.assertDoesNotThrow {
+                StompManager.sendRollRequest(it)
+            }
+        }
+    }
+
+    /**
+     * Ensures connectAndSubscribe handles an extremely long player ID gracefully.
+     */
+    @Test
+    fun testConnectWithLongPlayerId() = runTest {
+        val longId = "player".repeat(100)
+        Assertions.assertDoesNotThrow {
+            StompManager.connectAndSubscribe(longId)
+        }
+    }
+
+    /**
+     * Sends a roll request with whitespace-only player ID.
+     */
+    @Test
+    fun testRollRequestWithWhitespacePlayerId() = runTest {
+        Assertions.assertDoesNotThrow {
+            StompManager.sendRollRequest("   ")
+        }
+    }
 }
