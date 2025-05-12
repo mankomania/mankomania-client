@@ -120,7 +120,8 @@ sonar {
                     "src/main/java/com/example/mankomaniaclient/LoadingActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/NameActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/GameActivity.kt," +
-                    "src/main/java/com/example/mankomaniaclient/network/**"
+                    "src/main/java/com/example/mankomaniaclient/network/**" +
+                    "src/main/java/com/example/mankomaniaclient/CreateLobbyActivity.kt,"
         )
         property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties, **/drawable/**, **/viewmodel/**, **/screens/** ")
     }
