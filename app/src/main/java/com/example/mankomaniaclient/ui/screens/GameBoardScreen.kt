@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 @Composable
 fun GameBoardScreen(playerNames: List<String>,viewModel: GameViewModel) {
     val board by viewModel.board.collectAsState()
+    Log.d("GameBoardScreen", "Board size=${board.size}")
     val players by viewModel.players.collectAsState()
 
     val sideCount = board.size / 4

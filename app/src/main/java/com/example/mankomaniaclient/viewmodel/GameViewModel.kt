@@ -29,4 +29,8 @@ class GameViewModel : ViewModel() {
         _board.value   = state.board
         _players.value = state.players
     }
+
+    fun setPlayers(names: List<String>) {
+        _players.value = names.mapIndexed { index, name -> PlayerDto(name, index) }
+    }
 }

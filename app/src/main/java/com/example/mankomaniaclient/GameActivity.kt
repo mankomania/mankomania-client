@@ -16,7 +16,7 @@ class GameActivity : ComponentActivity() {
         val playerNames = intent.getStringArrayListExtra("playerNames") ?: arrayListOf("P1", "P2")
 
         setContent {
-            val viewModel = remember { GameViewModel() }
+            val viewModel = remember { GameViewModel().apply { setPlayers(playerNames) } }
             MaterialTheme {
                 GameBoardScreen(playerNames = playerNames, viewModel = viewModel)
             }
