@@ -5,7 +5,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.mankomaniaclient.api.StompManager
 import com.example.mankomaniaclient.model.DiceResult
 import com.example.mankomaniaclient.ui.components.DiceView
