@@ -11,6 +11,11 @@ import com.example.mankomaniaclient.ui.components.DiceView
 import com.example.mankomaniaclient.viewmodel.GameViewModel
 import kotlinx.coroutines.flow.collectLatest
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 
 /**
  * @file GameBoardScreen.kt
@@ -60,8 +65,14 @@ fun GameBoardScreen(gameViewModel: GameViewModel = viewModel()) {
             Text("Roll Dice")
         }
 
-        diceResult?.let {
-            DiceView(result = it)
+        AnimatedVisibility(
+            visible = diceResult != null,
+            enter = fadeIn() + scaleIn(),
+            exit = fadeOut() + scaleOut()
+        ) {
+            diceResult?.let {
+                DiceView(result = it)
+            }
         }
     }
 }
