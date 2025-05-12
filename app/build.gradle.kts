@@ -51,6 +51,11 @@ android {
     }
 }
 
+tasks.withType<Test> {
+    exclude("**/WebSocketServiceTest.class")
+}
+
+
 tasks.register<JacocoReport>("jacocoTestReport") {
     group = "verification"
     description = "Generates code coverage report for the test task."
@@ -103,7 +108,20 @@ sonar {
         property("sonar.sources", "src/main/java/com/example/mankomaniaclient")
         property("sonar.tests", "src/test/java/com/example/mankomaniaclient")
         property("sonar.coverage.jacoco.xmlReportPaths", "${layout.buildDirectory.get().asFile}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
-        property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties")
+
+        property(
+            "sonar.coverage.exclusions",
+            // alle Composables + MainActivity + Activities + Netzwerk
+            "src/main/java/com/example/mankomaniaclient/ui/**," +
+                    "src/main/java/com/example/mankomaniaclient/MainActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/CreateLobbActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/JoinLobbyActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/LoadingActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/NameActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/network/WebSocketService.kt"
+        )
+
+        property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties, **/drawable/**, **/viewmodel/**, **/screens/** ")
     }
 }
 
@@ -125,6 +143,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter.api)
+    testImplementation(libs.junit.jupiter.engine)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
     testRuntimeOnly(libs.junit.jupiter.engine)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

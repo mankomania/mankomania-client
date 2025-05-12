@@ -43,29 +43,11 @@ fun GameBoardScreen(gameViewModel: GameViewModel = viewModel()) {
             }
         }
     }
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 
-    // UI layout
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
-    ) {
-        Text("Dice Roll", style = MaterialTheme.typography.headlineSmall)
-
-        Button(onClick = { StompManager.sendRollRequest(playerId) }) {
-            Text("Roll Dice")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Show dice result using DiceView
-        DiceView(result = diceResult)
-    }
-}
-
-@Preview(showBackground = true)
 @Composable
-fun GameBoardScreenPreview() {
-    GameBoardScreen()
+fun GameBoardScreen() {
+    Text("Willkommen im Mankomania-Spiel!")
+    // TO DO: UI
 }
