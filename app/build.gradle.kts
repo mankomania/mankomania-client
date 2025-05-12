@@ -124,6 +124,7 @@ sonar {
 
         )
 
+
         property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties, **/drawable/**, **/viewmodel/**, **/screens/** ")
     }
 }
