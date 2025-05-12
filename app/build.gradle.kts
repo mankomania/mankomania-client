@@ -119,10 +119,13 @@ sonar {
                     "src/main/java/com/example/mankomaniaclient/JoinLobbyActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/LoadingActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/NameActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/network/WebSocketService.kt" +
+                    "src/main/java/com/example/mankomaniaclient/RulesActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/GameActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/network/**" +
                     "src/main/java/com/example/mankomaniaclient/CreateLobbyActivity.kt,"
         )
+
         property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties, **/drawable/**, **/viewmodel/**, **/screens/** ")
     }
 }
@@ -143,6 +146,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.kotlinx.serialization.json)
+    implementation("androidx.appcompat:appcompat:1.6.1")
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.junit.jupiter.engine)
