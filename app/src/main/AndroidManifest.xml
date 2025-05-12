@@ -32,7 +32,7 @@
 
         <!-- In-app only: Welcome- & Game-UI -->
         <activity
-            android:name=".com.example.mankomaniaclient.GameActivity"
+            android:name=".GameActivity"
             android:exported="false"
             android:label="@string/app_name"
             android:theme="@style/Theme.Mankomaniaclient" />
