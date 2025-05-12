@@ -3,7 +3,7 @@ package com.example.mankomaniaclient
 import com.example.mankomaniaclient.ui.model.MoneyDenomination
 import com.example.mankomaniaclient.ui.model.PlayerMoneyState
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
+import org.junit.jupiter.api.Assertions.*
 
 class PlayerMoneyStateTest {
 

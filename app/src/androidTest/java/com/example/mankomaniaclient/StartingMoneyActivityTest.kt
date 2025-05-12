@@ -18,7 +18,7 @@ class StartingMoneyActivityTest {
 
         val scenario = ActivityScenario.launch<StartingMoneyActivity>(intent)
 
-        // Test passa se l'activity si avvia senza crashare
+
         scenario.close()
     }
     @Test
