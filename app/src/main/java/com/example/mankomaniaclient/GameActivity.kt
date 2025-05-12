@@ -5,7 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import com.example.mankomaniaclient.ui.screens.GameBoardScreen
-import com.example.mankomaniaclient.ui.screens.WelcomeScreen
+import androidx.compose.runtime.remember
+import com.example.mankomaniaclient.viewmodel.GameViewModel
+
 
 class GameActivity : ComponentActivity() {
 
@@ -14,17 +16,12 @@ class GameActivity : ComponentActivity() {
         val playerName = intent.getStringExtra("playerName") ?: "Unknown"
         val lobbyId = intent.getStringExtra("lobbyId") ?: "???"
         setContent {
+            val viewModel = remember { GameViewModel() }
             MaterialTheme {
-                WelcomeScreen(
-                    onStartGame = {
-                        // Replace content with the actual board
-                        setContent {
-                            MaterialTheme { GameBoardScreen(playerName = playerName, lobbyId = lobbyId) }
-                        }
-                    }
-                )
+                GameBoardScreen(viewModel = viewModel)
             }
         }
+
     }
 
 }
