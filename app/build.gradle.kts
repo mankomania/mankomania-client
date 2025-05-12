@@ -5,7 +5,7 @@ plugins {
     id("jacoco")
     id("org.sonarqube") version "5.1.0.4882"
     alias(libs.plugins.kotlin.serialization)
-    }
+}
 
 android {
     namespace = "com.example.mankomaniaclient"
@@ -71,11 +71,11 @@ tasks.register<JacocoReport>("jacocoTestReport") {
 
     val fileFilter = listOf(
         "**/R.class",
-        "**/R$*.class",
-        "**/BuildConfig.*",
-        "**/Manifest*.*",
-        "**/*Test*.*",
-        "android/**/*.*"
+        "*/R$.class",
+        "*/BuildConfig.",
+        "*/Manifest.*",
+        "*/*Test.*",
+        "android/*/.*"
     )
 
     val debugTree =
@@ -125,7 +125,7 @@ sonar {
                     "src/main/java/com/example/mankomaniaclient/network/LobbyResponse.kt," +
                     "src/main/java/com/example/mankomaniaclient/network/WebSocketService.kt"
         )
-        property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties, **/drawable/**, **/viewmodel/**, **/screens/** ")
+        property("sonar.exclusions", "*/build/, */generated/*, */.idea/*, local.properties, */drawable/*, */viewmodel/*, */screens/** ")
     }
 }
 

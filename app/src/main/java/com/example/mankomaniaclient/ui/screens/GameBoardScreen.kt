@@ -1,4 +1,4 @@
-package com.example.mankomaniaclient.screens
+package com.example.mankomaniaclient.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -17,7 +17,7 @@ fun GameBoardScreen(playerName: String, lobbyId: String) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("🎲 Game started!", fontSize = 28.sp)
+        Text("Game started!", fontSize = 28.sp)
         Spacer(modifier = Modifier.height(16.dp))
         Text("Player: $playerName")
         Text("Lobby ID: $lobbyId")

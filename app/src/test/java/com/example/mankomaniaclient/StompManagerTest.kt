@@ -4,7 +4,7 @@ import com.example.mankomaniaclient.api.StompManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class StompManagerTest {

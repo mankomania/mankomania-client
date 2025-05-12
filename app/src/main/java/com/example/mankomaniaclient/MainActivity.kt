@@ -149,7 +149,7 @@ private fun MainScreen(
             // Apply the custom Material3 theme for the whole app
             GlobalTheme {
                 // Launch the main game screen
-                GameBoardScreen()
+                GameBoardScreen(playerName = "Test", lobbyId = "L1") // for now , later to be changed...
             }
         }
     }
