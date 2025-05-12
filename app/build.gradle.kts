@@ -4,7 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("jacoco")
     id("org.sonarqube") version "5.1.0.4882"
-}
+    alias(libs.plugins.kotlin.serialization)
+    }
 
 android {
     namespace = "com.example.mankomaniaclient"
@@ -105,8 +106,8 @@ sonar {
         property("sonar.projectKey", "mankomania_mankomania-client")
         property("sonar.organization", "mankomania-1")
         property("sonar.host.url", "https://sonarcloud.io")
-        property("sonar.sources", "app/src/main/java/com/example/mankomaniaclient")
-        property("sonar.tests", "app/src/test/java/com/example/mankomaniaclient")
+        property("sonar.sources", "src/main/java/com/example/mankomaniaclient")
+        property("sonar.tests", "src/test/java/com/example/mankomaniaclient")
         property("sonar.coverage.jacoco.xmlReportPaths", "${layout.buildDirectory.get().asFile}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
 
         property(
@@ -114,15 +115,16 @@ sonar {
             // alle Composables + MainActivity + Activities + Netzwerk
             "src/main/java/com/example/mankomaniaclient/ui/**," +
                     "src/main/java/com/example/mankomaniaclient/MainActivity.kt," +
-                    "src/main/java/com/example/mankomaniaclient/CreateLobbActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/CreateLobbyActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/JoinLobbyActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/LoadingActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/NameActivity.kt," +
-                    "src/main/java/com/example/mankomaniaclient/network/WebSocketService.kt" +
-                    "src/main/java/com/example/mankomaniaclient/RulesActivity.kt,"
-
+                    "src/main/java/com/example/mankomaniaclient/RulesActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/GameActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/network/LobbyMessage.kt," +
+                    "src/main/java/com/example/mankomaniaclient/network/LobbyResponse.kt," +
+                    "src/main/java/com/example/mankomaniaclient/network/WebSocketService.kt"
         )
-
         property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties, **/drawable/**, **/viewmodel/**, **/screens/** ")
     }
 }
@@ -142,11 +144,8 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.constraintlayout)
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-
+    implementation(libs.kotlinx.serialization.json)
+    implementation("androidx.appcompat:appcompat:1.6.1")
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.junit.jupiter.engine)
@@ -159,5 +158,5 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    debugImplementation("androidx.compose.ui:ui-tooling")
+
 }

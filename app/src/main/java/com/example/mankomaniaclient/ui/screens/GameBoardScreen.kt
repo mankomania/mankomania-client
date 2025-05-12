@@ -1,78 +1,25 @@
-package com.example.mankomaniaclient.ui.screens
+package com.example.mankomaniaclient.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.mankomaniaclient.api.StompManager
-import com.example.mankomaniaclient.model.DiceResult
-import com.example.mankomaniaclient.ui.components.DiceView
-import com.example.mankomaniaclient.viewmodel.GameViewModel
-import kotlinx.coroutines.flow.collectLatest
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-
-/**
- * @file GameBoardScreen.kt
- * @author eles17
- * @since 04.05.2025
- * @description
- * Main game screen that allows players to trigger dice rolls and view results.
- * Subscribes to WebSocket via StompManager and updates GameViewModel accordingly.
- */
+import androidx.compose.ui.unit.sp
 
 @Composable
-fun GameBoardScreen(gameViewModel: GameViewModel = viewModel()) {
-    val diceResult by gameViewModel.diceResult.collectAsState()
-    val isPlayerTurn by gameViewModel.isPlayerTurn.collectAsState()
-    val playerId = "blue" // Later should be dynamic when multiplayer is added
-
-    // Establish WebSocket connection and collect dice results
-    LaunchedEffect(Unit) {
-        StompManager.connectAndSubscribe(playerId)
-        StompManager.diceResultFlow.collectLatest { resultJson ->
-            try {
-                val numbers = Regex("""\d+""").findAll(resultJson).map { it.value.toInt() }.toList()
-                if (numbers.size >= 2) {
-                    gameViewModel.receiveDiceResult(DiceResult(numbers[0], numbers[1]))
-                } else {
-                    println("Invalid dice data: $resultJson")
-                }
-            } catch (e: Exception) {
-                println("Failed to parse dice result: $e")
-            }
-        }
-    }
-
-    // UI for rolling dice and showing the result
+fun GameBoardScreen(playerName: String, lobbyId: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(32.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Willkommen im Mankomania-Spiel!", style = MaterialTheme.typography.headlineMedium)
-
-        Button(
-            onClick = { gameViewModel.rollDice(playerId) },
-            enabled = isPlayerTurn
-        ) {
-            Text("Roll Dice")
-        }
-
-        AnimatedVisibility(
-            visible = diceResult != null,
-            enter = fadeIn() + scaleIn(),
-            exit = fadeOut() + scaleOut()
-        ) {
-            diceResult?.let {
-                DiceView(result = it)
-            }
-        }
+        Text("🎲 Game started!", fontSize = 28.sp)
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("Player: $playerName")
+        Text("Lobby ID: $lobbyId")
     }
 }
