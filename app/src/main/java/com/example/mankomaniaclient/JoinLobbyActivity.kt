@@ -34,20 +34,27 @@ class JoinLobbyActivity : ComponentActivity() {
                     lobbyResponse?.let { response ->
                         when (response.type) {
                             "joined" -> {
-                                hasNavigated.value = true
-                                val intent = Intent(context, CreateLobbyActivity::class.java).apply {
-                                    putExtra("playerName", playerName)
-                                    putExtra("lobbyId", response.lobbyId)
+                                if (!hasNavigated.value) {
+                                    hasNavigated.value = true
+                                    val intent =
+                                        Intent(context, CreateLobbyActivity::class.java).apply {
+                                            putExtra("playerName", playerName)
+                                            putExtra("lobbyId", response.lobbyId)
+                                        }
+                                    context.startActivity(intent)
                                 }
-                                context.startActivity(intent)
                             }
 
                             "join-failed" -> {
-                                hasNavigated.value = true
-                                Toast.makeText(context, "Join failed – Lobby does not exist!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "Join failed – Lobby does not exist!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
                     }
+
                 }
             }
 
