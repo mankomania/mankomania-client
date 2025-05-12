@@ -43,11 +43,25 @@ fun GameBoardScreen(gameViewModel: GameViewModel = viewModel()) {
             }
         }
     }
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 
-@Composable
-fun GameBoardScreen() {
-    Text("Willkommen im Mankomania-Spiel!")
-    // TO DO: UI
+    // UI for rolling dice and showing the result
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text("Willkommen im Mankomania-Spiel!", style = MaterialTheme.typography.headlineMedium)
+
+        Button(
+            onClick = { gameViewModel.rollDice(playerId) },
+            enabled = true // TODO: restrict to player's turn
+        ) {
+            Text("Roll Dice")
+        }
+
+        diceResult?.let {
+            DiceView(result = it)
+        }
+    }
 }
