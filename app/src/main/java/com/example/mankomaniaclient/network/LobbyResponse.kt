@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 data class LobbyResponse(
     val type: String,
     val lobbyId: String,
-    val playerName: String? = null,
-    val playerCount: Int? = null
+    val playerCount: Int,
+    val players: List<String>? = null
 )

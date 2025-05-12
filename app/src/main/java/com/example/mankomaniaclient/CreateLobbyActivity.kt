@@ -3,6 +3,7 @@ package com.example.mankomaniaclient
 import com.example.mankomaniaclient.network.WebSocketService
 import com.example.mankomaniaclient.com.example.mankomaniaclient.GameActivity
 
+import android.util.Log
 import android.os.Bundle
 import android.content.Intent
 import androidx.activity.ComponentActivity
@@ -43,19 +44,19 @@ class CreateLobbyActivity : ComponentActivity() {
         val lobbyResponse by WebSocketService.lobbyResponse.collectAsState()
         val finalLobbyId = remember { mutableStateOf("") }
 
-        // Nur ein Join/Create pro Start
         LaunchedEffect(Unit) {
-            if (lobbyIdFromIntent == null) {
+            val id: String = if (lobbyIdFromIntent == null) {
                 val newId = generateLobbyId()
                 WebSocketService.createLobby(newId, playerName)
-                finalLobbyId.value = newId
+                newId
             } else {
-                WebSocketService.joinLobby(lobbyIdFromIntent, playerName)
-                finalLobbyId.value = lobbyIdFromIntent
+                WebSocketService.subscribeToLobby(lobbyIdFromIntent!!)
+                lobbyIdFromIntent
             }
+
+            finalLobbyId.value = id
         }
 
-        // Spielstart
         LaunchedEffect(lobbyResponse) {
             if (lobbyResponse?.type == "start") {
                 val intent = Intent(context, GameActivity::class.java).apply {
@@ -66,7 +67,6 @@ class CreateLobbyActivity : ComponentActivity() {
             }
         }
 
-        // UI anzeigen
         CreateLobbyScreen(playerName = playerName, lobbyId = finalLobbyId.value)
     }
 
@@ -102,6 +102,7 @@ class CreateLobbyActivity : ComponentActivity() {
 
             Button(
                 onClick = {
+                    Log.d("LOBBY", "Trying to start game in $lobbyId by $playerName")
                     WebSocketService.startGame(lobbyId, playerName)
                 },
                 enabled = players.size >= 2

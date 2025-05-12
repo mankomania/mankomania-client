@@ -13,8 +13,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.json.Json
-import org.json.JSONObject
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
+import com.example.mankomaniaclient.network.LobbyResponse
+
+
 
 
 /**
@@ -125,14 +128,14 @@ object WebSocketService {
         }
     }
 
-
     fun joinLobby(lobbyId: String, playerName: String) {
-        Log.d("WebSocket", "Joining lobby $lobbyId as $playerName")
-        val message = JSONObject()
-        message.put("type", "join")
-        message.put("lobbyId", lobbyId)
-        message.put("playerName", playerName)
-        send(destination = "/topic/lobby", message = message.toString())
+        val message = LobbyMessage(
+            type = "join",
+            playerName = playerName,
+            lobbyId = lobbyId
+        )
+        val json = Json.encodeToString(message)
+        send("/app/lobby", json)
     }
 
     fun createLobby(lobbyId: String, playerName: String) {
@@ -154,5 +157,26 @@ object WebSocketService {
         val json = Json.encodeToString(message)
         send("/app/lobby", json)
     }
+
+    fun subscribeToLobby(lobbyId: String) {
+        scope.launch {
+            try {
+                session?.subscribeText("/topic/lobby/$lobbyId")?.collect { json ->
+                    val response = Json.decodeFromString<LobbyResponse>(json)
+                    Log.d("WebSocket", "Received lobby update (join): $response")
+
+                    // Update Players
+                    if (response.players != null) {
+                        _playersInLobby.value = response.players
+                    }
+
+                    _lobbyResponse.value = response
+                }
+            } catch (e: Exception) {
+                Log.e("WebSocket", "Error in subscribeToLobby: ${e.message}")
+            }
+        }
+    }
+
 
 }
