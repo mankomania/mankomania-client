@@ -64,9 +64,9 @@ class CreateLobbyActivity : ComponentActivity() {
                     putExtra("lobbyId", finalLobbyId.value)
                 }
                 context.startActivity(intent)
+                (context as? ComponentActivity)?.finish()
             }
         }
-
         CreateLobbyScreen(playerName = playerName, lobbyId = finalLobbyId.value)
     }
 

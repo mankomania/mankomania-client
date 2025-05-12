@@ -13,12 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.decodeFromString
-import com.example.mankomaniaclient.network.LobbyResponse
-
-
-
 
 /**
  * Handles all STOMP communication with the game server.
@@ -35,6 +29,7 @@ object WebSocketService {
     val playersInLobby: StateFlow<List<String>> = _playersInLobby.asStateFlow()
     private val _lobbyResponse = MutableStateFlow<LobbyResponse?>(null)
     val lobbyResponse: StateFlow<LobbyResponse?> = _lobbyResponse.asStateFlow()
+    private val jsonParser = Json { ignoreUnknownKeys = true }
 
 
     private var session: StompSession? = null
@@ -81,7 +76,7 @@ object WebSocketService {
 
                 launch {
                     stomp.subscribeText("/topic/lobby").collect { json ->
-                        val response = Json.decodeFromString<LobbyResponse>(json)
+                        val response = jsonParser.decodeFromString<LobbyResponse>(json)
                         Log.d("WebSocket", "Received lobby update: $response")
 
                         _lobbyResponse.value = response
@@ -134,7 +129,7 @@ object WebSocketService {
             playerName = playerName,
             lobbyId = lobbyId
         )
-        val json = Json.encodeToString(message)
+        val json = jsonParser.encodeToString(LobbyMessage.serializer(), message)
         send("/app/lobby", json)
     }
 
@@ -144,7 +139,7 @@ object WebSocketService {
             playerName = playerName,
             lobbyId = lobbyId
         )
-        val json = Json.encodeToString(message)
+        val json = jsonParser.encodeToString(LobbyMessage.serializer(), message)
         send("/app/lobby", json)
     }
 
@@ -154,7 +149,8 @@ object WebSocketService {
             playerName = playerName,
             lobbyId = lobbyId
         )
-        val json = Json.encodeToString(message)
+        val json = jsonParser.encodeToString(LobbyMessage.serializer(), message)
+
         send("/app/lobby", json)
     }
 
@@ -162,7 +158,7 @@ object WebSocketService {
         scope.launch {
             try {
                 session?.subscribeText("/topic/lobby/$lobbyId")?.collect { json ->
-                    val response = Json.decodeFromString<LobbyResponse>(json)
+                    val response = jsonParser.decodeFromString<LobbyResponse>(json)
                     Log.d("WebSocket", "Received lobby update (join): $response")
 
                     // Update Players
