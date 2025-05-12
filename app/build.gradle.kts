@@ -4,7 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("jacoco")
     id("org.sonarqube") version "5.1.0.4882"
-}
+    alias(libs.plugins.kotlin.serialization)
+    }
 
 android {
     namespace = "com.example.mankomaniaclient"
@@ -114,14 +115,17 @@ sonar {
             // alle Composables + MainActivity + Activities + Netzwerk
             "src/main/java/com/example/mankomaniaclient/ui/**," +
                     "src/main/java/com/example/mankomaniaclient/MainActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/CreateLobbyActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/api/LotteryApi.kt," +
                     "src/main/java/com/example/mankomaniaclient/LotteryActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/GameActivity.kt," +
-
-                    "src/main/java/com/example/mankomaniaclient/CreateLobbActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/JoinLobbyActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/LoadingActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/NameActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/RulesActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/GameActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/network/LobbyMessage.kt," +
+                    "src/main/java/com/example/mankomaniaclient/network/LobbyResponse.kt," +
                     "src/main/java/com/example/mankomaniaclient/network/WebSocketService.kt"
         )
 
@@ -143,6 +147,8 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.kotlinx.serialization.json)
+    implementation("androidx.appcompat:appcompat:1.6.1")
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.junit.jupiter.engine)

@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
-import com.example.mankomaniaclient.ui.screens.GameBoardScreen
+import com.example.mankomaniaclient.screens.GameBoardScreen
 import com.example.mankomaniaclient.ui.screens.WelcomeScreen
 import java.util.UUID
 import com.example.mankomaniaclient.viewmodel.LotteryViewModel
@@ -21,33 +21,21 @@ class GameActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val screenToShow = intent.getStringExtra(EXTRA_SCREEN) ?: SCREEN_WELCOME
+        val playerName = intent.getStringExtra("playerName") ?: "Unknown"
+        val lobbyId = intent.getStringExtra("lobbyId") ?: "???"
         setContent {
             MaterialTheme {
-                when (screenToShow) {
-                    SCREEN_LOTTERY -> {
-                        val tempPlayerId = UUID.randomUUID().toString()
-                        val lotteryViewModel = LotteryViewModel()
-                        lotteryViewModel.refreshAmount()
-
-                        LotteryScreen(
-                            playerId = tempPlayerId,
-                            lotteryViewModel = lotteryViewModel
-                        )
-                    }
-
-                    else -> {
-                        WelcomeScreen(
-                            onStartGame = {
-                                // Replace content with the actual board
-                                setContent {
-                                    MaterialTheme { GameBoardScreen() }
-                                }
-                            }
-                        )
+                WelcomeScreen(
+                    onStartGame = {
+                        // Replace content with the actual board
+                        setContent {
+                            MaterialTheme { GameBoardScreen(playerName = playerName, lobbyId = lobbyId) }
+                        }
                     }
                 }
             }
         }
     }
+
 }
+
