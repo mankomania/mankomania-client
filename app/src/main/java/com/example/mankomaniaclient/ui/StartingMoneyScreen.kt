@@ -17,24 +17,45 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mankomaniaclient.viewmodel.PlayerMoneyViewModel
 import com.example.mankomaniaclient.viewmodel.PlayerMoneyViewModelFactory
+import com.example.mankomaniaclient.network.PlayerSocketService
+import com.example.mankomaniaclient.network.PlayerSocketServiceInterface
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.CoroutineScope
 import org.hildan.krossbow.stomp.StompClient
 import org.hildan.krossbow.websocket.okhttp.OkHttpWebSocketClient
+import java.text.NumberFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 fun StartingMoneyScreen(playerId: String) {
-    val factory = remember {
-        PlayerMoneyViewModelFactory(
+    // Create a CoroutineScope tied to the composable's lifecycle
+    val coroutineScope = rememberCoroutineScope()
+
+    // Create an instance of PlayerSocketService
+    val socketService: PlayerSocketServiceInterface = remember {
+        PlayerSocketService(
             stompClient = StompClient(OkHttpWebSocketClient()),
-            playerId = playerId
+            coroutineScope = coroutineScope // Use the remembered coroutine scope
         )
     }
 
+    // Create a ViewModelFactory and initialize the ViewModel
+    val factory = remember {
+        PlayerMoneyViewModelFactory(
+            socketService = socketService,
+            playerId = playerId
+        )
+    }
     val viewModel: PlayerMoneyViewModel = viewModel(factory = factory)
+
+    // Collect the UI state and error state from the ViewModel
     val state by viewModel.financialState.collectAsState()
     val hasError by viewModel.hasError.collectAsState()
 
+    // Calculate the total amount dynamically
     val totalAmount = remember(state) {
         state.bills5000 * 5000 +
                 state.bills10000 * 10_000 +
@@ -42,6 +63,12 @@ fun StartingMoneyScreen(playerId: String) {
                 state.bills100000 * 100_000
     }
 
+    // Format the total amount based on the locale
+    val formattedTotalAmount = remember(totalAmount) {
+        NumberFormat.getCurrencyInstance(Locale.getDefault()).format(totalAmount)
+    }
+
+    // Scaffold UI to provide a top bar and content
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Your Starting Money 💰") })
@@ -54,43 +81,19 @@ fun StartingMoneyScreen(playerId: String) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Display the player ID
             Text(
                 text = "Player: $playerId",
                 fontSize = 18.sp,
                 color = Color.Gray
             )
 
+            // Show error card if an error exists
             if (hasError) {
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFFFEBEE)
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "⚠️ Connection failed",
-                            color = Color.Red,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Button(
-                            onClick = { viewModel.retryConnection() },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFFE57373)
-                            )
-                        ) {
-                            Text("Retry")
-                        }
-                    }
-                }
+                ErrorCard(viewModel = viewModel)
             }
 
+            // Display denomination boxes in rows
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -107,13 +110,15 @@ fun StartingMoneyScreen(playerId: String) {
                 DenominationBox("€100,000", state.bills100000, Color(0xFFFFCCBC))
             }
 
+            // Display the total amount
             Text(
-                text = "Total: €${"%,d".format(totalAmount)}",
+                text = "Total: $formattedTotalAmount",
                 fontSize = 22.sp,
                 color = Color(0xFF2E7D32),
                 style = MaterialTheme.typography.titleMedium
             )
 
+            // Button to refresh money
             Button(
                 onClick = { viewModel.updateMoney() },
                 modifier = Modifier.padding(top = 8.dp)
@@ -125,6 +130,46 @@ fun StartingMoneyScreen(playerId: String) {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Refresh Money")
+            }
+        }
+    }
+
+    // Cancel the coroutine scope when the composable is disposed
+    DisposableEffect(Unit) {
+        onDispose {
+            coroutineScope.cancel()
+        }
+    }
+}
+
+
+@Composable
+fun ErrorCard(viewModel: PlayerMoneyViewModel) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFFFEBEE)
+        ),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "⚠️ Connection failed. Please check your network and try again.",
+                color = Color.Red,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Button(
+                onClick = { viewModel.retryConnection() },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFE57373)
+                )
+            ) {
+                Text("Retry")
             }
         }
     }
@@ -146,7 +191,7 @@ fun DenominationBox(
     ) {
         Icon(
             imageVector = Icons.Default.Euro,
-            contentDescription = "Euro Icon",
+            contentDescription = "Euro denomination icon",
             tint = Color.Black,
             modifier = Modifier.size(28.dp)
         )
