@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 /**
  * @file MoveResult.kt
- * @author Lev
+ * @author eles17
  * @since 2025-05-13
  * @description
  * Represents the result of a player move: where they landed, what type of field it is,
