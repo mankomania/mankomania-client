@@ -116,6 +116,9 @@ sonar {
             "src/main/java/com/example/mankomaniaclient/ui/**," +
                     "src/main/java/com/example/mankomaniaclient/MainActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/CreateLobbyActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/api/LotteryApi.kt," +
+                    "src/main/java/com/example/mankomaniaclient/LotteryActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/GameActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/JoinLobbyActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/LoadingActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/NameActivity.kt," +
@@ -125,8 +128,8 @@ sonar {
                     "src/main/java/com/example/mankomaniaclient/network/LobbyResponse.kt," +
                     "src/main/java/com/example/mankomaniaclient/network/WebSocketService.kt"
         )
-        property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties, **/drawable/**, **/viewmodel/**, **/screens/** ")
-    }
+
+        property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties, **/drawable/**, **/viewmodel/GameViewModel.kt, **/screens/** ")    }
 }
 
 
@@ -158,5 +161,6 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
+    testImplementation("io.mockk:mockk:1.13.5")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
 }

@@ -42,11 +42,11 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+
 import android.content.Intent
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
-
 
 import com.example.mankomaniaclient.network.WebSocketService
 
@@ -85,6 +85,9 @@ class MainActivity : ComponentActivity() {
                 },
                 onPlay = {
                     startActivity(Intent(this, LoadingActivity::class.java))
+                },
+                onOpenLottery = {
+                    startActivity(Intent(this, LotteryActivity::class.java))
                 }
             )
         }
@@ -105,7 +108,8 @@ private fun MainScreen(
     clientCount: Int,
     onConnect: () -> Unit,
     onSendHello: () -> Unit,
-    onPlay: () -> Unit
+    onPlay: () -> Unit,
+    onOpenLottery: () -> Unit
 ) {
     MaterialTheme {
         Column(
@@ -131,6 +135,8 @@ private fun MainScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(onClick = onPlay) { Text("Play Mankomania") }
+
+            Button(onClick = onOpenLottery) { Text("Open Lottery") }
         }
     }
 }
