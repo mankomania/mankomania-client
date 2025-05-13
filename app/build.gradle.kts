@@ -5,7 +5,7 @@ plugins {
     id("jacoco")
     id("org.sonarqube") version "5.1.0.4882"
     alias(libs.plugins.kotlin.serialization)
-    }
+}
 
 android {
     namespace = "com.example.mankomaniaclient"
