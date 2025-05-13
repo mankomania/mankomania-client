@@ -19,16 +19,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.mankomaniaclient.ui.components.BoardCellView
 import com.example.mankomaniaclient.viewmodel.GameViewModel
+import androidx.compose.material3.Text
+
 
 @Composable
-fun GameBoardScreen(viewModel: GameViewModel) {
-    val board   by viewModel.board.collectAsState()
+fun GameBoardScreen(playerNames: List<String>,viewModel: GameViewModel) {
+    val board by viewModel.board.collectAsState()
+    Log.d("GameBoardScreen", "Board size=${board.size}")
+    if (board.isEmpty()) {
+        Text("⚠️ No cells received!")
+    }
     val players by viewModel.players.collectAsState()
 
-    Log.d("GameBoardScreen", "Board size=${board.size}, players=$players")
-
     val sideCount = board.size / 4
-    val bgColor   = MaterialTheme.colorScheme.surfaceVariant   // << soft grey / blue by default
+    val bgColor = MaterialTheme.colorScheme.surfaceVariant   // << soft grey / blue by default
 
     Box(
         modifier = Modifier
@@ -36,6 +40,33 @@ fun GameBoardScreen(viewModel: GameViewModel) {
             .background(bgColor)
             .padding(16.dp)
     ) {
+        Text(
+            text = playerNames.getOrNull(0) ?: "",
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(24.dp)
+        )
+
+        Text(
+            text = playerNames.getOrNull(1) ?: "",
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(24.dp)
+        )
+
+        Text(
+            text = playerNames.getOrNull(2) ?: "",
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(24.dp)
+        )
+
+        Text(
+            text = playerNames.getOrNull(3) ?: "",
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(24.dp)
+        )
         /* ---------- Top row ------------------------------------------------ */
         Row(Modifier.align(Alignment.TopCenter)) {
             for (i in 0 until sideCount) {
@@ -69,3 +100,5 @@ fun GameBoardScreen(viewModel: GameViewModel) {
         }
     }
 }
+
+
