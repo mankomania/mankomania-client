@@ -2,6 +2,7 @@ package com.example.mankomaniaclient.network
 
 import com.example.mankomaniaclient.viewmodel.GameViewModel
 import android.util.Log
+import com.example.mankomaniaclient.model.MoveResult
 import org.hildan.krossbow.stomp.StompClient
 import org.hildan.krossbow.stomp.StompSession
 import org.hildan.krossbow.stomp.sendText
@@ -105,6 +106,13 @@ object WebSocketService {
                         gameViewModel.onGameState(state)
                     }
                 }
+                launch{
+                    stomp.subscribeText("/topic/player-moved").collect { json ->
+                    val moveResult = jsonParser.decodeFromString<MoveResult>(json)
+                    Log.d("WebSocket", "Received move result: $moveResult")
+                    gameViewModel.onPlayerMoved(moveResult)
+                }
+            }
 
             } catch (e: Exception) {
                 connected = false
