@@ -10,6 +10,7 @@ package com.example.mankomaniaclient.ui.screens
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -20,11 +21,37 @@ import androidx.compose.ui.unit.dp
 import com.example.mankomaniaclient.ui.components.BoardCellView
 import com.example.mankomaniaclient.viewmodel.GameViewModel
 import androidx.compose.material3.Text
-
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 
 @Composable
 fun GameBoardScreen(playerNames: List<String>,viewModel: GameViewModel) {
     val board by viewModel.board.collectAsState()
+
+    // --- MoveResult dialog logic ---
+    val moveResult by viewModel.moveResult.collectAsState()
+    var showDialog by remember { mutableStateOf(true) }
+
+    if (moveResult != null && showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text("OK")
+                }
+            },
+            title = { Text("You landed on: ${moveResult!!.fieldType}") },
+            text = {
+                Column {
+                    Text(moveResult!!.fieldDescription)
+                    if (moveResult!!.playersOnField.isNotEmpty()) {
+                        Text("Other players here: ${moveResult!!.playersOnField.joinToString()}")
+                    }
+                }
+            }
+        )
+    }
+
     Log.d("GameBoardScreen", "Board size=${board.size}")
     if (board.isEmpty()) {
         Text("⚠️ No cells received!")
