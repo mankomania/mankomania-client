@@ -39,7 +39,7 @@ class PlayerSocketService(
      * Connects to the WebSocket and starts collecting updates
      * from the subscribed topic.
      */
-    private suspend fun connect(
+    suspend fun connect(
         url: String = "ws://se2-demo.aau.at:53210/ws",
         topic: String = "/topic/playerMoney"
     ) {
