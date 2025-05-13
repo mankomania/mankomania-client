@@ -19,9 +19,7 @@ import com.example.mankomaniaclient.viewmodel.PlayerMoneyViewModel
 import com.example.mankomaniaclient.viewmodel.PlayerMoneyViewModelFactory
 import com.example.mankomaniaclient.network.PlayerSocketService
 import com.example.mankomaniaclient.network.PlayerSocketServiceInterface
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.CoroutineScope
 import org.hildan.krossbow.stomp.StompClient
 import org.hildan.krossbow.websocket.okhttp.OkHttpWebSocketClient
 import java.text.NumberFormat
