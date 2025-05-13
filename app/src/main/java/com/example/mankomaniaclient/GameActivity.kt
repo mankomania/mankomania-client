@@ -42,7 +42,10 @@ class GameActivity : ComponentActivity() {
                         // swap in the actual game board
                         setContent {
                             MaterialTheme {
-                                GameBoardScreen(viewModel = gameViewModel)
+                                GameBoardScreen(
+                                    playerNames = listOf(playerName),   // <— hier Liste übergeben
+                                    viewModel   = gameViewModel
+                                )
                             }
                         }
                     }
