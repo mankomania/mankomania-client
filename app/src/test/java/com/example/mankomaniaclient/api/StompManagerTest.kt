@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import com.example.mankomaniaclient.config.NetworkConfig
 
 /**
  * @file StompManagerTest.kt

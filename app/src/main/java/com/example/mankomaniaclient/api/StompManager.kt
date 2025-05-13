@@ -7,6 +7,7 @@ package com.example.mankomaniaclient.api
  * Singleton object responsible for managing the WebSocket STOMP connection.
  * It connects to the backend server, sends dice roll requests, and listens for dice result messages.
  */
+import com.example.mankomaniaclient.config.NetworkConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -42,8 +43,8 @@ object StompManager {
         coroutineScope.launch {
             mutex.withLock {
                 if (session == null) {
-                    println("Connecting to WebSocket at ws://10.0.2.2:8081/ws")
-                    session = stompClient.connect("ws://10.0.2.2:8081/ws")
+                    println("Connecting to WebSocket at ws://10.0.2.2:8080/ws")
+                    session = stompClient.connect(NetworkConfig.WS_URL)
                     println("Connected to WebSocket!")
                 }
             }
@@ -68,8 +69,8 @@ object StompManager {
         coroutineScope.launch {
             mutex.withLock {
                 if (session == null) {
-                    println("Connecting to WebSocket at ws://10.0.2.2:8081/ws")
-                    session = stompClient.connect("ws://10.0.2.2:8081/ws")
+                    println("Connecting to WebSocket at ws://10.0.2.2:8080/ws")
+                    session = stompClient.connect(NetworkConfig.WS_URL)
                 }
             }
 
