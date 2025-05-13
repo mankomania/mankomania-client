@@ -10,7 +10,7 @@ package com.example.mankomaniaclient.viewmodel
  */
 
 import androidx.lifecycle.ViewModel
-import com.example.mankomaniaclient.api.StompManager
+import com.example.mankomaniaclient.network.WebSocketService
 import com.example.mankomaniaclient.model.DiceResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,7 +38,8 @@ class GameViewModel : ViewModel() {
         if (!_isPlayerTurn.value) return
 
         println("ROLL REQUEST for $playerId triggered from UI")
-        StompManager.sendRollRequest(playerId)
+
+        WebSocketService.send("/app/rollDice", playerId)
 
         // Optionally: disable further rolls until turn is over
         _isPlayerTurn.value = false
