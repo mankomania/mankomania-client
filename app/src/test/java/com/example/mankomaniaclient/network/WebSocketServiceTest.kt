@@ -1,4 +1,4 @@
-/*
+package com.example.mankomaniaclient.network/*
 package com.example.mankomaniaclient.network
 
 import android.util.Log

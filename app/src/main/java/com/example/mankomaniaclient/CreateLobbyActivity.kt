@@ -1,7 +1,7 @@
 package com.example.mankomaniaclient
 
 import com.example.mankomaniaclient.network.WebSocketService
-import com.example.mankomaniaclient.com.example.mankomaniaclient.GameActivity
+import com.example.mankomaniaclient.GameActivity
 
 import android.util.Log
 import android.os.Bundle
