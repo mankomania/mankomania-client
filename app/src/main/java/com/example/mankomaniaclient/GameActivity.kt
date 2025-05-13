@@ -1,5 +1,6 @@
 package com.example.mankomaniaclient.com.example.mankomaniaclient
 
+import com.example.mankomaniaclient.network.WebSocketService
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,6 +18,7 @@ class GameActivity : ComponentActivity() {
 
         setContent {
             val viewModel = remember { GameViewModel().apply { setPlayers(playerNames) } }
+            WebSocketService.setGameViewModel(viewModel)
             MaterialTheme {
                 GameBoardScreen(playerNames = playerNames, viewModel = viewModel)
             }

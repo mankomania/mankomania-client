@@ -26,6 +26,7 @@ class GameViewModel : ViewModel() {
 
     /** Called by WebSocketService when a new GameStateDto arrives */
     fun onGameState(state: GameStateDto) {
+        println("🧩 ViewModel received state: ${state.board.size} cells, ${state.players.size} players")
         _board.value   = state.board
         _players.value = state.players
     }

@@ -26,6 +26,9 @@ import androidx.compose.material3.Text
 fun GameBoardScreen(playerNames: List<String>,viewModel: GameViewModel) {
     val board by viewModel.board.collectAsState()
     Log.d("GameBoardScreen", "Board size=${board.size}")
+    if (board.isEmpty()) {
+        Text("⚠️ No cells received!")
+    }
     val players by viewModel.players.collectAsState()
 
     val sideCount = board.size / 4
