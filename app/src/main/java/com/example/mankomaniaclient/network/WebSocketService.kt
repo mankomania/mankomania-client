@@ -1,6 +1,7 @@
 package com.example.mankomaniaclient.network
 
 import com.example.mankomaniaclient.viewmodel.GameViewModel
+import com.example.mankomaniaclient.model.PlayerStatus
 import android.util.Log
 import com.example.mankomaniaclient.model.MoveResult
 import org.hildan.krossbow.stomp.StompClient
@@ -196,6 +197,23 @@ object WebSocketService {
             }
         }
     }
-
+    fun subscribeToPlayerStatuses(playerNames: List<String>) {
+        scope.launch {
+            val stomp = session ?: return@launch
+            for (playerName in playerNames) {
+                launch {
+                    try {
+                        stomp.subscribeText("/topic/player/$playerName/status").collect { json ->
+                            Log.d("WebSocket", "Received player status for $playerName: $json")
+                            val status = jsonParser.decodeFromString<PlayerStatus>(json)
+                            gameViewModel.updatePlayerStatus(status)
+                        }
+                    } catch (e: Exception) {
+                        Log.e("WebSocket", "Failed to subscribe to status for $playerName: ${e.message}")
+                    }
+                }
+            }
+        }
+    }
 
 }
