@@ -29,7 +29,6 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -41,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.mankomaniaclient.network.WebSocketService
+import androidx.activity.compose.setContent
 
 class MainActivity : ComponentActivity() {
 
@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate()")
 
-        webSocketService.connect()
+        WebSocketService.connect()
 
         setContent {
             val clientCount by webSocketService.clientCount.collectAsState()
