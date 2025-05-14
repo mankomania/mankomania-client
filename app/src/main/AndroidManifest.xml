@@ -63,7 +63,7 @@
 
         <activity
             android:name=".StartingMoneyActivity"
-            android:exported="true"
+            android:exported="false"
             android:label="Mankomania"
             android:theme="@style/Theme.Mankomaniaclient">
         </activity>

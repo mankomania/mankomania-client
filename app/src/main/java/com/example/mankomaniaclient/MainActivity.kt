@@ -46,6 +46,7 @@ class MainActivity : ComponentActivity() {
                     Toast.makeText(context, "Send Hello geklickt", Toast.LENGTH_SHORT).show()
                     webSocketService.send("/app/greetings", "hello local")
                 },
+
                 onPlay = {
                     startActivity(Intent(this, LoadingActivity::class.java))
                 },
