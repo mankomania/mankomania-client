@@ -180,9 +180,43 @@ class WebSocketServiceTest {
         assertEquals(0, service.clientCount.value)
     }
 
+@Test
+fun `subscribe to player-moved forwards MoveResult to ViewModel`() = runTest(dispatcher.scheduler) {
+    val jsonMove = """
+        {
+            "newPosition": 4,
+            "oldPosition": 2,
+            "fieldType": "CasinoAction",
+            "fieldDescription": "Try your luck!",
+            "playersOnField": ["Toni", "Jorge"]
+        }
+    """.trimIndent()
 
+    val fakeFlow = listOf(jsonMove).asFlow()
+    val mockViewModel = mockk<GameViewModel>(relaxed = true)
 
+    WebSocketService::class.java.getDeclaredField("gameViewModel").apply {
+        isAccessible = true
+        set(WebSocketService, mockViewModel)
+    }
 
+    coEvery { session.subscribeText("/topic/player-moved") } returns fakeFlow
+    coEvery { stompClient.connect(any()) } returns session
+
+    WebSocketService.connect()
+    advanceUntilIdle()
+
+    coVerify {
+        mockViewModel.onPlayerMoved(
+            MoveResult(
+                newPosition = 4,
+                oldPosition = 2,
+                fieldType = "CasinoAction",
+                fieldDescription = "Try your luck!",
+                playersOnField = listOf("Toni", "Jorge")
+            )
+        )
+    }
 }
 
  */
