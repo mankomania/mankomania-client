@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Euro
 import androidx.compose.material.icons.filled.Refresh
@@ -15,6 +17,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.ui.graphics.Shape
 import com.example.mankomaniaclient.viewmodel.PlayerMoneyViewModel
 import com.example.mankomaniaclient.viewmodel.PlayerMoneyViewModelFactory
 import com.example.mankomaniaclient.network.PlayerSocketService
@@ -29,18 +36,14 @@ import java.util.Locale
 @Composable
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 fun StartingMoneyScreen(playerId: String) {
-    // Create a CoroutineScope tied to the composable's lifecycle
     val coroutineScope = rememberCoroutineScope()
-
-    // Create an instance of PlayerSocketService
     val socketService: PlayerSocketServiceInterface = remember {
         PlayerSocketService(
             stompClient = StompClient(OkHttpWebSocketClient()),
-            coroutineScope = coroutineScope // Use the remembered coroutine scope
+            coroutineScope = coroutineScope
         )
     }
 
-    // Create a ViewModelFactory and initialize the ViewModel
     val factory = remember {
         PlayerMoneyViewModelFactory(
             socketService = socketService,
@@ -49,11 +52,9 @@ fun StartingMoneyScreen(playerId: String) {
     }
     val viewModel: PlayerMoneyViewModel = viewModel(factory = factory)
 
-    // Collect the UI state and error state from the ViewModel
     val state by viewModel.financialState.collectAsState()
     val hasError by viewModel.hasError.collectAsState()
 
-    // Calculate the total amount dynamically
     val totalAmount = remember(state) {
         state.bills5000 * 5000 +
                 state.bills10000 * 10_000 +
@@ -61,54 +62,54 @@ fun StartingMoneyScreen(playerId: String) {
                 state.bills100000 * 100_000
     }
 
-    // Format the total amount based on the locale
     val formattedTotalAmount = remember(totalAmount) {
         NumberFormat.getCurrencyInstance(Locale.getDefault()).format(totalAmount)
     }
 
-    // Scaffold UI to provide a top bar and content
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Your Starting Money 💰") })
+            TopAppBar(
+                title = { Text("Your Starting Money 💰") },
+                modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars)
+            )
         }
-    ) {
+    ) { innerPadding ->
+        // Apply system window insets to avoid overlapping with system bars
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .windowInsetsPadding(
+                    WindowInsets.systemBars.only(
+                        WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
+                    )
+                )
+                .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Display the player ID
             Text(
                 text = "Player: $playerId",
                 fontSize = 18.sp,
                 color = Color.Gray
             )
 
-            // Show error card if an error exists
             if (hasError) {
                 ErrorCard(viewModel = viewModel)
             }
 
-            // Display denomination boxes in rows
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+            // Use a responsive grid layout for denomination boxes
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(minSize = 150.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                DenominationBox("€5,000", state.bills5000, Color(0xFFE0F7FA))
-                DenominationBox("€10,000", state.bills10000, Color(0xFFD1C4E9))
+                item { DenominationBox("€5,000", state.bills5000, Color(0xFFE0F7FA)) }
+                item { DenominationBox("€10,000", state.bills10000, Color(0xFFD1C4E9)) }
+                item { DenominationBox("€50,000", state.bills50000, Color(0xFFFFF59D)) }
+                item { DenominationBox("€100,000", state.bills100000, Color(0xFFFFCCBC)) }
             }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                DenominationBox("€50,000", state.bills50000, Color(0xFFFFF59D))
-                DenominationBox("€100,000", state.bills100000, Color(0xFFFFCCBC))
-            }
-
-            // Display the total amount
             Text(
                 text = "Total: $formattedTotalAmount",
                 fontSize = 22.sp,
@@ -116,7 +117,6 @@ fun StartingMoneyScreen(playerId: String) {
                 style = MaterialTheme.typography.titleMedium
             )
 
-            // Button to refresh money
             Button(
                 onClick = { viewModel.updateMoney() },
                 modifier = Modifier.padding(top = 8.dp)
@@ -132,7 +132,6 @@ fun StartingMoneyScreen(playerId: String) {
         }
     }
 
-    // Cancel the coroutine scope when the composable is disposed
     DisposableEffect(Unit) {
         onDispose {
             coroutineScope.cancel()
@@ -140,14 +139,15 @@ fun StartingMoneyScreen(playerId: String) {
     }
 }
 
-
 @Composable
 fun ErrorCard(viewModel: PlayerMoneyViewModel) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFFFFEBEE)
         ),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .windowInsetsPadding(WindowInsets.systemBars)
     ) {
         Row(
             modifier = Modifier
