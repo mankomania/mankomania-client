@@ -17,6 +17,7 @@ import com.example.mankomaniaclient.network.GameStateDto
 import com.example.mankomaniaclient.network.PlayerDto
 import com.example.mankomaniaclient.network.WebSocketService
 import com.example.mankomaniaclient.model.DiceResult
+import com.example.mankomaniaclient.model.MoveResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -28,6 +29,10 @@ class GameViewModel : ViewModel() {
 
     private val _players = MutableStateFlow<List<PlayerDto>>(emptyList())
     val players: StateFlow<List<PlayerDto>> = _players
+
+    private val _moveResult = MutableStateFlow<MoveResult?>(null)
+    val moveResult: StateFlow<MoveResult?> = _moveResult
+
 
     /** Called by WebSocketService when a new GameStateDto arrives */
     fun onGameState(state: GameStateDto) {
@@ -68,5 +73,9 @@ class GameViewModel : ViewModel() {
      */
     fun setPlayerTurn(isTurn: Boolean) {
         _isPlayerTurn.value = isTurn
+    }
+
+    fun onPlayerMoved(result: MoveResult) {
+        _moveResult.value = result
     }
 }
