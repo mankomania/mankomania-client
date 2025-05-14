@@ -56,6 +56,10 @@
             android:name=".JoinLobbyActivity"
             android:exported="false"
             android:label="Mankomania" />
+        <activity
+            android:name=".RulesActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
 
         <activity android:name=".LotteryActivity"
             android:exported="false"

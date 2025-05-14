@@ -1,3 +1,27 @@
+/**
+ * # MainActivity
+ *
+ * Main entry point of the Android app. It initializes the user interface
+ * and establishes a WebSocket connection immediately upon creation.
+ * This activity manages the UI for showing live client metrics and handling
+ * button actions for WebSocket interactions (connect, send message).
+ *
+ * Additionally, it provides a button to transition to the `WelcomeScreen.kt`
+ * which serves as the entry point to the game (`Mankomania`). Upon clicking
+ * the "Play Mankomania" button, the user is taken to the `WelcomeScreen.kt`
+ * to begin the game session.
+ *
+ * Lifecycle:
+ * `onStart()` → `connect()`   |  • `onStop()` → `disconnect()`
+ *
+ * @author Angela Drucks
+ * @since sprint-1
+ * @description This activity is responsible for connecting to the WebSocket server
+ *              when the app starts, displaying the current number of connected clients,
+ *              providing buttons to trigger WebSocket actions like sending messages,
+ *              and managing the transition to the `WelcomeScreen.kt` where the game starts.
+ */
+
 package com.example.mankomaniaclient
 
 import android.content.Intent
