@@ -20,6 +20,7 @@ import com.example.mankomaniaclient.model.DiceResult
 import com.example.mankomaniaclient.model.MoveResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import com.example.mankomaniaclient.model.PlayerStatus
 
 class GameViewModel : ViewModel() {
 
@@ -77,5 +78,15 @@ class GameViewModel : ViewModel() {
 
     fun onPlayerMoved(result: MoveResult) {
         _moveResult.value = result
+    }
+
+    // --- Player status ----------------------------------------------
+    private val _playerStatuses = MutableStateFlow<Map<String, PlayerStatus>>(emptyMap())
+    val playerStatuses: StateFlow<Map<String, PlayerStatus>> = _playerStatuses
+
+    fun updatePlayerStatus(status: PlayerStatus) {
+        _playerStatuses.value = _playerStatuses.value.toMutableMap().apply {
+            put(status.name, status)
+        }
     }
 }
