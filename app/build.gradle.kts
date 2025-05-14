@@ -132,7 +132,6 @@ sonar {
 
 
 dependencies {
-
     implementation(libs.krossbow.websocket.okhttp)
     implementation(libs.krossbow.stomp.core)
     implementation(libs.krossbow.websocket.builtin)
@@ -145,12 +144,9 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.constraintlayout)
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation("org.hildan.krossbow:krossbow-stomp-core:7.0.0")
-    implementation("org.hildan.krossbow:krossbow-websocket-okhttp:7.0.0")
-    implementation("androidx.compose.material:material-icons-extended")
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter.api)
@@ -162,8 +158,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.1")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.1")
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     testImplementation(kotlin("test"))

@@ -21,6 +21,7 @@ appcompat = "1.7.0"
 
 
 [libraries]
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junitJupiterApi" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junitJupiterApi" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

@@ -35,4 +35,3 @@ Thumbs.db
 *.userosscache
 *.sln.docstates
 .kotlin/
-app/src/main/java/GameActivity.kt
