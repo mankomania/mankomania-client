@@ -1,5 +1,6 @@
 package com.example.mankomaniaclient.network
 
+import com.example.mankomaniaclient.viewmodel.GameViewModel
 import android.util.Log
 import org.hildan.krossbow.stomp.StompClient
 import org.hildan.krossbow.stomp.StompSession
@@ -37,7 +38,11 @@ object WebSocketService {
 
     private val _clientCount = MutableStateFlow(0)
     val clientCount: StateFlow<Int> = _clientCount.asStateFlow()
+    private lateinit var gameViewModel: GameViewModel
 
+    fun setGameViewModel(vm: GameViewModel) {
+        gameViewModel = vm
+    }
 
     fun connect(
         url: String = "ws://se2-demo.aau.at:53210/ws",
@@ -93,7 +98,13 @@ object WebSocketService {
                         }
                     }
                 }
-
+                launch {
+                    stomp.subscribeText("/topic/game").collect { json ->
+                        val state = jsonParser.decodeFromString<GameStateDto>(json)
+                        Log.d("Game", "Received game state: $state")
+                        gameViewModel.onGameState(state)
+                    }
+                }
 
             } catch (e: Exception) {
                 connected = false

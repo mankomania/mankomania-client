@@ -1,33 +1,45 @@
-package com.example.mankomaniaclient.viewmodel
-
-/**
+/*
  * @file GameViewModel.kt
- * @author eles17
- * @since 3.5.2025
+ * @author Angela Drucks, Lev Starman, Anna-Paloma Walder
+ * @since 2025-05-08
  * @description
+ * ViewModel that holds the current game state:
+ * the list of board cells and the list of players.
  * ViewModel for managing dice roll interactions and UI state.
  * Handles triggering of roll requests and updating UI based on results.
  */
 
+package com.example.mankomaniaclient.viewmodel
+
 import androidx.lifecycle.ViewModel
+import com.example.mankomaniaclient.network.CellDto
+import com.example.mankomaniaclient.network.GameStateDto
+import com.example.mankomaniaclient.network.PlayerDto
 import com.example.mankomaniaclient.network.WebSocketService
 import com.example.mankomaniaclient.model.DiceResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-/**
- * ViewModel for dice roll mechanics and UI state.
- * Delegates roll requests to StompManager, holds the latest dice result,
- * and tracks whether it's the player's turn.
- */
 class GameViewModel : ViewModel() {
 
-    // Holds the most recent dice roll result
-    private val _diceResult = MutableStateFlow<DiceResult?>(null)
+    // --- Board & Players State ----------------------------------------
+    private val _board   = MutableStateFlow<List<CellDto>>(emptyList())
+    val board: StateFlow<List<CellDto>> = _board
+
+    private val _players = MutableStateFlow<List<PlayerDto>>(emptyList())
+    val players: StateFlow<List<PlayerDto>> = _players
+
+    /** Called by WebSocketService when a new GameStateDto arrives */
+    fun onGameState(state: GameStateDto) {
+        _board.value   = state.board
+        _players.value = state.players
+    }
+
+    // --- Dice Roll State ----------------------------------------------
+    private val _diceResult   = MutableStateFlow<DiceResult?>(null)
     val diceResult: StateFlow<DiceResult?> = _diceResult
 
-    // Holds the player's turn state
-    private val _isPlayerTurn = MutableStateFlow(true) // Change to false later when full turn system is integrated
+    private val _isPlayerTurn = MutableStateFlow(true)
     val isPlayerTurn: StateFlow<Boolean> = _isPlayerTurn
 
     /**
@@ -38,10 +50,7 @@ class GameViewModel : ViewModel() {
         if (!_isPlayerTurn.value) return
 
         println("ROLL REQUEST for $playerId triggered from UI")
-
         WebSocketService.send("/app/rollDice", playerId)
-
-        // Optionally: disable further rolls until turn is over
         _isPlayerTurn.value = false
     }
 
