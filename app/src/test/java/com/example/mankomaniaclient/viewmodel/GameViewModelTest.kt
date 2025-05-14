@@ -69,4 +69,21 @@ class GameViewModelTest {
         viewModel.setPlayerTurn(false)
         assertFalse(viewModel.isPlayerTurn.value)
     }
+
+    /**
+     * Test that onPlayerMoved updates the moveResult state.
+     */
+    @Test
+    fun testOnPlayerMovedUpdatesState() = runTest {
+        val viewModel = GameViewModel()
+        val result = com.example.mankomaniaclient.model.MoveResult(
+            newPosition = 2,
+            oldPosition = 0,
+            fieldType = "PayFeeAction",
+            fieldDescription = "Pay fee to the bank",
+            playersOnField = listOf("Anna")
+        )
+        viewModel.onPlayerMoved(result)
+        assertEquals(result, viewModel.moveResult.value)
+    }
 }
