@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 
@@ -35,5 +36,6 @@ fun PlayerCharacterView(playerIndex: Int) {
             .size(24.dp)
             .background(color)
             .zIndex(1f) // Ensure figure draws above the cell
+            .testTag("PlayerFigure") // Added for testing
     )
 }
