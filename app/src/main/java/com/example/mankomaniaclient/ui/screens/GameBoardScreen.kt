@@ -1,10 +1,10 @@
-/*
+/**
  * @file GameBoardScreen.kt
  * @author Angela Drucks
  * @since 2025-05-08
  * @description Lays the board cells around the edges (clockwise)
  *              and paints a neutral surface-variant as backdrop.
- */
+ **/
 package com.example.mankomaniaclient.ui.screens
 
 import android.util.Log
@@ -23,6 +23,7 @@ import com.example.mankomaniaclient.viewmodel.GameViewModel
 import androidx.compose.material3.Text
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import com.example.mankomaniaclient.ui.components.PlayerCharacterView
 
 @Composable
 fun GameBoardScreen(playerNames: List<String>,viewModel: GameViewModel) {
@@ -54,7 +55,7 @@ fun GameBoardScreen(playerNames: List<String>,viewModel: GameViewModel) {
 
     Log.d("GameBoardScreen", "Board size=${board.size}")
     if (board.isEmpty()) {
-        Text("⚠️ No cells received!")
+        Text("No cells received!")
     }
     val players by viewModel.players.collectAsState()
 
@@ -98,7 +99,15 @@ fun GameBoardScreen(playerNames: List<String>,viewModel: GameViewModel) {
         Row(Modifier.align(Alignment.TopCenter)) {
             for (i in 0 until sideCount) {
                 Log.d("GameBoardScreen", "Top cell #$i → ${board.getOrNull(i)}")
-                BoardCellView(cell = board[i], players = players)
+
+                Box { // Render the top row of the board and display all player figures whose position matches the cell index
+                    BoardCellView(cell = board[i], players = players)
+                    players.forEachIndexed { index, player ->
+                        if (player.position == i) {
+                            PlayerCharacterView(playerIndex = index)
+                        }
+                    }
+                }
             }
         }
 
@@ -106,7 +115,15 @@ fun GameBoardScreen(playerNames: List<String>,viewModel: GameViewModel) {
         Column(Modifier.align(Alignment.CenterEnd)) {
             for (i in sideCount until 2 * sideCount) {
                 Log.d("GameBoardScreen", "Right cell #$i → ${board.getOrNull(i)}")
-                BoardCellView(cell = board[i], players = players)
+
+                Box { // Render the right column and show all player figures for each cell where a player's position matches
+                    BoardCellView(cell = board[i], players = players)
+                    players.forEachIndexed { index, player ->
+                        if (player.position == i) {
+                            PlayerCharacterView(playerIndex = index)
+                        }
+                    }
+                }
             }
         }
 
@@ -114,7 +131,15 @@ fun GameBoardScreen(playerNames: List<String>,viewModel: GameViewModel) {
         Row(Modifier.align(Alignment.BottomCenter)) {
             for (i in (2 * sideCount until 3 * sideCount).reversed()) {
                 Log.d("GameBoardScreen", "Bottom cell #$i → ${board.getOrNull(i)}")
-                BoardCellView(cell = board[i], players = players)
+
+                Box { // Render the bottom row in reverse and draw all player figures that are on each respective field
+                    BoardCellView(cell = board[i], players = players)
+                    players.forEachIndexed { index, player ->
+                        if (player.position == i) {
+                            PlayerCharacterView(playerIndex = index)
+                        }
+                    }
+                }
             }
         }
 
@@ -122,10 +147,19 @@ fun GameBoardScreen(playerNames: List<String>,viewModel: GameViewModel) {
         Column(Modifier.align(Alignment.CenterStart)) {
             for (i in (3 * sideCount until board.size).reversed()) {
                 Log.d("GameBoardScreen", "Left cell #$i → ${board.getOrNull(i)}")
-                BoardCellView(cell = board[i], players = players)
+
+                Box { // Render the left column in reverse and place player figures on the matching board cells
+                    BoardCellView(cell = board[i], players = players)
+                    players.forEachIndexed { index, player ->
+                        if (player.position == i) {
+                            PlayerCharacterView(playerIndex = index)
+                        }
+                    }
+                }
             }
         }
     }
 }
+
 
 
