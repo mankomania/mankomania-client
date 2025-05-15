@@ -2,9 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     id("jacoco")
     id("org.sonarqube") version "5.1.0.4882"
-    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -122,19 +122,16 @@ sonar {
                     "src/main/java/com/example/mankomaniaclient/JoinLobbyActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/LoadingActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/NameActivity.kt," +
-                    "src/main/java/com/example/mankomaniaclient/RulesActivity.kt," +
-                    "src/main/java/com/example/mankomaniaclient/GameActivity.kt," +
-                    "src/main/java/com/example/mankomaniaclient/network/LobbyMessage.kt," +
-                    "src/main/java/com/example/mankomaniaclient/network/LobbyResponse.kt," +
-                    "src/main/java/com/example/mankomaniaclient/network/WebSocketService.kt"
+                    "src/main/java/com/example/mankomaniaclient/StartingMoneyActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/network/WebSocketService.kt," +
+                    "src/main/java/com/example/mankomaniaclient/network/PlayerSocketService.kt"
         )
-
-        property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties, **/drawable/**, **/viewmodel/GameViewModel.kt, **/screens/** ")    }
+        property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties, **/drawable/**, **/viewmodel/**, **/screens/** ")
+    }
 }
 
 
 dependencies {
-
     implementation(libs.krossbow.websocket.okhttp)
     implementation(libs.krossbow.stomp.core)
     implementation(libs.krossbow.websocket.builtin)
@@ -148,7 +145,9 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.appcompat)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.junit.jupiter.engine)
@@ -159,9 +158,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.1")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.1")
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
+    testImplementation(kotlin("test"))
 }

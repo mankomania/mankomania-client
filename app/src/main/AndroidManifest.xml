@@ -56,7 +56,6 @@
             android:name=".JoinLobbyActivity"
             android:exported="false"
             android:label="Mankomania" />
-
         <activity
             android:name=".RulesActivity"
             android:exported="false"
@@ -66,6 +65,12 @@
             android:exported="false"
             android:label="Mankomania" />
 
+        <activity
+            android:name=".StartingMoneyActivity"
+            android:exported="true"
+            android:label="Mankomania"
+            android:theme="@style/Theme.Mankomaniaclient">
+        </activity>
 
     </application>
 
