@@ -53,6 +53,7 @@ class JoinLobbyActivity : ComponentActivity() {
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 hasAttemptedJoin.value = false
+                                webSocketService.clearLobbyResponse()
                             }
                         }
                     }
