@@ -28,9 +28,10 @@ class JoinLobbyActivity : ComponentActivity() {
             val context = LocalContext.current
             val lobbyResponse by webSocketService.lobbyResponse.collectAsState(initial = null)
             val hasNavigated = remember { mutableStateOf(false) }
+            val hasAttemptedJoin = remember { mutableStateOf(false) }
 
-            LaunchedEffect(lobbyResponse) {
-                if (!hasNavigated.value) {
+            LaunchedEffect(lobbyResponse, hasAttemptedJoin.value) {
+                if (hasAttemptedJoin.value && !hasNavigated.value) {
                     lobbyResponse?.let { response ->
                         when (response.type) {
                             "joined" -> {
@@ -51,6 +52,7 @@ class JoinLobbyActivity : ComponentActivity() {
                                     "Join failed – Lobby does not exist!",
                                     Toast.LENGTH_SHORT
                                 ).show()
+                                hasAttemptedJoin.value = false
                             }
                         }
                     }
@@ -61,6 +63,7 @@ class JoinLobbyActivity : ComponentActivity() {
             JoinLobbyScreen(
                 playerName = playerName,
                 onJoinLobby = { lobbyId ->
+                    hasAttemptedJoin.value = true
                     webSocketService.joinLobby(lobbyId, playerName)
                 }
             )
