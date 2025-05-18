@@ -35,15 +35,13 @@ class JoinLobbyActivity : ComponentActivity() {
                     lobbyResponse?.let { response ->
                         when (response.type) {
                             "joined" -> {
-                                if (!hasNavigated.value) {
-                                    hasNavigated.value = true
-                                    val intent =
-                                        Intent(context, CreateLobbyActivity::class.java).apply {
-                                            putExtra("playerName", playerName)
-                                            putExtra("lobbyId", response.lobbyId)
-                                        }
-                                    context.startActivity(intent)
-                                }
+                                hasNavigated.value = true
+                                val intent =
+                                    Intent(context, CreateLobbyActivity::class.java).apply {
+                                        putExtra("playerName", playerName)
+                                        putExtra("lobbyId", response.lobbyId)
+                                    }
+                                context.startActivity(intent)
                             }
 
                             "join-failed" -> {
@@ -65,6 +63,7 @@ class JoinLobbyActivity : ComponentActivity() {
                 playerName = playerName,
                 onJoinLobby = { lobbyId ->
                     hasAttemptedJoin.value = true
+                    webSocketService.clearLobbyResponse()
                     webSocketService.joinLobby(lobbyId, playerName)
                 }
             )
