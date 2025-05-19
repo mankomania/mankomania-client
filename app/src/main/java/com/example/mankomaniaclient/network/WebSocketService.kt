@@ -42,6 +42,9 @@ object WebSocketService {
     val clientCount: StateFlow<Int> = _clientCount.asStateFlow()
     private lateinit var gameViewModel: GameViewModel
 
+    fun clearLobbyResponse() {
+        _lobbyResponse.value = null
+    }
     fun setGameViewModel(vm: GameViewModel) {
         gameViewModel = vm
     }
