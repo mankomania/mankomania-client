@@ -35,6 +35,9 @@ class GameActivity : ComponentActivity() {
         val playerNames  = intent.getStringArrayListExtra("playerNames")
             ?: arrayListOf(singleName)
 
+        val lobbyId = intent.getStringExtra("lobbyId")
+            ?: throw IllegalStateException("Missing lobbyId in Intent")
+
         // Create ViewModel (lifecycle-aware, no extra Compose dependency)
         val gameViewModel = ViewModelProvider(this)[GameViewModel::class.java]
 
@@ -46,6 +49,7 @@ class GameActivity : ComponentActivity() {
                 setContent {
                     MaterialTheme {
                         GameBoardScreen(
+                            lobbyId = lobbyId,
                             playerNames = playerNames,
                             viewModel   = gameViewModel
                         )
@@ -74,6 +78,7 @@ class GameActivity : ComponentActivity() {
                                         "playerNames",
                                         ArrayList(playerNames)
                                     )
+                                    putExtra("lobbyId", lobbyId)
                                     putExtra(EXTRA_SCREEN, SCREEN_GAMEBOARD)
                                 }
                                 startActivity(next)
