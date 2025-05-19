@@ -103,12 +103,13 @@ object WebSocketService {
                     }
                 }
                 launch {
-                    stomp.subscribeText("/topic/game").collect { json ->
+                    stomp.subscribeText("/topic/game/state").collect { json ->
                         val state = jsonParser.decodeFromString<GameStateDto>(json)
                         Log.d("Game", "Received game state: $state")
                         gameViewModel.onGameState(state)
                     }
                 }
+
                 launch{
                     stomp.subscribeText("/topic/player-moved").collect { json ->
                     val moveResult = jsonParser.decodeFromString<MoveResult>(json)
