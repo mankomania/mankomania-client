@@ -1,6 +1,6 @@
 /**
  * @file StatusBarViewTest.kt
- * @author Lev
+ * @author eles17
  * @since 2025-05-19
  * @description Verifies the player status update logic for StatusBarView using GameViewModel.
  */
