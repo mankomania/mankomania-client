@@ -24,9 +24,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import com.example.mankomaniaclient.ui.components.PlayerCharacterView
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mankomaniaclient.network.WebSocketService
 
 @Composable
-fun GameBoardScreen(lobbyId: String, playerNames: List<String>,viewModel: GameViewModel) {
+fun GameBoardScreen(lobbyId: String, playerNames: List<String>, viewModel: GameViewModel ) {
+
+    LaunchedEffect(Unit) {
+        WebSocketService.setGameViewModel(viewModel)
+    }
 
     // Subscribe to lobby updates when the screen is first displayed
     LaunchedEffect(lobbyId) {
