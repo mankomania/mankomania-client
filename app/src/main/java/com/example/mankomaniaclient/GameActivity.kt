@@ -1,5 +1,6 @@
 package com.example.mankomaniaclient
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,41 +16,77 @@ import androidx.lifecycle.ViewModelProvider
  * @since 2025-05-13
  * @description
  *   Main entry point for the game UI.
- *   Shows a welcome screen first, then loads the game board when the user starts.
+ *   Routes between Welcome, Lottery (future), and the GameBoard.
  */
 class GameActivity : ComponentActivity() {
 
     companion object {
-        const val EXTRA_SCREEN    = "extra_screen"
-        const val SCREEN_WELCOME  = "welcome"
-        const val SCREEN_LOTTERY  = "lottery"
+        const val EXTRA_SCREEN     = "extra_screen"
+        const val SCREEN_WELCOME   = "welcome"
+        const val SCREEN_LOTTERY   = "lottery"
+        const val SCREEN_GAMEBOARD = "gameboard"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Retrieve player name and lobby ID from the Intent (fallbacks)
-        val playerName = intent.getStringExtra("playerName") ?: "Unknown"
-        val lobbyId    = intent.getStringExtra("lobbyId")    ?: "???"
+        // Retrieve both single-name fallback and full list from Intent
+        val singleName   = intent.getStringExtra("playerName") ?: "Unknown"
+        val playerNames  = intent.getStringArrayListExtra("playerNames")
+            ?: arrayListOf(singleName)
 
-        // Create your ViewModel here (lifecycle‐aware, no extra Compose dependency)
+        val lobbyId = intent.getStringExtra("lobbyId")
+            ?: throw IllegalStateException("Missing lobbyId in Intent")
+
+        // Create ViewModel (lifecycle-aware, no extra Compose dependency)
         val gameViewModel = ViewModelProvider(this)[GameViewModel::class.java]
 
-        setContent {
-            MaterialTheme {
-                WelcomeScreen(
-                    onStartGame = {
-                        // swap in the actual game board
-                        setContent {
-                            MaterialTheme {
-                                GameBoardScreen(
-                                    playerNames = listOf(playerName),   // <— hier Liste übergeben
-                                    viewModel   = gameViewModel
-                                )
-                            }
-                        }
+        // Decide which screen to show based on the EXTRA_SCREEN flag
+        when (intent.getStringExtra(EXTRA_SCREEN)) {
+
+            SCREEN_GAMEBOARD -> {
+                // Directly show the main GameBoard, using the full list!
+                setContent {
+                    MaterialTheme {
+                        GameBoardScreen(
+                            lobbyId = lobbyId,
+                            playerNames = playerNames,
+                            viewModel   = gameViewModel
+                        )
                     }
-                )
+                }
+            }
+
+            SCREEN_LOTTERY -> {
+                // Placeholder for future Lottery mini-game
+                setContent {
+                    MaterialTheme {
+                        // LotteryScreen(/* … */)
+                    }
+                }
+            }
+
+            else -> {
+                // Default: show WelcomeScreen, then navigate to GameBoard on start
+                setContent {
+                    MaterialTheme {
+                        WelcomeScreen(
+                            onStartGame = {
+                                // Restart this Activity with GAMEBOARD flag and full list
+                                val next = Intent(this, GameActivity::class.java).apply {
+                                    putStringArrayListExtra(
+                                        "playerNames",
+                                        ArrayList(playerNames)
+                                    )
+                                    putExtra("lobbyId", lobbyId)
+                                    putExtra(EXTRA_SCREEN, SCREEN_GAMEBOARD)
+                                }
+                                startActivity(next)
+                                finish()
+                            }
+                        )
+                    }
+                }
             }
         }
     }

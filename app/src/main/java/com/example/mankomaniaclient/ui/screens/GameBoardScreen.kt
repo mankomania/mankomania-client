@@ -26,13 +26,20 @@ import androidx.compose.material3.Button
 import com.example.mankomaniaclient.ui.components.PlayerCharacterView
 
 @Composable
-fun GameBoardScreen(playerNames: List<String>,viewModel: GameViewModel) {
-    val board by viewModel.board.collectAsState()
+fun GameBoardScreen(lobbyId: String, playerNames: List<String>,viewModel: GameViewModel) {
 
-    // --- MoveResult dialog logic ---
+    // Subscribe to lobby updates when the screen is first displayed
+    LaunchedEffect(lobbyId) {
+        Log.d("GameBoardScreen", "Subscribing to lobby $lobbyId")
+        viewModel.subscribeToLobby(lobbyId)
+    }
+    // Collect state values
+    val board by viewModel.board.collectAsState()
+    val players by viewModel.players.collectAsState()
     val moveResult by viewModel.moveResult.collectAsState()
     var showDialog by remember { mutableStateOf(true) }
 
+    // Show move result dialog when a move occurs
     if (moveResult != null && showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
@@ -53,11 +60,14 @@ fun GameBoardScreen(playerNames: List<String>,viewModel: GameViewModel) {
         )
     }
 
+    // Debug log board size
     Log.d("GameBoardScreen", "Board size=${board.size}")
+
+    // Fallback if board is empty
     if (board.isEmpty()) {
         Text("No cells received!")
+        return
     }
-    val players by viewModel.players.collectAsState()
 
     val sideCount = board.size / 4
     val bgColor = MaterialTheme.colorScheme.surfaceVariant   // << soft grey / blue by default
@@ -69,6 +79,7 @@ fun GameBoardScreen(playerNames: List<String>,viewModel: GameViewModel) {
             .padding(16.dp)
     ) {
         Text(
+            // Display player names at corners
             text = playerNames.getOrNull(0) ?: "",
             modifier = Modifier
                 .align(Alignment.TopStart)
