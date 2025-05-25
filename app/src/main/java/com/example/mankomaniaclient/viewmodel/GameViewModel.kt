@@ -20,6 +20,8 @@ import com.example.mankomaniaclient.model.DiceResult
 import com.example.mankomaniaclient.model.MoveResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import android.util.Log
+
 
 class GameViewModel : ViewModel() {
 
@@ -41,13 +43,10 @@ class GameViewModel : ViewModel() {
         WebSocketService.subscribeToLobby(lobbyId)
     }
 
-    init {
-        // Register this ViewModel with the WebSocketService for callbacks
-        WebSocketService.setGameViewModel(this)
-    }
 
     /** Called by WebSocketService when a new GameStateDto arrives */
     fun onGameState(state: GameStateDto) {
+        Log.d("GameViewModel", "Received state with board size = ${state.board.size}")
         _board.value   = state.board
         _players.value = state.players
     }

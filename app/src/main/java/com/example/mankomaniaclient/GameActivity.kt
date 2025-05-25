@@ -9,6 +9,7 @@ import com.example.mankomaniaclient.ui.screens.GameBoardScreen
 import com.example.mankomaniaclient.ui.screens.WelcomeScreen
 import com.example.mankomaniaclient.viewmodel.GameViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.mankomaniaclient.network.WebSocketService
 
 /**
  * @file GameActivity.kt
@@ -40,6 +41,8 @@ class GameActivity : ComponentActivity() {
 
         // Create ViewModel (lifecycle-aware, no extra Compose dependency)
         val gameViewModel = ViewModelProvider(this)[GameViewModel::class.java]
+        WebSocketService.setGameViewModel(gameViewModel)
+        WebSocketService.connect()
 
         // Decide which screen to show based on the EXTRA_SCREEN flag
         when (intent.getStringExtra(EXTRA_SCREEN)) {
