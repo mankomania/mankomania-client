@@ -171,14 +171,16 @@ object WebSocketService {
             lobbyId = lobbyId
         )
         val json = jsonParser.encodeToString(LobbyMessage.serializer(), message)
-
+        Log.d("WS-START", "Sending start for lobby $lobbyId by $playerName")
         send("/app/lobby", jsonParser.encodeToString(LobbyMessage.serializer(), message))
     }
 
     fun subscribeToLobby(lobbyId: String) {
         scope.launch {
             try {
-                session?.subscribeText("/topic/lobby/$lobbyId")?.collect { json ->
+                session
+                    ?.subscribeText("/topic/lobby/$lobbyId")
+                    ?.collect { json ->
                     val response = jsonParser.decodeFromString<LobbyResponse>(json)
                     Log.d("WebSocket", "Received lobby update (join): $response")
 
@@ -199,6 +201,7 @@ object WebSocketService {
                 session
                     ?.subscribeText("/topic/game/state/$lobbyId")
                     ?.collect { json ->
+                        Log.d("WS-STATE", "Got game state JSON: $json")
                         val state = jsonParser.decodeFromString<GameStateDto>(json)
                         Log.d("WebSocket", "Received game state: $state")
                         gameViewModel.onGameState(state)
