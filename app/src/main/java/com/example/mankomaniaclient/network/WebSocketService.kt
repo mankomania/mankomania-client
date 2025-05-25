@@ -164,6 +164,7 @@ object WebSocketService {
     }
 
     fun startGame(lobbyId: String, playerName: String) {
+        subscribeToLobby(lobbyId)
         val message = LobbyMessage(
             type = "start",
             playerName = playerName,
@@ -171,7 +172,7 @@ object WebSocketService {
         )
         val json = jsonParser.encodeToString(LobbyMessage.serializer(), message)
 
-        send("/app/lobby", json)
+        send("/app/lobby", jsonParser.encodeToString(LobbyMessage.serializer(), message))
     }
 
     fun subscribeToLobby(lobbyId: String) {
@@ -196,7 +197,7 @@ object WebSocketService {
         scope.launch {
             try {
                 session
-                    ?.subscribeText("/topic/game/state")
+                    ?.subscribeText("/topic/game/state/$lobbyId")
                     ?.collect { json ->
                         val state = jsonParser.decodeFromString<GameStateDto>(json)
                         Log.d("WebSocket", "Received game state: $state")
