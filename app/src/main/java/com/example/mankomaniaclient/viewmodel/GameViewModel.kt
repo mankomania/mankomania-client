@@ -90,4 +90,9 @@ class GameViewModel : ViewModel() {
     fun onPlayerMoved(result: MoveResult) {
         _moveResult.value = result
     }
+
+    /** Clears the last move-result so the dialog disappears */
+    fun clearMoveResult() {
+        _moveResult.value = null
+    }
 }
