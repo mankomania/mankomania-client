@@ -282,7 +282,8 @@ fun GameBoardContent(
         Row(
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .padding(top = 20.dp),
+                .offset(y = (-30).dp)
+                .padding(top = 0.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             for (i in 0 until sideCount) {
@@ -324,8 +325,8 @@ fun GameBoardContent(
         Column(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
-                .padding(end = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(end = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp)
         ) {
             for (i in sideCount until 2 * sideCount) {
                 Row(
@@ -366,7 +367,8 @@ fun GameBoardContent(
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 20.dp),
+                .offset(y = 30.dp)
+                .padding(bottom = 0.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             for (i in (2 * sideCount until 3 * sideCount).reversed()) {
@@ -408,8 +410,8 @@ fun GameBoardContent(
         Column(
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .padding(start = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(start = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp)
         ) {
             for (i in (3 * sideCount until board.size).reversed()) {
                 Row(
