@@ -9,6 +9,7 @@ package com.example.mankomaniaclient.network
 
 import kotlinx.serialization.Serializable
 
+// fixme you have already DiceResult and MoveResult, only use one then
 @Serializable
 data class DiceMoveResultDto(
     val playerId: String,
