@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import android.content.Intent
 import androidx.compose.ui.platform.LocalContext
+import com.example.mankomaniaclient.util.Constants.DEFAULT_BOARD_SIZE
 
 
 @Composable
@@ -46,7 +47,7 @@ fun CreateLobbyScreen(
 
         if (players.size >= 2) {
             Button(onClick = {
-                WebSocketService.startGame(lobbyId, playerName)
+                WebSocketService.startGame(lobbyId, playerName, DEFAULT_BOARD_SIZE)
             }) {
                 Text("Start Game")
             }

@@ -13,5 +13,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class GameStartedDto(
     val gameId: String,
-    val startPositions: List<Int>
+    val startPositions: List<Int>,
+    val firstPlayerIndex: Int
 )
