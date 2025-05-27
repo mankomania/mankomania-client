@@ -6,6 +6,7 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 
+// fixme you are opening connections per minigame, better just add one and send topics via that
 class LotteryApi {
 
     private val BASE_URL = "http://se2-demo.aau.at:53210"
