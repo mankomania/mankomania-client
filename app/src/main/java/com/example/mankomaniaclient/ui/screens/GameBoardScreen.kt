@@ -7,6 +7,7 @@
  **/
 package com.example.mankomaniaclient.ui.screens
 
+import androidx.compose.ui.graphics.Color
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -23,6 +24,7 @@ import com.example.mankomaniaclient.viewmodel.GameViewModel
 import androidx.compose.material3.Text
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.ui.text.font.FontWeight
 import com.example.mankomaniaclient.ui.components.PlayerCharacterView
 
 @Composable
@@ -65,57 +67,73 @@ fun GameBoardScreen(lobbyId: String, playerNames: List<String>,viewModel: GameVi
 
     // Fallback if board is empty
     if (board.isEmpty()) {
-        Text("No cells received!")
+        Text("No cells received! Gameboard is not building. Error!")
         return
     }
 
     val sideCount = board.size / 4
-    val bgColor = MaterialTheme.colorScheme.surfaceVariant   // << soft grey / blue by default
+    val bgColor = MaterialTheme.colorScheme.surfaceVariant
+
+    // helper function: to get player color
+    fun getPlayerColor(playerIndex: Int): Color {
+        return when (playerIndex) {
+            0 -> Color.Red
+            1 -> Color.Blue
+            2 -> Color.Green
+            3 -> Color.Yellow
+            else -> Color.Gray
+        }
+    }
+
+    // helper function: to get player name at position
+    fun getPlayerNameAtPosition(position: Int): Pair<String, Color>? {
+        players.forEachIndexed { index, player ->
+            if (player.position == position) {
+                val playerName = playerNames.getOrNull(index) ?: player.name
+                return Pair(playerName, getPlayerColor(index))
+            }
+        }
+        return null
+    }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(bgColor)
-            .padding(16.dp)
+            .padding(32.dp) // Increased padding for better spacing
     ) {
-        Text(
-            // Display player names at corners
-            text = playerNames.getOrNull(0) ?: "",
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(24.dp)
-        )
 
-        Text(
-            text = playerNames.getOrNull(1) ?: "",
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(24.dp)
-        )
-
-        Text(
-            text = playerNames.getOrNull(2) ?: "",
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(24.dp)
-        )
-
-        Text(
-            text = playerNames.getOrNull(3) ?: "",
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(24.dp)
-        )
         /* ---------- Top row ------------------------------------------------ */
-        Row(Modifier.align(Alignment.TopCenter)) {
+        Row(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 24.dp) // Add some top padding
+        ) {
             for (i in 0 until sideCount) {
                 Log.d("GameBoardScreen", "Top cell #$i → ${board.getOrNull(i)}")
 
-                Box { // Render the top row of the board and display all player figures whose position matches the cell index
-                    BoardCellView(cell = board[i], players = players)
-                    players.forEachIndexed { index, player ->
-                        if (player.position == i) {
-                            PlayerCharacterView(playerIndex = index)
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Player name above the cell if player is on this position
+                    val playerInfo = getPlayerNameAtPosition(i)
+                    if (playerInfo != null) {
+                        Text(
+                            text = playerInfo.first,
+                            color = playerInfo.second,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                    } else {
+                        Spacer(modifier = Modifier.height(20.dp)) // Maintain spacing
+                    }
+
+                    Box {
+                        BoardCellView(cell = board[i], players = players)
+                        players.forEachIndexed { index, player ->
+                            if (player.position == i) {
+                                PlayerCharacterView(playerIndex = index)
+                            }
                         }
                     }
                 }
@@ -123,54 +141,133 @@ fun GameBoardScreen(lobbyId: String, playerNames: List<String>,viewModel: GameVi
         }
 
         /* ---------- Right column ------------------------------------------- */
-        Column(Modifier.align(Alignment.CenterEnd)) {
+        Column(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .padding(end = 24.dp) // Add some end padding
+        ) {
             for (i in sideCount until 2 * sideCount) {
                 Log.d("GameBoardScreen", "Right cell #$i → ${board.getOrNull(i)}")
 
-                Box { // Render the right column and show all player figures for each cell where a player's position matches
-                    BoardCellView(cell = board[i], players = players)
-                    players.forEachIndexed { index, player ->
-                        if (player.position == i) {
-                            PlayerCharacterView(playerIndex = index)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box {
+                        BoardCellView(cell = board[i], players = players)
+                        players.forEachIndexed { index, player ->
+                            if (player.position == i) {
+                                PlayerCharacterView(playerIndex = index)
+                            }
                         }
+                    }
+
+                    // Player name to the right of the cell if player is on this position
+                    val playerInfo = getPlayerNameAtPosition(i)
+                    if (playerInfo != null) {
+                        Text(
+                            text = playerInfo.first,
+                            color = playerInfo.second,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    } else {
+                        Spacer(modifier = Modifier.width(60.dp)) // Maintain spacing
                     }
                 }
             }
         }
 
         /* ---------- Bottom row (reverse) ----------------------------------- */
-        Row(Modifier.align(Alignment.BottomCenter)) {
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 24.dp) // Add some bottom padding
+        ) {
             for (i in (2 * sideCount until 3 * sideCount).reversed()) {
                 Log.d("GameBoardScreen", "Bottom cell #$i → ${board.getOrNull(i)}")
 
-                Box { // Render the bottom row in reverse and draw all player figures that are on each respective field
-                    BoardCellView(cell = board[i], players = players)
-                    players.forEachIndexed { index, player ->
-                        if (player.position == i) {
-                            PlayerCharacterView(playerIndex = index)
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Box {
+                        BoardCellView(cell = board[i], players = players)
+                        players.forEachIndexed { index, player ->
+                            if (player.position == i) {
+                                PlayerCharacterView(playerIndex = index)
+                            }
                         }
+                    }
+
+                    // Player name below the cell if player is on this position
+                    val playerInfo = getPlayerNameAtPosition(i)
+                    if (playerInfo != null) {
+                        Text(
+                            text = playerInfo.first,
+                            color = playerInfo.second,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    } else {
+                        Spacer(modifier = Modifier.height(20.dp)) // Maintain spacing
                     }
                 }
             }
         }
 
         /* ---------- Left column (reverse) ---------------------------------- */
-        Column(Modifier.align(Alignment.CenterStart)) {
+        Column(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(start = 24.dp) // Add some start padding
+        ) {
             for (i in (3 * sideCount until board.size).reversed()) {
                 Log.d("GameBoardScreen", "Left cell #$i → ${board.getOrNull(i)}")
 
-                Box { // Render the left column in reverse and place player figures on the matching board cells
-                    BoardCellView(cell = board[i], players = players)
-                    players.forEachIndexed { index, player ->
-                        if (player.position == i) {
-                            PlayerCharacterView(playerIndex = index)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Player name to the left of the cell if player is on this position
+                    val playerInfo = getPlayerNameAtPosition(i)
+                    if (playerInfo != null) {
+                        Text(
+                            text = playerInfo.first,
+                            color = playerInfo.second,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                    } else {
+                        Spacer(modifier = Modifier.width(60.dp)) // Maintain spacing
+                    }
+
+                    Box {
+                        BoardCellView(cell = board[i], players = players)
+                        players.forEachIndexed { index, player ->
+                            if (player.position == i) {
+                                PlayerCharacterView(playerIndex = index)
+                            }
                         }
                     }
                 }
             }
         }
+
+        // Game info in center (optional - you can remove this if not needed)
+        Column(
+            modifier = Modifier.align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Mankomania",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            )
+            Text(
+                text = "Lobby: $lobbyId",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+            )
+        }
     }
 }
-
 
 
