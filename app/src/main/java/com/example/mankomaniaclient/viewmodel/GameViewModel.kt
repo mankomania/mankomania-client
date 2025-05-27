@@ -101,4 +101,9 @@ class GameViewModel : ViewModel() {
             put(status.name, status)
         }
     }
+
+    /** Clears the last move-result so the dialog disappears */
+    fun clearMoveResult() {
+        _moveResult.value = null
+    }
 }
