@@ -37,6 +37,8 @@ fun GameBoardScreen(lobbyId: String, playerNames: List<String>,viewModel: GameVi
     val board by viewModel.board.collectAsState()
     val players by viewModel.players.collectAsState()
     val moveResult by viewModel.moveResult.collectAsState()
+    val lotteryResult by viewModel.lotteryResult.collectAsState()
+    val showLotteryDialog by viewModel.showLotteryDialog.collectAsState()
     var showDialog by remember { mutableStateOf(true) }
 
     // Show move result dialog when a move occurs
@@ -55,6 +57,42 @@ fun GameBoardScreen(lobbyId: String, playerNames: List<String>,viewModel: GameVi
                     if (moveResult!!.playersOnField.isNotEmpty()) {
                         Text("Other players here: ${moveResult!!.playersOnField.joinToString()}")
                     }
+                }
+            }
+        )
+    }
+
+    // Show brief lottery notification (auto-dismisses)
+    if (showLotteryDialog && lotteryResult != null) {
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissLotteryDialog() },
+            confirmButton = {
+                Button(onClick = { viewModel.dismissLotteryDialog() }) {
+                    Text("OK")
+                }
+            },
+            title = {
+                Text(
+                    if (lotteryResult!!.wonAmount > 0) "🎰 LOTTERY WIN! 🎰"
+                    else "🎰 LOTTERY 🎰"
+                )
+            },
+            text = {
+                Column {
+                    Text(lotteryResult!!.message)
+                    if (lotteryResult!!.wonAmount > 0) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Amount won: ${lotteryResult!!.wonAmount} €",
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.primary)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text("Current pool: ${lotteryResult!!.newPoolAmount} €",
+                        style = MaterialTheme.typography.bodySmall)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("(Auto-closing in 3 seconds...)",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.outline)
                 }
             }
         )
