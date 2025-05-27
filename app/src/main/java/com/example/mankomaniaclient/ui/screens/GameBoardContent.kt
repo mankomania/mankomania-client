@@ -30,7 +30,7 @@ import com.example.mankomaniaclient.ui.components.BoardCellView
 import com.example.mankomaniaclient.ui.components.PlayerCharacterView
 
 /**
- * Pure-UI version of the game board.
+ * Pure-UI version of the game board. Make UI changes here, not in GameBoardScreen!
  *
  * @param board         Immutable list of cells coming from the server.
  * @param players       Current player states.

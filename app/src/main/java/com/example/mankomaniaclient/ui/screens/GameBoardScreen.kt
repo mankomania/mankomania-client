@@ -4,6 +4,7 @@
  * @since 2025-05-08
  * @description ViewModel-aware wrapper: subscribes to lobby updates and feeds
  *              state into the stateless GameBoardContent composable.
+ *              Here no UI  -> for UI go into GameboardContent.kt and use compose preview there.
  */
 package com.example.mankomaniaclient.ui.screens
 
