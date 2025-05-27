@@ -243,7 +243,12 @@ fun GameBoardContent(
 }
 
 /*------------------------------------------------------ Preview with dummy data */
-@Preview(showBackground = true, widthDp = 420, heightDp = 820)
+@Preview(
+    name = "GameBoard – Landscape",
+    showBackground = true,
+    widthDp = 820,
+    heightDp = 420
+)
 @Composable
 private fun GameBoardContentPreview() {
     /* Dummy board: 20 cells, every 5th cell has a branch */
@@ -251,7 +256,7 @@ private fun GameBoardContentPreview() {
 
     /* Dummy players */
     val players = listOf(
-        PlayerDto(name = "Anna", position = 2),
+        PlayerDto(name = "Kevin", position = 2),
         PlayerDto(name = "Bob",  position = 5),
         PlayerDto(name = "Clara", position = 11)
     )
