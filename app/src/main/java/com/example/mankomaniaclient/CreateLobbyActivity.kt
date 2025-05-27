@@ -105,6 +105,7 @@ class CreateLobbyActivity : ComponentActivity() {
 
             Button(
                 onClick = {
+                    WebSocketService.subscribeToLobby(lobbyId)
                     Log.d("LOBBY", "Trying to start game in $lobbyId by $playerName")
                     WebSocketService.startGame(lobbyId, playerName)
                 },
