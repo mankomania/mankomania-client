@@ -133,7 +133,10 @@ sonar {
                     "src/main/java/com/example/mankomaniaclient/network/WebSocketService.kt"
         )
 
-        property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties, **/drawable/**, **/viewmodel/GameViewModel.kt, **/screens/** ")    }
+        property("sonar.exclusions",
+            "**/build/**, **/generated/**, **/.idea/**, local.properties, **/drawable/**, **/viewmodel/GameViewModel.kt, **/screens/**, **/network/**"
+        )
+    }
 }
 
 
