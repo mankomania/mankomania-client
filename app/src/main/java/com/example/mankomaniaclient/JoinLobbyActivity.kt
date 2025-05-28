@@ -28,21 +28,20 @@ class JoinLobbyActivity : ComponentActivity() {
             val context = LocalContext.current
             val lobbyResponse by webSocketService.lobbyResponse.collectAsState(initial = null)
             val hasNavigated = remember { mutableStateOf(false) }
+            val hasAttemptedJoin = remember { mutableStateOf(false) }
 
-            LaunchedEffect(lobbyResponse) {
-                if (!hasNavigated.value) {
+            LaunchedEffect(lobbyResponse, hasAttemptedJoin.value) {
+                if (hasAttemptedJoin.value && !hasNavigated.value) {
                     lobbyResponse?.let { response ->
                         when (response.type) {
                             "joined" -> {
-                                if (!hasNavigated.value) {
-                                    hasNavigated.value = true
-                                    val intent =
-                                        Intent(context, CreateLobbyActivity::class.java).apply {
-                                            putExtra("playerName", playerName)
-                                            putExtra("lobbyId", response.lobbyId)
-                                        }
-                                    context.startActivity(intent)
-                                }
+                                hasNavigated.value = true
+                                val intent =
+                                    Intent(context, CreateLobbyActivity::class.java).apply {
+                                        putExtra("playerName", playerName)
+                                        putExtra("lobbyId", response.lobbyId)
+                                    }
+                                context.startActivity(intent)
                             }
 
                             "join-failed" -> {
@@ -51,6 +50,8 @@ class JoinLobbyActivity : ComponentActivity() {
                                     "Join failed – Lobby does not exist!",
                                     Toast.LENGTH_SHORT
                                 ).show()
+                                hasAttemptedJoin.value = false
+                                webSocketService.clearLobbyResponse()
                             }
                         }
                     }
@@ -61,6 +62,8 @@ class JoinLobbyActivity : ComponentActivity() {
             JoinLobbyScreen(
                 playerName = playerName,
                 onJoinLobby = { lobbyId ->
+                    hasAttemptedJoin.value = true
+                    webSocketService.clearLobbyResponse()
                     webSocketService.joinLobby(lobbyId, playerName)
                 }
             )

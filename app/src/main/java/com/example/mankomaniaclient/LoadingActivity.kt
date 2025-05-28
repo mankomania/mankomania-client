@@ -27,7 +27,7 @@ class LoadingActivity : ComponentActivity() {
         Handler(Looper.getMainLooper()).postDelayed({
             startActivity(Intent(this, NameActivity::class.java))
             finish()
-        }, 5000) // 3 Sekunden Delay
+        }, 1000) // 1 Sekunden Delay
 
         setContent {
             LoadingScreen()
@@ -39,7 +39,6 @@ class LoadingActivity : ComponentActivity() {
 @Composable
 fun LoadingScreen() {
     Box(modifier = Modifier.fillMaxSize()) {
-        // Hintergrundbild
         Image(
             painter = painterResource(id = R.drawable.loading_screen),
             contentDescription = "Loading",
@@ -47,7 +46,6 @@ fun LoadingScreen() {
             modifier = Modifier.fillMaxSize()
         )
 
-        // Ladebalken zentriert am unteren Rand
         Column(
             modifier = Modifier
                 .fillMaxSize()

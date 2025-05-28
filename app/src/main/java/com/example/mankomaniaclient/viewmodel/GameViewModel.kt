@@ -33,6 +33,18 @@ class GameViewModel : ViewModel() {
     private val _moveResult = MutableStateFlow<MoveResult?>(null)
     val moveResult: StateFlow<MoveResult?> = _moveResult
 
+    /**
+     * Subscribe to the given lobby via WebSocket.
+     * This will route incoming GameStateDto and MoveResults automatically
+     */
+    fun subscribeToLobby(lobbyId: String) {
+        WebSocketService.subscribeToLobby(lobbyId)
+    }
+
+    init {
+        // Register this ViewModel with the WebSocketService for callbacks
+        WebSocketService.setGameViewModel(this)
+    }
 
     /** Called by WebSocketService when a new GameStateDto arrives */
     fun onGameState(state: GameStateDto) {
@@ -77,5 +89,10 @@ class GameViewModel : ViewModel() {
 
     fun onPlayerMoved(result: MoveResult) {
         _moveResult.value = result
+    }
+
+    /** Clears the last move-result so the dialog disappears */
+    fun clearMoveResult() {
+        _moveResult.value = null
     }
 }

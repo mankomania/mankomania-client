@@ -61,8 +61,10 @@ class CreateLobbyActivity : ComponentActivity() {
             if (lobbyResponse?.type == "start") {
                 val players = WebSocketService.playersInLobby.value
                 val intent = Intent(context, GameActivity::class.java).apply {
-                    putExtra("lobbyId", finalLobbyId.value)
                     putStringArrayListExtra("playerNames", ArrayList(players))
+                    putExtra("lobbyId", finalLobbyId.value)
+                    putExtra(GameActivity.EXTRA_SCREEN, GameActivity.SCREEN_GAMEBOARD)
+
                 }
                 context.startActivity(intent)
                 (context as? ComponentActivity)?.finish()
@@ -103,6 +105,7 @@ class CreateLobbyActivity : ComponentActivity() {
 
             Button(
                 onClick = {
+                    WebSocketService.subscribeToLobby(lobbyId)
                     Log.d("LOBBY", "Trying to start game in $lobbyId by $playerName")
                     WebSocketService.startGame(lobbyId, playerName)
                 },
