@@ -1,4 +1,4 @@
-package com.example.mankomaniaclient.api
+package com.example.mankomaniaclient.model
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
