@@ -49,7 +49,8 @@ class GameViewModel : ViewModel() {
 
     /** Called by WebSocketService when a new GameStateDto arrives */
     fun onGameState(state: GameStateDto) {
-        _board.value   = state.board
+        // state.board: List<CellDto>, state.players: List<PlayerDto>
+        _board.value = state.board
         _players.value = state.players
     }
 
