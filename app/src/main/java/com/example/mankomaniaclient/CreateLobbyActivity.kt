@@ -16,6 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.mankomaniaclient.viewmodel.GameViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mankomaniaclient.util.Constants.DEFAULT_BOARD_SIZE
+
 
 class CreateLobbyActivity : ComponentActivity() {
     private fun generateLobbyId(length: Int = 6): String {
@@ -39,11 +43,21 @@ class CreateLobbyActivity : ComponentActivity() {
     }
 
     @Composable
-    fun CreateLobbyContent(playerName: String, lobbyIdFromIntent: String?) {
+    fun CreateLobbyContent(
+        playerName: String,
+        lobbyIdFromIntent: String?,
+        viewModel: GameViewModel = viewModel<GameViewModel>()
+    ) {
         val context = LocalContext.current
         val lobbyResponse by WebSocketService.lobbyResponse.collectAsState()
         val finalLobbyId = remember { mutableStateOf("") }
 
+        // store local player name once into view model
+        LaunchedEffect(Unit) {
+            viewModel.setLocalPlayerName(playerName)
+        }
+
+        // lobby create and join flow
         LaunchedEffect(Unit) {
             val id: String = if (lobbyIdFromIntent == null) {
                 val newId = generateLobbyId()
@@ -57,6 +71,7 @@ class CreateLobbyActivity : ComponentActivity() {
             finalLobbyId.value = id
         }
 
+        // lobby wait for start signal flow -> navigate to GameActivity once server broadcasts "start"
         LaunchedEffect(lobbyResponse) {
             if (lobbyResponse?.type == "start") {
                 val players = WebSocketService.playersInLobby.value
@@ -105,9 +120,8 @@ class CreateLobbyActivity : ComponentActivity() {
 
             Button(
                 onClick = {
-                    WebSocketService.subscribeToLobby(lobbyId)
                     Log.d("LOBBY", "Trying to start game in $lobbyId by $playerName")
-                    WebSocketService.startGame(lobbyId, playerName)
+                    WebSocketService.startGame(lobbyId, playerName, boardSize = DEFAULT_BOARD_SIZE)
                 },
                 enabled = players.size >= 2
             ) {

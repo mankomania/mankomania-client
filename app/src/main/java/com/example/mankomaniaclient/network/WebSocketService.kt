@@ -10,11 +10,15 @@ import org.hildan.krossbow.stomp.subscribeText
 import org.hildan.krossbow.websocket.okhttp.OkHttpWebSocketClient
 import kotlinx.coroutines.Dispatchers
 
+import com.example.mankomaniaclient.network.GameStateDto
+
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.json.Json
+
+import com.example.mankomaniaclient.util.Constants.DEFAULT_BOARD_SIZE
 
 /**
  * Handles all STOMP communication with the game server.
@@ -163,19 +167,21 @@ object WebSocketService {
         send("/app/lobby", json)
     }
 
-    fun startGame(lobbyId: String, playerName: String) {
+    fun startGame(lobbyId: String, playerName: String, boardSize: Int = DEFAULT_BOARD_SIZE) {
         subscribeToLobby(lobbyId)
         val message = LobbyMessage(
             type = "start",
             playerName = playerName,
-            lobbyId = lobbyId
+            lobbyId = lobbyId,
+            boardSize = boardSize
         )
         val json = jsonParser.encodeToString(LobbyMessage.serializer(), message)
-        Log.d("WS-START", "Sending start for lobby $lobbyId by $playerName")
-        send("/app/lobby", jsonParser.encodeToString(LobbyMessage.serializer(), message))
+        Log.d("WS-START", "Sending start for lobby $lobbyId by $playerName, size=$boardSize")
+        send("/app/lobby", json)
     }
 
     fun subscribeToLobby(lobbyId: String) {
+        // 1 - Lobby Updates (join, create, update)
         scope.launch {
             try {
                 session
@@ -195,7 +201,7 @@ object WebSocketService {
                 Log.e("WebSocket", "Error in subscribeToLobby: ${e.message}")
             }
         }
-        // neuer Game-State subscription-Block
+        // 2 - Game State Updates (after start and during game session)
         scope.launch {
             try {
                 session
@@ -208,6 +214,21 @@ object WebSocketService {
                     }
             } catch (e: Exception) {
                 Log.e("WebSocket", "Error subscribing to game state: ${e.message}")
+            }
+        }
+
+        // 3) Game started signal (once after start)
+        scope.launch {
+            try {
+                session
+                    ?.subscribeText("/topic/game/started/$lobbyId")
+                    ?.collect { json ->
+                        Log.d("WS-STARTED", "GameStarted JSON: $json")
+                        val started = jsonParser.decodeFromString<GameStartedDto>(json)
+                        gameViewModel.onGameStarted(started)
+                    }
+            } catch (e: Exception) {
+                Log.e("WebSocket", "Error in game started subscription: ${e.message}")
             }
         }
     }
