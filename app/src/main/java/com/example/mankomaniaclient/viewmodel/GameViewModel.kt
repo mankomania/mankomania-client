@@ -108,6 +108,11 @@ class GameViewModel : ViewModel() {
         }
     }
 
+    /** Clears the last move-result so the dialog disappears */
+    fun clearMoveResult() {
+        _moveResult.value = null
+    }
+
     /**
      * Automatically triggers lottery when landing on field 3
      */

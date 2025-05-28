@@ -2,9 +2,10 @@
  * @file GameBoardScreen.kt
  * @author Angela Drucks
  * @since 2025-05-08
- * @description Lays the board cells around the edges (clockwise)
- *              and paints a neutral surface-variant as backdrop.
- **/
+ * @description ViewModel-aware wrapper: subscribes to lobby updates and feeds
+ *              state into the stateless GameBoardContent composable.
+ *              Here no UI  -> for UI go into GameboardContent.kt and use compose preview there.
+ */
 package com.example.mankomaniaclient.ui.screens
 
 import android.util.Log
@@ -33,10 +34,11 @@ fun GameBoardScreen(lobbyId: String, playerNames: List<String>,viewModel: GameVi
         Log.d("GameBoardScreen", "Subscribing to lobby $lobbyId")
         viewModel.subscribeToLobby(lobbyId)
     }
-    // Collect state values
+
+    /* Collect state from the ViewModel -------------------------------- */
     val board by viewModel.board.collectAsState()
     val players by viewModel.players.collectAsState()
-    val moveResult by viewModel.moveResult.collectAsState()
+    val moveResult by viewModel.moveResult.collectAsState()     // type: MoveResult?
     val lotteryResult by viewModel.lotteryResult.collectAsState()
     val showLotteryDialog by viewModel.showLotteryDialog.collectAsState()
     var showDialog by remember { mutableStateOf(true) }
@@ -82,17 +84,23 @@ fun GameBoardScreen(lobbyId: String, playerNames: List<String>,viewModel: GameVi
                     Text(lotteryResult!!.message)
                     if (lotteryResult!!.wonAmount > 0) {
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("Amount won: ${lotteryResult!!.wonAmount} €",
+                        Text(
+                            "Amount won: ${lotteryResult!!.wonAmount} €",
                             style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.primary)
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text("Current pool: ${lotteryResult!!.newPoolAmount} €",
-                        style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        "Current pool: ${lotteryResult!!.newPoolAmount} €",
+                        style = MaterialTheme.typography.bodySmall
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("(Auto-closing in 3 seconds...)",
+                    Text(
+                        "(Auto-closing in 3 seconds...)",
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.outline)
+                        color = MaterialTheme.colorScheme.outline
+                    )
                 }
             }
         )
@@ -138,77 +146,14 @@ fun GameBoardScreen(lobbyId: String, playerNames: List<String>,viewModel: GameVi
                 .padding(24.dp)
         )
 
-        Text(
-            text = playerNames.getOrNull(3) ?: "",
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(24.dp)
+        /* Delegate rendering to the pure-UI composable -------------------- */
+        GameBoardContent(
+            board = board,
+            players = players,
+            lobbyId = lobbyId,
+            playerNames = playerNames,
+            moveResult = moveResult,
+            onDismissMoveResult = { viewModel.clearMoveResult() }
         )
-        /* ---------- Top row ------------------------------------------------ */
-        Row(Modifier.align(Alignment.TopCenter)) {
-            for (i in 0 until sideCount) {
-                Log.d("GameBoardScreen", "Top cell #$i → ${board.getOrNull(i)}")
-
-                Box { // Render the top row of the board and display all player figures whose position matches the cell index
-                    BoardCellView(cell = board[i], players = players)
-                    players.forEachIndexed { index, player ->
-                        if (player.position == i) {
-                            PlayerCharacterView(playerIndex = index)
-                        }
-                    }
-                }
-            }
-        }
-
-        /* ---------- Right column ------------------------------------------- */
-        Column(Modifier.align(Alignment.CenterEnd)) {
-            for (i in sideCount until 2 * sideCount) {
-                Log.d("GameBoardScreen", "Right cell #$i → ${board.getOrNull(i)}")
-
-                Box { // Render the right column and show all player figures for each cell where a player's position matches
-                    BoardCellView(cell = board[i], players = players)
-                    players.forEachIndexed { index, player ->
-                        if (player.position == i) {
-                            PlayerCharacterView(playerIndex = index)
-                        }
-                    }
-                }
-            }
-        }
-
-        /* ---------- Bottom row (reverse) ----------------------------------- */
-        Row(Modifier.align(Alignment.BottomCenter)) {
-            for (i in (2 * sideCount until 3 * sideCount).reversed()) {
-                Log.d("GameBoardScreen", "Bottom cell #$i → ${board.getOrNull(i)}")
-
-                Box { // Render the bottom row in reverse and draw all player figures that are on each respective field
-                    BoardCellView(cell = board[i], players = players)
-                    players.forEachIndexed { index, player ->
-                        if (player.position == i) {
-                            PlayerCharacterView(playerIndex = index)
-                        }
-                    }
-                }
-            }
-        }
-
-        /* ---------- Left column (reverse) ---------------------------------- */
-        Column(Modifier.align(Alignment.CenterStart)) {
-            for (i in (3 * sideCount until board.size).reversed()) {
-                Log.d("GameBoardScreen", "Left cell #$i → ${board.getOrNull(i)}")
-
-                Box { // Render the left column in reverse and place player figures on the matching board cells
-                    BoardCellView(cell = board[i], players = players)
-                    players.forEachIndexed { index, player ->
-                        if (player.position == i) {
-                            PlayerCharacterView(playerIndex = index)
-                        }
-                    }
-                }
-            }
-        }
     }
 }
-
-
-
