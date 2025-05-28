@@ -117,7 +117,8 @@ sonar {
                     "src/main/java/com/example/mankomaniaclient/LoadingActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/NameActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/RulesActivity.kt," +
-                    "src/main/java/com/example/mankomaniaclient/network/**"
+                    "src/main/java/com/example/mankomaniaclient/StartingMoneyActivity.kt,"+
+            "src/main/java/com/example/mankomaniaclient/network/**"
         )
         property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties, **/drawable/**, **/viewmodel/**, **/screens/**, **/network/**"
         )
