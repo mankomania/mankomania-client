@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import com.example.mankomaniaclient.model.MoveResult
@@ -43,9 +44,20 @@ class GameBoardScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithText("You landed on: Casino").assertIsDisplayed()
+        // Wait until a node with the *exact* title text appears
+        composeTestRule.waitUntil(
+            timeoutMillis = 5000,
+            condition = {
+                composeTestRule
+                    .onAllNodesWithText("Du landest auf: Casino")
+                    .fetchSemanticsNodes()
+                    .isNotEmpty()
+            }
+        )
+
+        composeTestRule.onNodeWithText("Du landest auf: Casino").assertIsDisplayed()
         composeTestRule.onNodeWithText("Try your luck").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Other players here: Anna, Toni").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Andere Spieler hier: Anna, Toni").assertIsDisplayed()
     }
 
 
