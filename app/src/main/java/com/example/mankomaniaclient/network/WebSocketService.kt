@@ -182,15 +182,25 @@ object WebSocketService {
                 session
                     ?.subscribeText("/topic/lobby/$lobbyId")
                     ?.collect { json ->
-                    val response = jsonParser.decodeFromString<LobbyResponse>(json)
-                    Log.d("WebSocket", "Received lobby update (join): $response")
+                    //val response = jsonParser.decodeFromString<LobbyResponse>(json)
+                    //Log.d("WebSocket", "Received lobby update (join): $response")
+                        try {
+                            val response = jsonParser.decodeFromString<LobbyResponse>(json)
+                            Log.d("WebSocket", "Received lobby update (join): $response")
 
                     // Update Players
-                    if (response.players != null) {
+                    /**if (response.players != null) {
                         _playersInLobby.value = response.players
-                    }
+                    }**/
+                            // Update Players
+                            if (response.players != null) {
+                                _playersInLobby.value = response.players
+                            }
 
-                    _lobbyResponse.value = response
+                            _lobbyResponse.value = response
+                        } catch (e: Exception) {
+                            Log.e("WebSocket", "Failed to decode LobbyResponse: ${e.message}")
+                        }
                 }
             } catch (e: Exception) {
                 Log.e("WebSocket", "Error in subscribeToLobby: ${e.message}")
@@ -219,9 +229,13 @@ object WebSocketService {
                 launch {
                     try {
                         stomp.subscribeText("/topic/player/$playerName/status").collect { json ->
-                            Log.d("WebSocket", "Received player status for $playerName: $json")
-                            val status = jsonParser.decodeFromString<PlayerStatus>(json)
-                            gameViewModel.updatePlayerStatus(status)
+                            try {
+                                Log.d("WebSocket", "Received player status for $playerName: $json")
+                                val status = jsonParser.decodeFromString<PlayerStatus>(json)
+                                gameViewModel.updatePlayerStatus(status)
+                            } catch (e: Exception) {
+                                Log.e("WebSocket", "Failed to decode PlayerStatus for $playerName: ${e.message}")
+                            }
                         }
                     } catch (e: Exception) {
                         Log.e("WebSocket", "Failed to subscribe to status for $playerName: ${e.message}")
