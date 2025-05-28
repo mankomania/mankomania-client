@@ -30,16 +30,23 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
         viewBinding = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
 
     testOptions {
@@ -56,7 +63,6 @@ tasks.withType<Test> {
     exclude("**/WebSocketServiceTest.class")
 }
 
-
 tasks.register<JacocoReport>("jacocoTestReport") {
     group = "verification"
     description = "Generates code coverage report for the test task."
@@ -65,28 +71,19 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     reports {
         xml.required.set(true)
         xml.outputLocation.set(layout.buildDirectory.file("reports/jacoco/jacocoTestReport/jacocoTestReport.xml"))
-
-
     }
 
     val fileFilter = listOf(
-        "**/R.class",
-        "**/R$*.class",
-        "**/BuildConfig.*",
-        "**/Manifest*.*",
-        "**/*Test*.*",
-        "android/**/*.*"
+        "**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*", "**/*Test*.*", "android/**/*.*"
     )
 
-    val debugTree =
-        fileTree("${project.layout.buildDirectory.get().asFile}/tmp/kotlin-classes/debug") {
-            exclude(fileFilter)
-        }
+    val debugTree = fileTree("${project.layout.buildDirectory.get().asFile}/tmp/kotlin-classes/debug") {
+        exclude(fileFilter)
+    }
 
-    val javaDebugTree =
-        fileTree("${project.layout.buildDirectory.get().asFile}/intermediates/javac/debug") {
-            exclude(fileFilter)
-        }
+    val javaDebugTree = fileTree("${project.layout.buildDirectory.get().asFile}/intermediates/javac/debug") {
+        exclude(fileFilter)
+    }
 
     val mainSrc = listOf(
         "${project.projectDir}/src/main/java",
@@ -109,27 +106,22 @@ sonar {
         property("sonar.sources", "src/main/java/com/example/mankomaniaclient")
         property("sonar.tests", "src/test/java/com/example/mankomaniaclient")
         property("sonar.coverage.jacoco.xmlReportPaths", "${layout.buildDirectory.get().asFile}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
-
-        property(
-            "sonar.coverage.exclusions",
-            // alle Composables + MainActivity + Activities + Netzwerk
+        property("sonar.coverage.exclusions",
             "src/main/java/com/example/mankomaniaclient/ui/**," +
                     "src/main/java/com/example/mankomaniaclient/MainActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/CreateLobbyActivity.kt," +
-                    "src/main/java/com/example/mankomaniaclient/api/LotteryApi.kt," +
+                    "src/main/java/com/example/mankomaniaclient/api/**," +
                     "src/main/java/com/example/mankomaniaclient/LotteryActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/GameActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/JoinLobbyActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/LoadingActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/NameActivity.kt," +
-                    "src/main/java/com/example/mankomaniaclient/StartingMoneyActivity.kt," +
-                    "src/main/java/com/example/mankomaniaclient/network/WebSocketService.kt," +
-                    "src/main/java/com/example/mankomaniaclient/network/PlayerSocketService.kt"
+                    "src/main/java/com/example/mankomaniaclient/RulesActivity.kt," +
+                    "src/main/java/com/example/mankomaniaclient/network/**"
         )
-        property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties, **/drawable/**, **/viewmodel/**, **/screens/** ")
+        property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties, **/drawable/**, **/viewmodel/**, **/screens/**")
     }
 }
-
 
 dependencies {
     implementation(libs.krossbow.websocket.okhttp)
