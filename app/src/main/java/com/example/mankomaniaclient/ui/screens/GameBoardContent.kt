@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,9 +33,8 @@ import androidx.compose.ui.unit.sp
 import com.example.mankomaniaclient.model.MoveResult
 import com.example.mankomaniaclient.network.CellDto
 import com.example.mankomaniaclient.network.PlayerDto
-import com.example.mankomaniaclient.ui.components.BoardCellView
-import com.example.mankomaniaclient.ui.components.PlayerCharacterView
-import com.example.mankomaniaclient.ui.components.PlayerCharacterView
+// import com.example.mankomaniaclient.ui.components.BoardCellView
+// import com.example.mankomaniaclient.ui.components.PlayerCharacterView
 
 /**
  * Pure-UI version of the game board. Make UI changes here, not in GameBoardScreen!
@@ -230,7 +230,8 @@ fun GameBoardContent(
                 .size(24.dp)
                 .shadow(4.dp, CircleShape)
                 .background(color, CircleShape)
-                .border(2.dp, Color.White, CircleShape),
+                .border(2.dp, Color.White, CircleShape)
+                .testTag("PlayerFigure"),
             contentAlignment = Alignment.Center
         ) {
             Text(
