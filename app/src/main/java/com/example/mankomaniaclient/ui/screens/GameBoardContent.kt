@@ -136,6 +136,7 @@ fun GameBoardContent(
             else -> Color(0xFF718096) // Modernes Grau
         }
 
+    /*
     fun getPlayerNameAtPosition(position: Int): Pair<String, Color>? {
         players.forEachIndexed { index, player ->
             if (player.position == position) {
@@ -145,6 +146,8 @@ fun GameBoardContent(
         }
         return null
     }
+
+     */
 
     @Composable
     fun EnhancedBoardCell(
@@ -157,7 +160,7 @@ fun GameBoardContent(
 
         Box(
             modifier = modifier
-                .size(80.dp) // Größere Zellen!
+                .size(68.dp) // Größere Zellen!
                 .shadow(
                     elevation = if (isSpecialCell) 8.dp else 4.dp,
                     shape = RoundedCornerShape(16.dp),
@@ -266,7 +269,8 @@ fun GameBoardContent(
     /* --------------------------------------------------------------- Layout */
     Box(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .wrapContentHeight()
             .background(
                 brush = Brush.radialGradient(
                     colors = listOf(
@@ -275,7 +279,7 @@ fun GameBoardContent(
                     )
                 )
             )
-            .padding(40.dp) // Mehr Padding für bessere Proportionen
+            .padding(horizontal = 24.dp, vertical = 16.dp)
     ) {
 
         /* ---------------- Top row --------------------------------------- */
@@ -291,10 +295,13 @@ fun GameBoardContent(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    /*
                     // Player name tag above cell
+
                     getPlayerNameAtPosition(i)?.let { (name, color) ->
                         PlayerNameTag(name = name, color = color)
                     } ?: Spacer(Modifier.height(26.dp))
+                    */
 
                     // Cell with overlaid players
                     Box {
@@ -355,10 +362,13 @@ fun GameBoardContent(
                         }
                     }
 
-                    // Player name tag beside cell
+                   /* // Player name tag beside cell
+
                     getPlayerNameAtPosition(i)?.let { (name, color) ->
                         PlayerNameTag(name = name, color = color)
                     } ?: Spacer(Modifier.width(80.dp))
+
+                    */
                 }
             }
         }
@@ -398,10 +408,14 @@ fun GameBoardContent(
                         }
                     }
 
-                    // Player name tag below cell
+                    /*
+                   // Player name tag below cell
+
                     getPlayerNameAtPosition(i)?.let { (name, color) ->
                         PlayerNameTag(name = name, color = color)
                     } ?: Spacer(Modifier.height(26.dp))
+
+                     */
                 }
             }
         }
@@ -418,10 +432,12 @@ fun GameBoardContent(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Player name tag beside cell
+                    /*// Player name tag beside cell
                     getPlayerNameAtPosition(i)?.let { (name, color) ->
                         PlayerNameTag(name = name, color = color)
                     } ?: Spacer(Modifier.width(80.dp))
+
+                     */
 
                     // Cell with overlaid players
                     Box {
@@ -486,6 +502,63 @@ fun GameBoardContent(
                 }
             }
         }
+
+        if (playerNames.size > 0) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp),
+                contentAlignment = Alignment.TopStart
+            ) {
+                PlayerNameTag(
+                    name = playerNames[0],
+                    color = getPlayerColor(0)
+                )
+            }
+        }
+        
+        if (playerNames.size > 1) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp),
+                contentAlignment = Alignment.TopEnd
+            ) {
+                PlayerNameTag(
+                    name = playerNames[1],
+                    color = getPlayerColor(1)
+                )
+            }
+        }
+
+        if (playerNames.size > 2) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp),
+                contentAlignment = Alignment.BottomEnd
+            ) {
+                PlayerNameTag(
+                    name = playerNames[2],
+                    color = getPlayerColor(2)
+                )
+            }
+        }
+
+        if (playerNames.size > 3) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp),
+                contentAlignment = Alignment.BottomStart
+            ) {
+                PlayerNameTag(
+                    name = playerNames[3],
+                    color = getPlayerColor(3)
+                )
+            }
+        }
+
     }
 }
 
