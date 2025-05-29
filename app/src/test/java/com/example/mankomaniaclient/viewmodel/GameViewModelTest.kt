@@ -1,10 +1,12 @@
 package com.example.mankomaniaclient.viewmodel
 
 import com.example.mankomaniaclient.model.DiceResult
+import com.example.mankomaniaclient.model.PlayerStatus
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import app.cash.turbine.test
 
 /**
  * @file GameViewModelTest.kt
@@ -85,5 +87,23 @@ class GameViewModelTest {
         )
         viewModel.onPlayerMoved(result)
         assertEquals(result, viewModel.moveResult.value)
+    }
+
+    @Test
+    fun `updatePlayerStatus should add or replace player status`() = runTest {
+        val viewModel = GameViewModel()
+        val status1 = PlayerStatus("Toni", position = 3, balance = 50000, money = mapOf(5000 to 5))
+        val status2 = PlayerStatus("Jorge", position = 5, balance = 80000, money = mapOf(10000 to 2))
+
+        viewModel.updatePlayerStatus(status1)
+        viewModel.updatePlayerStatus(status2)
+
+        viewModel.playerStatuses.test {
+            val value = awaitItem()
+            assertEquals(2, value.size)
+            assertEquals(3, value["Toni"]?.position)
+            assertEquals(80000, value["Jorge"]?.balance)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }

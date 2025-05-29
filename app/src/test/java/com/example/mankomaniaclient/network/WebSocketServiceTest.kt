@@ -1,7 +1,9 @@
-package com.example.mankomaniaclient.network/*
 package com.example.mankomaniaclient.network
-
+/*
 import android.util.Log
+import com.example.mankomaniaclient.model.MoveResult
+import com.example.mankomaniaclient.network.WebSocketService
+import com.example.mankomaniaclient.model.PlayerStatus
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.coVerifySequence
@@ -27,7 +29,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.BeforeEach
 import kotlinx.coroutines.flow.asFlow
 import com.example.mankomaniaclient.network.WebSocketService
-
+import com.example.mankomaniaclient.viewmodel.GameViewModel
 
 
 // src/test/java/…/WebSocketServiceTest.kt
@@ -217,6 +219,51 @@ fun `subscribe to player-moved forwards MoveResult to ViewModel`() = runTest(dis
             )
         )
     }
-}
 
- */
+    @Test
+fun `subscribeToPlayerStatuses forwards PlayerStatus to GameViewModel`() = runTest(dispatcher.scheduler) {
+    val jsonStatus = """
+        {
+            "name": "Toni",
+            "position": 4,
+            "balance": 120000,
+            "money": {
+                "5000": 3,
+                "10000": 2
+            }
+        }
+    """.trimIndent()
+
+    val fakeFlow = listOf(jsonStatus).asFlow()
+    val mockViewModel = mockk<GameViewModel>(relaxed = true)
+
+    WebSocketService::class.java.getDeclaredField("gameViewModel").apply {
+        isAccessible = true
+        set(WebSocketService, mockViewModel)
+    }
+
+    WebSocketService::class.java.getDeclaredField("session").apply {
+        isAccessible = true
+        set(WebSocketService, session)
+    }
+
+    coEvery { session.subscribeText("/topic/player/Toni/status") } returns fakeFlow
+
+    WebSocketService.subscribeToPlayerStatuses(listOf("Toni"))
+    advanceUntilIdle()
+
+    coVerify {
+        mockViewModel.updatePlayerStatus(
+            PlayerStatus(
+                name = "Toni",
+                position = 4,
+                balance = 120000,
+                money = mapOf(5000 to 3, 10000 to 2)
+            )
+        )
+    }
+}
+}
+}
+*/
+
