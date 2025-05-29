@@ -42,6 +42,9 @@ fun StatusBarView(
                 Text("You: ${player.name}", style = MaterialTheme.typography.titleMedium)
                 Text("Position: ${player.position}", style = MaterialTheme.typography.bodyMedium)
                 Text("Balance: ${player.balance}", style = MaterialTheme.typography.bodyMedium)
+                if (player.isActive) {
+                    Text("Your turn!", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+                }
             }
         }
     }

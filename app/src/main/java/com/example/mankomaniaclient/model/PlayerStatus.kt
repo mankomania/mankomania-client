@@ -11,5 +11,6 @@ data class PlayerStatus(
     val name: String,
     val position: Int,
     val balance: Int,
-    val money: Map<Int, Int>
+    val money: Map<Int, Int>,
+    val isActive: Boolean
 )
