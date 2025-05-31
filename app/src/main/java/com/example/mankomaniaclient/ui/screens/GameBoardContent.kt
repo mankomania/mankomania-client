@@ -126,8 +126,8 @@ fun GameBoardContent(
 
     val topRow = listOf(0, 1, 2, 3, 4, 5, 10, 11, 12)
     val rightCol = listOf(13, 14, 19)
-    val bottomRow = listOf(20, 21, 22, 23, 24, 29, 30, 31, 32)
-    val leftCol = listOf(33, 34, 39)
+    val bottomRow = listOf(20, 21, 22, 23, 24, 29, 30, 31, 32).reversed();
+    val leftCol = listOf(33, 34, 39).reversed();
     val outerRing = topRow + rightCol + bottomRow + leftCol
     val minigameFields = board.filter { it.index >= 40 }
     val lotteryField = board.find { it.type == "LOTTERY" }
@@ -166,6 +166,12 @@ fun GameBoardContent(
         val isLottery = cell.type == "LOTTERY"
         val isNormal = cell.type == "NORMAL"
         val isSpecialCell = isBranch || isLottery
+        val startColors = mapOf(
+            0 to Color(0xFFE53E3E),
+            12 to Color(0xFF3182CE),
+            20 to Color(0xFF38A169),
+            32 to Color(0xFFD69E2E)
+        )
 
         val hasPlayer = players.any { it.position == cell.index }
 
@@ -187,7 +193,7 @@ fun GameBoardContent(
                             colors = listOf(Color(0xFF6A1B9A), Color(0xFF8E24AA))
                         )
                         isStart -> Brush.linearGradient(
-                            colors = listOf(Color(0xFF81C784), Color(0xFF388E3C))
+                            colors = listOf(startColors[cell.index] ?: Color.Gray, Color.White)
                         )
                         isBranch -> Brush.linearGradient(
                             colors = listOf(Color(0xFFFFF176), Color(0xFFFDD835))
@@ -300,7 +306,7 @@ fun GameBoardContent(
         Row(
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .offset(y = (-30).dp)
+                .offset(y = (-10).dp)
                 .padding(top = 0.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -391,7 +397,7 @@ fun GameBoardContent(
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .offset(y = 30.dp)
+                .offset(y = 10.dp)
                 .padding(bottom = 0.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -475,6 +481,71 @@ fun GameBoardContent(
                         }
                     }
                 }
+            }
+        }
+
+        // Branches
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(y = 100.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                EnhancedBoardCell(board.first { it.index == 6 }, players)
+                EnhancedBoardCell(board.first { it.index == 7 }, players)
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                EnhancedBoardCell(board.first { it.index == 8 }, players)
+                EnhancedBoardCell(board.first { it.index == 9 }, players)
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .offset(x = (-80).dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                EnhancedBoardCell(board.first { it.index == 15 }, players)
+                EnhancedBoardCell(board.first { it.index == 16 }, players)
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                EnhancedBoardCell(board.first { it.index == 17 }, players)
+                EnhancedBoardCell(board.first { it.index == 18 }, players)
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .offset(y = (-100).dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                EnhancedBoardCell(board.first { it.index == 25 }, players)
+                EnhancedBoardCell(board.first { it.index == 26 }, players)
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                EnhancedBoardCell(board.first { it.index == 27 }, players)
+                EnhancedBoardCell(board.first { it.index == 28 }, players)
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .offset(x = (80).dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                EnhancedBoardCell(board.first { it.index == 35 }, players)
+                EnhancedBoardCell(board.first { it.index == 36 }, players)
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                EnhancedBoardCell(board.first { it.index == 37 }, players)
+                EnhancedBoardCell(board.first { it.index == 38 }, players)
             }
         }
 
