@@ -124,7 +124,13 @@ fun GameBoardContent(
         return
     }
 
-    val sideCount = board.size / 4
+    val topRow = listOf(0, 1, 2, 3, 4, 5, 10, 11, 12)
+    val rightCol = listOf(13, 14, 19)
+    val bottomRow = listOf(20, 21, 22, 23, 24, 29, 30, 31, 32)
+    val leftCol = listOf(33, 34, 39)
+    val outerRing = topRow + rightCol + bottomRow + leftCol
+    val minigameFields = board.filter { it.index >= 40 }
+    val lotteryField = board.find { it.type == "LOTTERY" }
 
     /* -------------------------------------------------------------- helpers */
     fun getPlayerColor(playerIndex: Int): Color =
@@ -155,31 +161,39 @@ fun GameBoardContent(
         players: List<PlayerDto>,
         modifier: Modifier = Modifier
     ) {
-        val isSpecialCell = cell.hasBranch
+        val isBranch = cell.hasBranch || cell.type == "BRANCH"
+        val isStart = cell.type == "START"
+        val isLottery = cell.type == "LOTTERY"
+        val isNormal = cell.type == "NORMAL"
+        val isSpecialCell = isBranch || isLottery
+
         val hasPlayer = players.any { it.position == cell.index }
 
         Box(
             modifier = modifier
-                .size(68.dp) // Größere Zellen!
+                .size(68.dp)
                 .shadow(
-                    elevation = if (isSpecialCell) 8.dp else 4.dp,
-                    shape = RoundedCornerShape(16.dp),
-                    ambientColor = if (isSpecialCell) Color(0xFFFFD700) else Color.Black
+                    elevation = when {
+                        isLottery -> 12.dp
+                        isBranch -> 8.dp
+                        isStart -> 6.dp
+                        else -> 4.dp
+                    },
+                    shape = RoundedCornerShape(16.dp)
                 )
                 .background(
-                    brush = if (isSpecialCell) {
-                        Brush.radialGradient(
-                            colors = listOf(
-                                Color(0xFFFFD700),
-                                Color(0xFFFFA000)
-                            )
+                    brush = when {
+                        isLottery -> Brush.radialGradient(
+                            colors = listOf(Color(0xFF6A1B9A), Color(0xFF8E24AA))
                         )
-                    } else {
-                        Brush.linearGradient(
-                            colors = listOf(
-                                Color.White,
-                                Color(0xFFF5F5F5)
-                            )
+                        isStart -> Brush.linearGradient(
+                            colors = listOf(Color(0xFF81C784), Color(0xFF388E3C))
+                        )
+                        isBranch -> Brush.linearGradient(
+                            colors = listOf(Color(0xFFFFF176), Color(0xFFFDD835))
+                        )
+                        else -> Brush.linearGradient(
+                            colors = listOf(Color.White, Color(0xFFF5F5F5))
                         )
                     },
                     shape = RoundedCornerShape(16.dp)
@@ -290,7 +304,7 @@ fun GameBoardContent(
                 .padding(top = 0.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            for (i in 0 until sideCount) {
+            for (i in topRow) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -305,7 +319,7 @@ fun GameBoardContent(
 
                     // Cell with overlaid players
                     Box {
-                        EnhancedBoardCell(board[i], players)
+                        EnhancedBoardCell(board.first { it.index == i }, players)
 
                         // Player indicators
                         var playerOffset = 0
@@ -335,14 +349,14 @@ fun GameBoardContent(
                 .padding(end = 10.dp),
             verticalArrangement = Arrangement.spacedBy(5.dp)
         ) {
-            for (i in sideCount until 2 * sideCount) {
+            for (i in rightCol) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     // Cell with overlaid players
                     Box {
-                        EnhancedBoardCell(board[i], players)
+                        EnhancedBoardCell(board.first { it.index == i }, players)
 
                         // Player indicators
                         var playerOffset = 0
@@ -381,14 +395,14 @@ fun GameBoardContent(
                 .padding(bottom = 0.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            for (i in (2 * sideCount until 3 * sideCount).reversed()) {
+            for (i in bottomRow) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     // Cell with overlaid players
                     Box {
-                        EnhancedBoardCell(board[i], players)
+                        EnhancedBoardCell(board.first { it.index == i }, players)
 
                         // Player indicators
                         var playerOffset = 0
@@ -427,7 +441,7 @@ fun GameBoardContent(
                 .padding(start = 10.dp),
             verticalArrangement = Arrangement.spacedBy(5.dp)
         ) {
-            for (i in (3 * sideCount until board.size).reversed()) {
+            for (i in leftCol) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -441,7 +455,7 @@ fun GameBoardContent(
 
                     // Cell with overlaid players
                     Box {
-                        EnhancedBoardCell(board[i], players)
+                        EnhancedBoardCell(board.first { it.index == i }, players)
 
                         // Player indicators
                         var playerOffset = 0
