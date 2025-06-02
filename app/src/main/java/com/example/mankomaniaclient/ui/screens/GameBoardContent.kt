@@ -124,7 +124,13 @@ fun GameBoardContent(
         return
     }
 
-    val sideCount = board.size / 4
+    val topRow = listOf(0, 1, 2, 3, 4, 5, 10, 11, 12)
+    val rightCol = listOf(13, 14, 19)
+    val bottomRow = listOf(20, 21, 22, 23, 24, 29, 30, 31, 32).reversed();
+    val leftCol = listOf(33, 34, 39).reversed();
+    val outerRing = topRow + rightCol + bottomRow + leftCol
+    val minigameFields = board.filter { it.index >= 40 }
+    val lotteryField = board.find { it.type == "LOTTERY" }
 
     /* -------------------------------------------------------------- helpers */
     fun getPlayerColor(playerIndex: Int): Color =
@@ -136,6 +142,7 @@ fun GameBoardContent(
             else -> Color(0xFF718096) // Modernes Grau
         }
 
+    /*
     fun getPlayerNameAtPosition(position: Int): Pair<String, Color>? {
         players.forEachIndexed { index, player ->
             if (player.position == position) {
@@ -146,37 +153,53 @@ fun GameBoardContent(
         return null
     }
 
+     */
+
     @Composable
     fun EnhancedBoardCell(
         cell: CellDto,
         players: List<PlayerDto>,
         modifier: Modifier = Modifier
     ) {
-        val isSpecialCell = cell.hasBranch
+        val isBranch = cell.hasBranch || cell.type == "BRANCH"
+        val isStart = cell.type == "START"
+        val isLottery = cell.type == "LOTTERY"
+        val isNormal = cell.type == "NORMAL"
+        val isSpecialCell = isBranch || isLottery
+        val startColors = mapOf(
+            0 to Color(0xFFE53E3E),
+            12 to Color(0xFF3182CE),
+            20 to Color(0xFF38A169),
+            32 to Color(0xFFD69E2E)
+        )
+
         val hasPlayer = players.any { it.position == cell.index }
 
         Box(
             modifier = modifier
-                .size(80.dp) // Größere Zellen!
+                .size(68.dp)
                 .shadow(
-                    elevation = if (isSpecialCell) 8.dp else 4.dp,
-                    shape = RoundedCornerShape(16.dp),
-                    ambientColor = if (isSpecialCell) Color(0xFFFFD700) else Color.Black
+                    elevation = when {
+                        isLottery -> 12.dp
+                        isBranch -> 8.dp
+                        isStart -> 6.dp
+                        else -> 4.dp
+                    },
+                    shape = RoundedCornerShape(16.dp)
                 )
                 .background(
-                    brush = if (isSpecialCell) {
-                        Brush.radialGradient(
-                            colors = listOf(
-                                Color(0xFFFFD700),
-                                Color(0xFFFFA000)
-                            )
+                    brush = when {
+                        isLottery -> Brush.radialGradient(
+                            colors = listOf(Color(0xFF6A1B9A), Color(0xFF8E24AA))
                         )
-                    } else {
-                        Brush.linearGradient(
-                            colors = listOf(
-                                Color.White,
-                                Color(0xFFF5F5F5)
-                            )
+                        isStart -> Brush.linearGradient(
+                            colors = listOf(startColors[cell.index] ?: Color.Gray, Color.White)
+                        )
+                        isBranch -> Brush.linearGradient(
+                            colors = listOf(Color(0xFFFFF176), Color(0xFFFDD835))
+                        )
+                        else -> Brush.linearGradient(
+                            colors = listOf(Color.White, Color(0xFFF5F5F5))
                         )
                     },
                     shape = RoundedCornerShape(16.dp)
@@ -266,7 +289,8 @@ fun GameBoardContent(
     /* --------------------------------------------------------------- Layout */
     Box(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .wrapContentHeight()
             .background(
                 brush = Brush.radialGradient(
                     colors = listOf(
@@ -275,30 +299,33 @@ fun GameBoardContent(
                     )
                 )
             )
-            .padding(40.dp) // Mehr Padding für bessere Proportionen
+            .padding(horizontal = 24.dp, vertical = 16.dp)
     ) {
 
         /* ---------------- Top row --------------------------------------- */
         Row(
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .offset(y = (-30).dp)
+                .offset(y = (-10).dp)
                 .padding(top = 0.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            for (i in 0 until sideCount) {
+            for (i in topRow) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    /*
                     // Player name tag above cell
+
                     getPlayerNameAtPosition(i)?.let { (name, color) ->
                         PlayerNameTag(name = name, color = color)
                     } ?: Spacer(Modifier.height(26.dp))
+                    */
 
                     // Cell with overlaid players
                     Box {
-                        EnhancedBoardCell(board[i], players)
+                        EnhancedBoardCell(board.first { it.index == i }, players)
 
                         // Player indicators
                         var playerOffset = 0
@@ -328,14 +355,14 @@ fun GameBoardContent(
                 .padding(end = 10.dp),
             verticalArrangement = Arrangement.spacedBy(5.dp)
         ) {
-            for (i in sideCount until 2 * sideCount) {
+            for (i in rightCol) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     // Cell with overlaid players
                     Box {
-                        EnhancedBoardCell(board[i], players)
+                        EnhancedBoardCell(board.first { it.index == i }, players)
 
                         // Player indicators
                         var playerOffset = 0
@@ -355,10 +382,13 @@ fun GameBoardContent(
                         }
                     }
 
-                    // Player name tag beside cell
+                   /* // Player name tag beside cell
+
                     getPlayerNameAtPosition(i)?.let { (name, color) ->
                         PlayerNameTag(name = name, color = color)
                     } ?: Spacer(Modifier.width(80.dp))
+
+                    */
                 }
             }
         }
@@ -367,18 +397,18 @@ fun GameBoardContent(
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .offset(y = 30.dp)
+                .offset(y = 10.dp)
                 .padding(bottom = 0.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            for (i in (2 * sideCount until 3 * sideCount).reversed()) {
+            for (i in bottomRow) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     // Cell with overlaid players
                     Box {
-                        EnhancedBoardCell(board[i], players)
+                        EnhancedBoardCell(board.first { it.index == i }, players)
 
                         // Player indicators
                         var playerOffset = 0
@@ -398,10 +428,14 @@ fun GameBoardContent(
                         }
                     }
 
-                    // Player name tag below cell
+                    /*
+                   // Player name tag below cell
+
                     getPlayerNameAtPosition(i)?.let { (name, color) ->
                         PlayerNameTag(name = name, color = color)
                     } ?: Spacer(Modifier.height(26.dp))
+
+                     */
                 }
             }
         }
@@ -413,19 +447,21 @@ fun GameBoardContent(
                 .padding(start = 10.dp),
             verticalArrangement = Arrangement.spacedBy(5.dp)
         ) {
-            for (i in (3 * sideCount until board.size).reversed()) {
+            for (i in leftCol) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Player name tag beside cell
+                    /*// Player name tag beside cell
                     getPlayerNameAtPosition(i)?.let { (name, color) ->
                         PlayerNameTag(name = name, color = color)
                     } ?: Spacer(Modifier.width(80.dp))
 
+                     */
+
                     // Cell with overlaid players
                     Box {
-                        EnhancedBoardCell(board[i], players)
+                        EnhancedBoardCell(board.first { it.index == i }, players)
 
                         // Player indicators
                         var playerOffset = 0
@@ -445,6 +481,71 @@ fun GameBoardContent(
                         }
                     }
                 }
+            }
+        }
+
+        // Branches
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(y = 100.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                EnhancedBoardCell(board.first { it.index == 6 }, players)
+                EnhancedBoardCell(board.first { it.index == 7 }, players)
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                EnhancedBoardCell(board.first { it.index == 8 }, players)
+                EnhancedBoardCell(board.first { it.index == 9 }, players)
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .offset(x = (-80).dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                EnhancedBoardCell(board.first { it.index == 15 }, players)
+                EnhancedBoardCell(board.first { it.index == 16 }, players)
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                EnhancedBoardCell(board.first { it.index == 17 }, players)
+                EnhancedBoardCell(board.first { it.index == 18 }, players)
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .offset(y = (-100).dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                EnhancedBoardCell(board.first { it.index == 25 }, players)
+                EnhancedBoardCell(board.first { it.index == 26 }, players)
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                EnhancedBoardCell(board.first { it.index == 27 }, players)
+                EnhancedBoardCell(board.first { it.index == 28 }, players)
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .offset(x = (80).dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                EnhancedBoardCell(board.first { it.index == 35 }, players)
+                EnhancedBoardCell(board.first { it.index == 36 }, players)
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                EnhancedBoardCell(board.first { it.index == 37 }, players)
+                EnhancedBoardCell(board.first { it.index == 38 }, players)
             }
         }
 
@@ -486,6 +587,63 @@ fun GameBoardContent(
                 }
             }
         }
+
+        if (playerNames.size > 0) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp),
+                contentAlignment = Alignment.TopStart
+            ) {
+                PlayerNameTag(
+                    name = playerNames[0],
+                    color = getPlayerColor(0)
+                )
+            }
+        }
+        
+        if (playerNames.size > 1) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp),
+                contentAlignment = Alignment.TopEnd
+            ) {
+                PlayerNameTag(
+                    name = playerNames[1],
+                    color = getPlayerColor(1)
+                )
+            }
+        }
+
+        if (playerNames.size > 2) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp),
+                contentAlignment = Alignment.BottomEnd
+            ) {
+                PlayerNameTag(
+                    name = playerNames[2],
+                    color = getPlayerColor(2)
+                )
+            }
+        }
+
+        if (playerNames.size > 3) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp),
+                contentAlignment = Alignment.BottomStart
+            ) {
+                PlayerNameTag(
+                    name = playerNames[3],
+                    color = getPlayerColor(3)
+                )
+            }
+        }
+
     }
 }
 
