@@ -50,7 +50,8 @@ object WebSocketService {
     }
 
     fun connect(
-        url: String = "ws://se2-demo.aau.at:53210/ws",
+        url: String = "ws://10.0.2.2:8080/ws",
+        //url: String = "ws://se2-demo.aau.at:53210/ws",
         greetingsTopic: String = "/topic/greetings",
         clientCountTopic: String = "/topic/clientCount"
     ) {

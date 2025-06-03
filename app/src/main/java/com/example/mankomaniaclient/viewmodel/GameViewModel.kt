@@ -45,6 +45,7 @@ class GameViewModel : ViewModel() {
     init {
         // Register this ViewModel with the WebSocketService for callbacks
         WebSocketService.setGameViewModel(this)
+        WebSocketService.connect()
     }
 
     /** Called by WebSocketService when a new GameStateDto arrives */
