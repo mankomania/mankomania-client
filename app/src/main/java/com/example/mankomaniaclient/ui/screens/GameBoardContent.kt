@@ -550,6 +550,7 @@ fun GameBoardContent(
         }
 
         /* ---------------- Enhanced Centre label -------------------------- */
+        /*
         Card(
             modifier = Modifier
                 .align(Alignment.Center)
@@ -586,7 +587,7 @@ fun GameBoardContent(
                     )
                 }
             }
-        }
+        } */
 
         if (playerNames.size > 0) {
             Box(
@@ -644,6 +645,18 @@ fun GameBoardContent(
             }
         }
 
+    }
+    @Composable
+    fun BranchCell(cell: CellDto, modifier: Modifier = Modifier) {
+        Box(
+            modifier = modifier
+                .size(32.dp)
+                .border(1.dp, Color.Gray, shape = RoundedCornerShape(6.dp))
+                .background(Color.LightGray),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = cell.index.toString(), fontSize = 12.sp)
+        }
     }
 }
 
