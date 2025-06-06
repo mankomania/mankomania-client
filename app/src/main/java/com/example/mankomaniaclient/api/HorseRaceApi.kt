@@ -1,5 +1,6 @@
 package com.example.mankomaniaclient.api
 
+import com.example.mankomaniaclient.model.Horse
 import com.example.mankomaniaclient.network.WebSocketService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
