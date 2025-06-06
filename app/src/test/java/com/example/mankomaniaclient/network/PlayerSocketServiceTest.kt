@@ -1,6 +1,5 @@
-package com.example.mankomaniaclient
+package com.example.mankomaniaclient.network
 
-import com.example.mankomaniaclient.network.PlayerSocketService
 import com.example.mankomaniaclient.ui.model.PlayerFinancialState
 import com.example.mankomaniaclient.ui.model.PlayerMoneyUpdate
 import io.mockk.coEvery
@@ -17,7 +16,6 @@ import org.hildan.krossbow.stomp.StompClient
 import org.hildan.krossbow.stomp.StompSession
 import org.hildan.krossbow.stomp.frame.FrameBody
 import org.hildan.krossbow.stomp.frame.StompFrame
-import org.hildan.krossbow.stomp.headers.StompMessageHeaders
 import org.hildan.krossbow.stomp.headers.StompSendHeaders
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
