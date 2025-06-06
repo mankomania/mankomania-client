@@ -66,10 +66,8 @@ class PlayerSocketService(
      * Connects to the WebSocket and subscribes, then sends a money update request.
      */
     override suspend fun connectAndSubscribe(playerId: String) {
-        connect()
-        sendMoneyUpdate(playerId)
+        connect() //
     }
-
     /**
      * Disconnects the current session from the WebSocket server.
      */

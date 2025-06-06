@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Euro
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -49,6 +48,7 @@ fun StartingMoneyScreen(playerId: String) {
             playerId = playerId
         )
     }
+
     val viewModel: PlayerMoneyViewModel = viewModel(factory = factory)
 
     val state by viewModel.financialState.collectAsState()
@@ -73,7 +73,6 @@ fun StartingMoneyScreen(playerId: String) {
             )
         }
     ) { innerPadding ->
-        // Apply system window insets to avoid overlapping with system bars
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -93,10 +92,9 @@ fun StartingMoneyScreen(playerId: String) {
             )
 
             if (hasError) {
-                ErrorCard(viewModel = viewModel)
+                ErrorCard(viewModel)
             }
 
-            // Use a responsive grid layout for denomination boxes
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(minSize = 150.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -115,19 +113,6 @@ fun StartingMoneyScreen(playerId: String) {
                 color = Color(0xFF2E7D32),
                 style = MaterialTheme.typography.titleMedium
             )
-
-            Button(
-                onClick = { viewModel.updateMoney() },
-                modifier = Modifier.padding(top = 8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Refresh,
-                    contentDescription = "Refresh",
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Refresh Money")
-            }
         }
     }
 
@@ -141,9 +126,7 @@ fun StartingMoneyScreen(playerId: String) {
 @Composable
 fun ErrorCard(viewModel: PlayerMoneyViewModel) {
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFFEBEE)
-        ),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFEBEE)),
         modifier = Modifier
             .fillMaxWidth()
             .windowInsetsPadding(WindowInsets.systemBars)
@@ -162,9 +145,7 @@ fun ErrorCard(viewModel: PlayerMoneyViewModel) {
             )
             Button(
                 onClick = { viewModel.retryConnection() },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFE57373)
-                )
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE57373))
             ) {
                 Text("Retry")
             }
@@ -173,11 +154,7 @@ fun ErrorCard(viewModel: PlayerMoneyViewModel) {
 }
 
 @Composable
-fun DenominationBox(
-    denominationText: String,
-    count: Int,
-    backgroundColor: Color
-) {
+fun DenominationBox(denominationText: String, count: Int, backgroundColor: Color) {
     Column(
         modifier = Modifier
             .width(140.dp)
@@ -192,16 +169,8 @@ fun DenominationBox(
             tint = Color.Black,
             modifier = Modifier.size(28.dp)
         )
-        Text(
-            text = denominationText,
-            fontSize = 16.sp,
-            color = Color.Black
-        )
+        Text(text = denominationText, fontSize = 16.sp, color = Color.Black)
         Spacer(modifier = Modifier.height(6.dp))
-        Text(
-            text = "x$count",
-            fontSize = 20.sp,
-            color = Color.DarkGray
-        )
+        Text(text = "x$count", fontSize = 20.sp, color = Color.DarkGray)
     }
 }
