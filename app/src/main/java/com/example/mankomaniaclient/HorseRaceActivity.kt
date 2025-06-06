@@ -6,7 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.example.mankomaniaclient.ui.screen.HorseRaceScreen
-import com.example.mankomaniaclient.ui.viewmodel.HorseRaceViewModel
+import com.example.mankomaniaclient.viewmodel.HorseRaceViewModel
 
 class HorseRaceActivity : ComponentActivity() {
 
