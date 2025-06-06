@@ -1,23 +1,25 @@
 package com.example.mankomaniaclient
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.lifecycle.ViewModelProvider
 import com.example.mankomaniaclient.ui.screen.HorseRaceScreen
-import com.example.mankomaniaclient.viewmodel.HorseRaceViewModel
+import com.example.mankomaniaclient.ui.viewmodel.HorseRaceViewModel
 
 class HorseRaceActivity : ComponentActivity() {
 
-    private lateinit var viewModel: HorseRaceViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        viewModel = ViewModelProvider(this)[HorseRaceViewModel::class.java]
-
         setContent {
-            HorseRaceScreen(viewModel)
+            HorseRaceScreen(viewModel = HorseRaceViewModel())
+        }
+    }
+
+    companion object {
+        fun createIntent(context: Context): Intent {
+            return Intent(context, HorseRaceActivity::class.java)
         }
     }
 }
