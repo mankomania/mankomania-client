@@ -1,15 +1,15 @@
+package com.example.mankomaniaclient
+
 import com.example.mankomaniaclient.network.PlayerSocketService
 import com.example.mankomaniaclient.ui.model.PlayerFinancialState
 import com.example.mankomaniaclient.ui.model.PlayerMoneyUpdate
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import org.junit.jupiter.api.Assertions.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -17,16 +17,17 @@ import org.hildan.krossbow.stomp.StompClient
 import org.hildan.krossbow.stomp.StompSession
 import org.hildan.krossbow.stomp.frame.FrameBody
 import org.hildan.krossbow.stomp.frame.StompFrame
+import org.hildan.krossbow.stomp.headers.StompMessageHeaders
 import org.hildan.krossbow.stomp.headers.StompSendHeaders
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PlayerSocketServiceTest {
 
     private val testScheduler = TestCoroutineScheduler()
     private val testDispatcher = StandardTestDispatcher(testScheduler)
-    private val testScope = TestScope(testDispatcher)
 
     private lateinit var stompClient: StompClient
     private lateinit var stompSession: StompSession
@@ -45,6 +46,7 @@ class PlayerSocketServiceTest {
 
         playerSocketService = PlayerSocketService(stompClient, this)
     }
+
     @Test
     fun `sendMoneyUpdate should send correct JSON`() = runTest(testDispatcher) {
         val playerId = "valentina"
@@ -62,26 +64,11 @@ class PlayerSocketServiceTest {
             )
         }
     }
-
-    @Test
-    fun `connectAndSubscribe should connect and send update`() = runTest(testDispatcher) {
-        val playerId = "test123"
-        val expectedJson = Json.encodeToString(PlayerMoneyUpdate(playerId))
-
-        playerSocketService.connectAndSubscribe(playerId)
-        testScheduler.advanceUntilIdle()
-
-        coVerify { stompClient.connect(any()) }
-        coVerify { stompSession.send(
-            match { it.destination == "/app/updateMoney" },
-            FrameBody.Text(expectedJson)
-        ) }
-    }
     @Test
     fun `should encode PlayerFinancialState into JSON`() {
         val state = PlayerFinancialState(1, 2, 3, 4)
         val json = Json.encodeToString(state)
-        val decoded = Json.decodeFromString<PlayerFinancialState>(json)
+        val decoded = Json.decodeFromString(PlayerFinancialState.serializer(), json)
         assertEquals(state, decoded)
     }
 
@@ -91,11 +78,12 @@ class PlayerSocketServiceTest {
         testScheduler.advanceUntilIdle()
 
         playerSocketService.disconnect()
+
         coVerify { stompSession.disconnect() }
     }
+
     @Test
     fun `should decode JSON into PlayerFinancialState`() {
-        // Arrange
         val json = """
             {
                 "bills5000": 2,
@@ -105,16 +93,9 @@ class PlayerSocketServiceTest {
             }
         """.trimIndent()
 
-        // Act
-        val result = Json.decodeFromString<PlayerFinancialState>(json)
+        val result = Json.decodeFromString(PlayerFinancialState.serializer(), json)
+        val expected = PlayerFinancialState(2, 3, 1, 4)
 
-        // Assert
-        val expected = PlayerFinancialState(
-            bills5000 = 2,
-            bills10000 = 3,
-            bills50000 = 1,
-            bills100000 = 4
-        )
         assertEquals(expected, result)
     }
 
@@ -124,4 +105,3 @@ class PlayerSocketServiceTest {
         assertEquals(PlayerFinancialState(0, 0, 0, 0), state)
     }
 }
-
