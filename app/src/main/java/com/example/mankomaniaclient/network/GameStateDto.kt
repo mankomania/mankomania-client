@@ -18,7 +18,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CellDto(
     val index: Int,
-    val hasBranch: Boolean
+    val hasBranch: Boolean,
+    val type: String? = null
 )
 
 @Serializable
