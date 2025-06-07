@@ -63,11 +63,11 @@ class GameViewModel : ViewModel() {
      * Sends a dice roll request to the backend via StompManager.
      * Only works when it's the player's turn.
      */
-    fun rollDice(playerId: String) {
+    fun rollDice(playerName: String) {
         if (!_isPlayerTurn.value) return
 
-        println("ROLL REQUEST for $playerId triggered from UI")
-        WebSocketService.send("/app/rollDice", playerId)
+        println("ROLL REQUEST for $playerName triggered from UI")
+        WebSocketService.send("/app/rollDice", playerName)
         _isPlayerTurn.value = false
     }
 

@@ -56,7 +56,9 @@ fun GameBoardContent(
     lobbyId: String,
     playerNames: List<String>,
     moveResult: MoveResult? = null,
-    onDismissMoveResult: () -> Unit = {}
+    onDismissMoveResult: () -> Unit = {},
+    onRollDice: () -> Unit,
+
 ) {
     var showDialog by remember { mutableStateOf(true) }
 
@@ -123,6 +125,21 @@ fun GameBoardContent(
         }
         return
     }
+    Spacer(modifier = Modifier.height(16.dp))
+
+    Button(
+        onClick = { onRollDice() },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 32.dp)
+    ) {
+        Text(
+            text = "Roll Dice",
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
+    }
+
 
     val topRow = listOf(0, 1, 2, 3, 4, 9, 10, 11, 12)
     val rightCol = listOf(13, 14, 19)

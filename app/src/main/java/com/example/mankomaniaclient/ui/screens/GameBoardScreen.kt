@@ -38,6 +38,12 @@ fun GameBoardScreen(
         lobbyId             = lobbyId,
         playerNames         = playerNames,
         moveResult          = moveResult,
-        onDismissMoveResult = { viewModel.clearMoveResult() }
+        onDismissMoveResult = { viewModel.clearMoveResult() },
+        onRollDice = {
+            val myPlayerName = playerNames.firstOrNull() ?: return@GameBoardContent
+            viewModel.rollDice(myPlayerName)
+        }
+
     )
+
 }
