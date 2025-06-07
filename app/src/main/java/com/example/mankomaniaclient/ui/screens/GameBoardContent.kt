@@ -124,7 +124,7 @@ fun GameBoardContent(
         return
     }
 
-    val topRow = listOf(0, 1, 2, 3, 4, 5, 10, 11, 12)
+    val topRow = listOf(0, 1, 2, 3, 4, 9, 10, 11, 12)
     val rightCol = listOf(13, 14, 19)
     val bottomRow = listOf(20, 21, 22, 23, 24, 29, 30, 31, 32).reversed();
     val leftCol = listOf(33, 34, 39).reversed();
@@ -240,6 +240,15 @@ fun GameBoardContent(
                 }
             }
         }
+    }
+
+    @Composable
+    fun MiniBranchCell(cell: CellDto, players: List<PlayerDto>) {
+        EnhancedBoardCell(
+            cell = cell,
+            players = players,
+            modifier = Modifier.size(36.dp)
+        )
     }
 
     @Composable
@@ -488,68 +497,69 @@ fun GameBoardContent(
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .offset(y = 100.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .offset(y = 60.dp, x = 40.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                EnhancedBoardCell(board.first { it.index == 6 }, players)
-                EnhancedBoardCell(board.first { it.index == 7 }, players)
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                MiniBranchCell(board.first { it.index == 5 }, players)
+                MiniBranchCell(board.first { it.index == 8 }, players)
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                EnhancedBoardCell(board.first { it.index == 8 }, players)
-                EnhancedBoardCell(board.first { it.index == 9 }, players)
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                MiniBranchCell(board.first { it.index == 6 }, players)
+                MiniBranchCell(board.first { it.index == 7 }, players)
             }
         }
 
         Row(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
-                .offset(x = (-80).dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                .offset(x = -80.dp, y = 40.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                EnhancedBoardCell(board.first { it.index == 15 }, players)
-                EnhancedBoardCell(board.first { it.index == 16 }, players)
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                MiniBranchCell(board.first { it.index == 16 }, players)
+                MiniBranchCell(board.first { it.index == 17 }, players)
             }
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                EnhancedBoardCell(board.first { it.index == 17 }, players)
-                EnhancedBoardCell(board.first { it.index == 18 }, players)
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                MiniBranchCell(board.first { it.index == 15 }, players)
+                MiniBranchCell(board.first { it.index == 18 }, players)
             }
         }
 
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .offset(y = (-100).dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .offset(y = -60.dp, x = -40.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                EnhancedBoardCell(board.first { it.index == 25 }, players)
-                EnhancedBoardCell(board.first { it.index == 26 }, players)
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                MiniBranchCell(board.first { it.index == 27 }, players)
+                MiniBranchCell(board.first { it.index == 26 }, players)
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                EnhancedBoardCell(board.first { it.index == 27 }, players)
-                EnhancedBoardCell(board.first { it.index == 28 }, players)
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                MiniBranchCell(board.first { it.index == 28 }, players)
+                MiniBranchCell(board.first { it.index == 25 }, players)
             }
         }
 
         Row(
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .offset(x = (80).dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                .offset(x = 80.dp, y = -40.dp ),
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                EnhancedBoardCell(board.first { it.index == 35 }, players)
-                EnhancedBoardCell(board.first { it.index == 36 }, players)
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                MiniBranchCell(board.first { it.index == 38 }, players)
+                MiniBranchCell(board.first { it.index == 35 }, players)
             }
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                EnhancedBoardCell(board.first { it.index == 37 }, players)
-                EnhancedBoardCell(board.first { it.index == 38 }, players)
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                MiniBranchCell(board.first { it.index == 37 }, players)
+                MiniBranchCell(board.first { it.index == 36 }, players)
             }
         }
 
         /* ---------------- Enhanced Centre label -------------------------- */
+        /*
         Card(
             modifier = Modifier
                 .align(Alignment.Center)
@@ -586,7 +596,7 @@ fun GameBoardContent(
                     )
                 }
             }
-        }
+        } */
 
         if (playerNames.size > 0) {
             Box(
@@ -644,6 +654,18 @@ fun GameBoardContent(
             }
         }
 
+    }
+    @Composable
+    fun BranchCell(cell: CellDto, modifier: Modifier = Modifier) {
+        Box(
+            modifier = modifier
+                .size(32.dp)
+                .border(1.dp, Color.Gray, shape = RoundedCornerShape(6.dp))
+                .background(Color.LightGray),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = cell.index.toString(), fontSize = 12.sp)
+        }
     }
 }
 
