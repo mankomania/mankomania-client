@@ -12,6 +12,9 @@
 package com.example.mankomaniaclient.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.example.mankomaniaclient.api.LotteryApi
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import com.example.mankomaniaclient.network.CellDto
 import com.example.mankomaniaclient.network.GameStateDto
 import com.example.mankomaniaclient.network.PlayerDto
@@ -32,6 +35,15 @@ class GameViewModel : ViewModel() {
 
     private val _moveResult = MutableStateFlow<MoveResult?>(null)
     val moveResult: StateFlow<MoveResult?> = _moveResult
+
+    // --- Lottery State ------------------------------------------------
+    private val _lotteryResult = MutableStateFlow<LotteryResult?>(null)
+    val lotteryResult: StateFlow<LotteryResult?> = _lotteryResult
+
+    private val _showLotteryDialog = MutableStateFlow(false)
+    val showLotteryDialog: StateFlow<Boolean> = _showLotteryDialog
+
+    private val lotteryApi = LotteryApi()
 
     /**
      * Subscribe to the given lobby via WebSocket.
@@ -89,10 +101,116 @@ class GameViewModel : ViewModel() {
 
     fun onPlayerMoved(result: MoveResult) {
         _moveResult.value = result
+
+        // Check if player landed on lottery field (field 3)
+        if (result.newPosition == 3) {
+            triggerLottery(getCurrentPlayerName())
+        }
     }
 
     /** Clears the last move-result so the dialog disappears */
     fun clearMoveResult() {
         _moveResult.value = null
     }
+
+    /**
+     * Automatically triggers lottery when landing on field 3
+     */
+    private fun triggerLottery(playerName: String) {
+        viewModelScope.launch {
+            try {
+                // Get current lottery amount
+                val currentAmount = lotteryApi.getCurrentAmount() ?: 0
+
+                if (currentAmount > 0) {
+                    // Automatically claim lottery
+                    val claimResponse = lotteryApi.claimLottery(playerName)
+                    if (claimResponse != null) {
+                        _lotteryResult.value = LotteryResult(
+                            playerName = playerName,
+                            wonAmount = claimResponse.wonAmount,
+                            newPoolAmount = claimResponse.newAmount,
+                            message = if (claimResponse.wonAmount > 0) {
+                                "$playerName won ${claimResponse.wonAmount} € from the lottery!"
+                            } else {
+                                "Lottery was empty! ${claimResponse.newAmount} € added to pool"
+                            }
+                        )
+
+                        // Log the lottery result for debugging
+                        android.util.Log.d("LOTTERY", "Player $playerName: Won ${claimResponse.wonAmount} €")
+
+                    } else {
+                        _lotteryResult.value = LotteryResult(
+                            playerName = playerName,
+                            wonAmount = 0,
+                            newPoolAmount = currentAmount,
+                            message = "Lottery claim failed for $playerName"
+                        )
+                    }
+                } else {
+                    // If lottery is empty, automatically add starter amount
+                    val payResponse = lotteryApi.payToLottery(playerName, 1000, "Lottery starter")
+                    _lotteryResult.value = LotteryResult(
+                        playerName = playerName,
+                        wonAmount = 0,
+                        newPoolAmount = payResponse?.newAmount ?: 1000,
+                        message = "Lottery was empty! $playerName added 1000 € to start the pool"
+                    )
+
+                    android.util.Log.d("LOTTERY", "Player $playerName started lottery with 1000 €")
+                }
+
+                // Show notification briefly, then auto-dismiss
+                _showLotteryDialog.value = true
+
+                // Auto-dismiss after 3 seconds
+                kotlinx.coroutines.delay(3000)
+                _showLotteryDialog.value = false
+                _lotteryResult.value = null
+
+            } catch (e: Exception) {
+                android.util.Log.e("LOTTERY", "Lottery error for $playerName: ${e.message}")
+                _lotteryResult.value = LotteryResult(
+                    playerName = playerName,
+                    wonAmount = 0,
+                    newPoolAmount = 0,
+                    message = "Lottery error for $playerName"
+                )
+
+                // Also auto-dismiss error messages
+                _showLotteryDialog.value = true
+                kotlinx.coroutines.delay(2000)
+                _showLotteryDialog.value = false
+                _lotteryResult.value = null
+            }
+        }
+    }
+
+    /**
+     * Dismisses the lottery dialog
+     */
+    fun dismissLotteryDialog() {
+        _showLotteryDialog.value = false
+        _lotteryResult.value = null
+    }
+
+    /**
+     * Gets the current player's name (you might need to adjust this based on your game logic)
+     */
+    private fun getCurrentPlayerName(): String {
+        // This is a placeholder - you'll need to implement logic to get the current player
+        // You might need to track whose turn it is or get it from the move result
+        return _players.value.firstOrNull()?.name ?: "Unknown Player"
+    }
 }
+
+/**
+ * Data class for lottery results
+ */
+data class LotteryResult(
+    val playerName: String,
+    val wonAmount: Int,
+    val newPoolAmount: Int,
+    val message: String
+)

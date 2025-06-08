@@ -48,6 +48,23 @@ object WebSocketService {
         gameViewModel = vm
     }
 
+    /**
+     * Subscribe to a custom topic with callback
+     * NEW: Added for lottery functionality
+     */
+    fun subscribeToTopic(topic: String, callback: (String) -> Unit) {
+        scope.launch {
+            try {
+                session?.subscribeText(topic)?.collect { message ->
+                    Log.d("WebSocket", "Received from $topic: $message")
+                    callback(message)
+                }
+            } catch (e: Exception) {
+                Log.e("WebSocket", "Error subscribing to $topic: ${e.message}")
+            }
+        }
+    }
+
     fun connect(
         url: String = "ws://se2-demo.aau.at:53210/ws",
         greetingsTopic: String = "/topic/greetings",
@@ -209,6 +226,4 @@ object WebSocketService {
             }
         }
     }
-
-
 }
