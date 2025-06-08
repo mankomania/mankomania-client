@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
+// fixme create subpackages for web socket handling and messages
 /**
  * Represents a horse in the horse race game.
  * @property id The unique identifier of the horse.
