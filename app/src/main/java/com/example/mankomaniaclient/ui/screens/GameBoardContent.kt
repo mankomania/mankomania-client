@@ -58,7 +58,7 @@ fun GameBoardContent(
     moveResult: MoveResult? = null,
     onDismissMoveResult: () -> Unit = {},
     onRollDice: () -> Unit,
-
+    isPlayerTurn: Boolean
 ) {
     var showDialog by remember { mutableStateOf(true) }
 
@@ -670,6 +670,23 @@ fun GameBoardContent(
                 )
             }
         }
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .offset(x = (-40).dp, y = (-100).dp)
+        ) {
+            Button(
+                onClick = { onRollDice() },
+                enabled = isPlayerTurn,
+                shape = RoundedCornerShape(30.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isPlayerTurn) Color.Black else Color.LightGray
+                ),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Text("🎲 Roll", color = Color.White)
+            }
+        }
 
     }
     @Composable
@@ -711,7 +728,9 @@ private fun GameBoardContentPreview() {
             board = board,
             players = players,
             lobbyId = "GAME123",
-            playerNames = players.map { it.name }
+            playerNames = players.map { it.name },
+            onRollDice = {},
+            isPlayerTurn = true
         )
     }
 }

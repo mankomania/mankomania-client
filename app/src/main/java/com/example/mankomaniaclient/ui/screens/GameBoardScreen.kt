@@ -30,7 +30,7 @@ fun GameBoardScreen(
     val board      by viewModel.board.collectAsState()
     val players    by viewModel.players.collectAsState()
     val moveResult by viewModel.moveResult.collectAsState()     // type: MoveResult?
-
+    val isMyTurn by viewModel.isPlayerTurn.collectAsState()
     /* Delegate rendering to the pure-UI composable -------------------- */
     GameBoardContent(
         board               = board,
@@ -42,8 +42,8 @@ fun GameBoardScreen(
         onRollDice = {
             val myPlayerName = playerNames.firstOrNull() ?: return@GameBoardContent
             viewModel.rollDice(myPlayerName)
-        }
-
+        },
+        isPlayerTurn = isMyTurn
     )
 
 }
