@@ -23,7 +23,12 @@ fun GameBoardScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(lobbyId, lifecycleOwner) {
         Log.d("GameBoardScreen", "Subscribing to lobby $lobbyId")
-        viewModel.subscribeToLobby(lobbyId)
+        val myPlayerName = playerNames.firstOrNull()
+        if (myPlayerName != null) {
+            viewModel.subscribeToLobbyWithPlayerName(lobbyId, myPlayerName)}
+        else{
+            Log.e("GameBoardScreen", "❌ myPlayerName is null – can't subscribe properly")
+        }
     }
 
     /* Collect state from the ViewModel -------------------------------- */

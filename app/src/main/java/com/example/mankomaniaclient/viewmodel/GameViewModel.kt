@@ -33,13 +33,21 @@ class GameViewModel : ViewModel() {
     private val _moveResult = MutableStateFlow<MoveResult?>(null)
     val moveResult: StateFlow<MoveResult?> = _moveResult
 
+    private var myPlayerName: String? = null
+
+    fun setPlayerName(name: String) {
+        myPlayerName = name
+    }
+
     /**
      * Subscribe to the given lobby via WebSocket.
      * This will route incoming GameStateDto and MoveResults automatically
      */
-    fun subscribeToLobby(lobbyId: String) {
+    fun subscribeToLobbyWithPlayerName(lobbyId: String, playerName: String) {
+        myPlayerName = playerName
         WebSocketService.subscribeToLobby(lobbyId)
     }
+
 
     init {
         // Register this ViewModel with the WebSocketService for callbacks
@@ -50,12 +58,13 @@ class GameViewModel : ViewModel() {
     fun onGameState(state: GameStateDto) {
         _board.value   = state.board
         _players.value = state.players
-
-        val myName = state.players.firstOrNull()?.name
-        val localName = _players.value.firstOrNull()?.name
-
-        _isPlayerTurn.value = (myName == localName)
+        println("🔄 onGameState called")
+        println("📛 currentTurnPlayerName = ${state.currentTurnPlayerName}")
+        println("📛 myPlayerName = $myPlayerName")
+        _isPlayerTurn.value = (state.currentTurnPlayerName == myPlayerName)
+        println("🎯 isPlayerTurn = ${_isPlayerTurn.value}")
     }
+
 
     // --- Dice Roll State ----------------------------------------------
     private val _diceResult   = MutableStateFlow<DiceResult?>(null)
@@ -100,4 +109,5 @@ class GameViewModel : ViewModel() {
     fun clearMoveResult() {
         _moveResult.value = null
     }
+
 }

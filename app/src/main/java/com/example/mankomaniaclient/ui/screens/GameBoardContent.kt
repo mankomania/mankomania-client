@@ -127,21 +127,6 @@ fun GameBoardContent(
     }
     Spacer(modifier = Modifier.height(16.dp))
 
-    Button(
-        onClick = { onRollDice() },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 32.dp)
-            .offset(x = (-32).dp, y = (-112).dp)
-    ) {
-        Text(
-            text = "Roll Dice",
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
-    }
-
-
     val topRow = listOf(0, 1, 2, 3, 4, 9, 10, 11, 12)
     val rightCol = listOf(13, 14, 19)
     val bottomRow = listOf(20, 21, 22, 23, 24, 29, 30, 31, 32).reversed();

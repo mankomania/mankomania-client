@@ -31,7 +31,8 @@ data class PlayerDto(
 @Serializable
 data class GameStateDto(
     val players: List<PlayerDto>,
-    val board:   List<CellDto>
+    val board:   List<CellDto>,
+    val currentTurnPlayerName: String
 )
 
 
