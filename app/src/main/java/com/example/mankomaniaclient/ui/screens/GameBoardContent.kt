@@ -132,6 +132,7 @@ fun GameBoardContent(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 32.dp)
+            .offset(x = (-32).dp, y = (-112).dp)
     ) {
         Text(
             text = "Roll Dice",
@@ -670,10 +671,11 @@ fun GameBoardContent(
                 )
             }
         }
+
         Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .offset(x = (-40).dp, y = (-100).dp)
+                .offset(x = (-150).dp, y = (-75).dp)
         ) {
             Button(
                 onClick = { onRollDice() },

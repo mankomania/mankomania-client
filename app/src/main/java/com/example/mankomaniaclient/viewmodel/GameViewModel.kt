@@ -50,6 +50,11 @@ class GameViewModel : ViewModel() {
     fun onGameState(state: GameStateDto) {
         _board.value   = state.board
         _players.value = state.players
+
+        val myName = state.players.firstOrNull()?.name
+        val localName = _players.value.firstOrNull()?.name
+
+        _isPlayerTurn.value = (myName == localName)
     }
 
     // --- Dice Roll State ----------------------------------------------
