@@ -41,6 +41,12 @@ object WebSocketService {
     val clientCount: StateFlow<Int> = _clientCount.asStateFlow()
     private var gameViewModel: GameViewModel? = null
 
+    private var myPlayerName: String? = null
+
+    fun setPlayerName(name: String) {
+        myPlayerName = name
+    }
+
     fun clearLobbyResponse() {
         _lobbyResponse.value = null
     }

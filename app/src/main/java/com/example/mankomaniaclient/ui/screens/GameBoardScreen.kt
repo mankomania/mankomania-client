@@ -10,6 +10,7 @@ package com.example.mankomaniaclient.ui.screens
 
 import android.util.Log
 import androidx.compose.runtime.*
+import kotlinx.coroutines.delay
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.mankomaniaclient.viewmodel.GameViewModel
 
@@ -21,14 +22,12 @@ fun GameBoardScreen(
 ) {
     /* Subscribe exactly once when the screen appears ------------------- */
     val lifecycleOwner = LocalLifecycleOwner.current
-    LaunchedEffect(lobbyId, lifecycleOwner) {
+    LaunchedEffect(lobbyId, playerNames, lifecycleOwner) {
+        val myName = playerNames.firstOrNull() ?: return@LaunchedEffect
         Log.d("GameBoardScreen", "Subscribing to lobby $lobbyId")
-        val myPlayerName = playerNames.firstOrNull()
-        if (myPlayerName != null) {
-            viewModel.subscribeToLobbyWithPlayerName(lobbyId, myPlayerName)}
-        else{
-            Log.e("GameBoardScreen", "❌ myPlayerName is null – can't subscribe properly")
-        }
+            viewModel.setPlayerName(myName)
+            delay(200)
+            viewModel.subscribeToLobbyWithPlayerName(lobbyId, myName)
     }
 
     /* Collect state from the ViewModel -------------------------------- */
@@ -45,8 +44,7 @@ fun GameBoardScreen(
         moveResult          = moveResult,
         onDismissMoveResult = { viewModel.clearMoveResult() },
         onRollDice = {
-            val myPlayerName = playerNames.firstOrNull() ?: return@GameBoardContent
-            viewModel.rollDice(myPlayerName)
+            viewModel.rollDice()
         },
         isPlayerTurn = isMyTurn
     )

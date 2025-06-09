@@ -45,6 +45,7 @@ class GameViewModel : ViewModel() {
      */
     fun subscribeToLobbyWithPlayerName(lobbyId: String, playerName: String) {
         myPlayerName = playerName
+        WebSocketService.setGameViewModel(this)
         WebSocketService.subscribeToLobby(lobbyId)
     }
 
@@ -56,11 +57,13 @@ class GameViewModel : ViewModel() {
 
     /** Called by WebSocketService when a new GameStateDto arrives */
     fun onGameState(state: GameStateDto) {
+        println("⏱️ Called onGameState with myPlayerName=$myPlayerName and currentTurnPlayerName=${state.currentTurnPlayerName}")
         _board.value   = state.board
         _players.value = state.players
         println("🔄 onGameState called")
         println("📛 currentTurnPlayerName = ${state.currentTurnPlayerName}")
         println("📛 myPlayerName = $myPlayerName")
+        val isTurn = (state.currentTurnPlayerName == myPlayerName)
         _isPlayerTurn.value = (state.currentTurnPlayerName == myPlayerName)
         println("🎯 isPlayerTurn = ${_isPlayerTurn.value}")
     }
@@ -77,12 +80,13 @@ class GameViewModel : ViewModel() {
      * Sends a dice roll request to the backend via StompManager.
      * Only works when it's the player's turn.
      */
-    fun rollDice(playerName: String) {
+    fun rollDice() {
         if (!_isPlayerTurn.value) return
-
-        println("ROLL REQUEST for $playerName triggered from UI")
-        WebSocketService.send("/app/rollDice", playerName)
-        _isPlayerTurn.value = false
+        myPlayerName?.let { playerName ->
+            println("ROLL REQUEST for $playerName triggered from UI")
+            WebSocketService.send("/app/rollDice", playerName)
+            _isPlayerTurn.value = false
+        }
     }
 
     /**

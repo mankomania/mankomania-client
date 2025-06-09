@@ -47,9 +47,11 @@ class CreateLobbyActivity : ComponentActivity() {
         LaunchedEffect(Unit) {
             val id: String = if (lobbyIdFromIntent == null) {
                 val newId = generateLobbyId()
+                WebSocketService.setPlayerName(playerName)
                 WebSocketService.createLobby(newId, playerName)
                 newId
             } else {
+                WebSocketService.setPlayerName(playerName)
                 WebSocketService.subscribeToLobby(lobbyIdFromIntent!!)
                 lobbyIdFromIntent
             }
