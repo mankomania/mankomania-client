@@ -5,8 +5,9 @@
  * @description
  * ViewModel that holds the current game state:
  * the list of board cells and the list of players.
- * ViewModel for managing dice roll interactions and UI state.
- * Handles triggering of roll requests and updating UI based on results.
+ * Manages dice roll interactions and UI state.
+ * Also handles the “Game Started” signal to set initial positions
+ * and determine which player begins.
  */
 
 package com.example.mankomaniaclient.viewmodel
@@ -18,6 +19,7 @@ import com.example.mankomaniaclient.network.PlayerDto
 import com.example.mankomaniaclient.network.WebSocketService
 import com.example.mankomaniaclient.model.DiceResult
 import com.example.mankomaniaclient.model.MoveResult
+import com.example.mankomaniaclient.network.GameStartedDto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -32,6 +34,22 @@ class GameViewModel : ViewModel() {
 
     private val _moveResult = MutableStateFlow<MoveResult?>(null)
     val moveResult: StateFlow<MoveResult?> = _moveResult
+
+    // --- Game Started State ----------------------------------------
+    private val _gameStarted = MutableStateFlow<GameStartedDto?>(null)
+    val gameStarted: StateFlow<GameStartedDto?> = _gameStarted
+
+    // Stores the local player's name for turn determination.
+    private lateinit var localPlayerName: String
+
+    /**
+     * Call this once you know the player's name (e.g., before joining the lobby).
+     * Used later to compare against firstPlayerIndex from the server.
+     */
+    fun setLocalPlayerName(name: String) {
+        localPlayerName = name
+    }
+
 
     /**
      * Subscribe to the given lobby via WebSocket.
@@ -50,6 +68,25 @@ class GameViewModel : ViewModel() {
     fun onGameState(state: GameStateDto) {
         _board.value   = state.board
         _players.value = state.players
+    }
+
+    /**
+     * Called by WebSocketService when the server signals that the game has started.
+     * Initializes player positions and unlocks the first turn.
+     */
+    fun onGameStarted(dto: GameStartedDto) {
+        _gameStarted.value = dto
+
+        // 1) Map startPositions to PlayerDto list using the join order
+        val orderedNames = WebSocketService.playersInLobby.value
+        val startingPlayers = dto.startPositions.mapIndexed { index, pos ->
+            PlayerDto(name = orderedNames[index], position = pos)
+        }
+        _players.value = startingPlayers
+
+        // 2) Determine first turn: compare localPlayerName index with server's firstPlayerIndex
+        val myIndex = orderedNames.indexOf(localPlayerName)
+        _isPlayerTurn.value = (myIndex == dto.firstPlayerIndex)
     }
 
     // --- Dice Roll State ----------------------------------------------
