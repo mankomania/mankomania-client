@@ -25,6 +25,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import com.example.mankomaniaclient.ui.components.PlayerCharacterView
+import android.content.Intent
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import com.example.mankomaniaclient.RulesActivity
 
 @Composable
 fun GameBoardScreen(lobbyId: String, playerNames: List<String>,viewModel: GameViewModel) {
@@ -42,6 +49,12 @@ fun GameBoardScreen(lobbyId: String, playerNames: List<String>,viewModel: GameVi
     val lotteryResult by viewModel.lotteryResult.collectAsState()
     val showLotteryDialog by viewModel.showLotteryDialog.collectAsState()
     var showDialog by remember { mutableStateOf(true) }
+    val context = LocalContext.current
+
+    LaunchedEffect(lobbyId) {
+        Log.d("GameBoardScreen", "Subscribing to lobby $lobbyId")
+        viewModel.subscribeToLobby(lobbyId)
+    }
 
     // Show move result dialog when a move occurs
     if (moveResult != null && showDialog) {
@@ -155,5 +168,23 @@ fun GameBoardScreen(lobbyId: String, playerNames: List<String>,viewModel: GameVi
             moveResult = moveResult,
             onDismissMoveResult = { viewModel.clearMoveResult() }
         )
+
+        // Spielregeln Button
+        FloatingActionButton(
+            onClick = {
+                val intent = Intent(context, RulesActivity::class.java)
+                context.startActivity(intent)
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+                .size(48.dp),
+            containerColor = MaterialTheme.colorScheme.secondary
+        ) {
+            Icon(
+                imageVector = Icons.Default.Info,
+                contentDescription = "Spielregeln"
+            )
+        }
     }
 }
