@@ -21,13 +21,15 @@ class OpponentsViewTest {
             name = "Lev",
             position = 4,
             balance = 125000,
-            money = mapOf(5000 to 2)
+            money = mapOf(5000 to 2),
+            isTurn = true
         )
         val player2 = PlayerStatus(
             name = "Anna",
             position = 6,
             balance = 97000,
-            money = mapOf(10000 to 1, 5000 to 3)
+            money = mapOf(10000 to 1, 5000 to 3),
+            isTurn = false
         )
 
         viewModel.updatePlayerStatus(player1)
@@ -39,5 +41,7 @@ class OpponentsViewTest {
         assertEquals(4, result["Lev"]?.position)
         assertEquals(97000, result["Anna"]?.balance)
         assertEquals(mapOf(10000 to 1, 5000 to 3), result["Anna"]?.money)
+        assertEquals(true, result["Lev"]?.isTurn)
+        assertEquals(false, result["Anna"]?.isTurn)
     }
 }

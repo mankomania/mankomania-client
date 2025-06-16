@@ -35,7 +35,10 @@ fun OpponentsView(viewModel: GameViewModel = viewModel()) {
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = player.name, style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        text = if (player.isTurn) "${player.name}" else player.name,
+                        style = MaterialTheme.typography.titleMedium
+                    )
                     Text(text = "Position: ${player.position}", style = MaterialTheme.typography.bodyMedium)
                     Text(text = "Balance: ${player.balance}", style = MaterialTheme.typography.bodyMedium)
 
