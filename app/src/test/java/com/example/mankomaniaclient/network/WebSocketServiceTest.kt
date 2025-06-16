@@ -230,7 +230,9 @@ fun `subscribeToPlayerStatuses forwards PlayerStatus to GameViewModel`() = runTe
             "money": {
                 "5000": 3,
                 "10000": 2
-            }
+            },
+            "isTurn": true
+
         }
     """.trimIndent()
 
@@ -258,7 +260,10 @@ fun `subscribeToPlayerStatuses forwards PlayerStatus to GameViewModel`() = runTe
                 name = "Toni",
                 position = 4,
                 balance = 120000,
-                money = mapOf(5000 to 3, 10000 to 2)
+                money = mapOf(5000 to 3, 10000 to 2),
+                isTurn = true
+
+
             )
         )
     }
