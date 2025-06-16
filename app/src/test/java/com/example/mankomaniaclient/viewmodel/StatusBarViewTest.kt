@@ -21,7 +21,8 @@ class StatusBarViewTest {
             name = "Lev",
             position = 4,
             balance = 125000,
-            money = mapOf(5000 to 2, 10000 to 1)
+            money = mapOf(5000 to 2, 10000 to 1),
+            isTurn = true
         )
 
         viewModel.updatePlayerStatus(testStatus)
@@ -32,5 +33,15 @@ class StatusBarViewTest {
         assertEquals(4, result?.position)
         assertEquals(125000, result?.balance)
         assertEquals(mapOf(5000 to 2, 10000 to 1), result?.money)
+        assertEquals(true, result?.isTurn)
+    }
+
+
+    @Test
+    fun `statusBarView does not crash on unknown player`() = runTest {
+        val viewModel = GameViewModel()
+        // Do not add any player status
+        val result = viewModel.playerStatuses.value["Ghost"]
+        assertEquals(null, result)
     }
 }
