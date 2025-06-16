@@ -92,8 +92,8 @@ class GameViewModelTest {
     @Test
     fun `updatePlayerStatus should add or replace player status`() = runTest {
         val viewModel = GameViewModel()
-        val status1 = PlayerStatus("Toni", position = 3, balance = 50000, money = mapOf(5000 to 5))
-        val status2 = PlayerStatus("Jorge", position = 5, balance = 80000, money = mapOf(10000 to 2))
+        val status1 = PlayerStatus("Toni", 3, 50000, mapOf(5000 to 5), isTurn = true)
+        val status2 = PlayerStatus("Jorge", 5, 80000, mapOf(10000 to 2), isTurn = false)
 
         viewModel.updatePlayerStatus(status1)
         viewModel.updatePlayerStatus(status2)
@@ -103,7 +103,14 @@ class GameViewModelTest {
             assertEquals(2, value.size)
             assertEquals(3, value["Toni"]?.position)
             assertEquals(80000, value["Jorge"]?.balance)
+            assertTrue(value["Toni"]?.isTurn == true)
+            assertFalse(value["Jorge"]?.isTurn == true)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+    @Test
+    fun `playerStatuses should initially be empty`() = runTest {
+        val viewModel = GameViewModel()
+        assertTrue(viewModel.playerStatuses.value.isEmpty())
     }
 }
