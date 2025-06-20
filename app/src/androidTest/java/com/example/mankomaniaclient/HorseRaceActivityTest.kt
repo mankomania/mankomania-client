@@ -1,26 +1,28 @@
 package com.example.mankomaniaclient
 
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withText
-import androidx.test.ext.junit.rules.ActivityScenarioRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.assertIsDisplayed
+import com.example.mankomaniaclient.ui.screens.HorseRaceScreen
+import com.example.mankomaniaclient.viewmodel.HorseRaceViewModel
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
 class HorseRaceActivityTest {
 
     @get:Rule
-    val activityRule = ActivityScenarioRule(HorseRaceActivity::class.java)
+    val composeTestRule = createComposeRule()
 
     @Test
     fun activityLaunchesSuccessfully() {
-        // Verifica che il testo "Horse Race" sia visibile
-        onView(withText("Horse Race")).check(matches(isDisplayed()))
-        // Verifica che il pulsante "Spin Roulette" sia visibile
-        onView(withText("Spin Roulette")).check(matches(isDisplayed()))
+        // Create a viewModel instance for testing
+        val viewModel = HorseRaceViewModel()
+
+        composeTestRule.setContent {
+            HorseRaceScreen(viewModel = viewModel)
+        }
+
+        composeTestRule.onNodeWithText("Horse Race").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Spin Roulette").assertIsDisplayed()
     }
 }
