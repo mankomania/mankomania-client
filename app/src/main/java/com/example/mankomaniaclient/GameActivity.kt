@@ -40,6 +40,8 @@ class GameActivity : ComponentActivity() {
 
         // Create ViewModel (lifecycle-aware, no extra Compose dependency)
         val gameViewModel = ViewModelProvider(this)[GameViewModel::class.java]
+        val myPlayerName = intent.getStringExtra("MY_NAME") ?: ""
+
 
         WebSocketService.setGameViewModel(gameViewModel)
         WebSocketService.subscribeToLobby(lobbyId)
@@ -54,6 +56,7 @@ class GameActivity : ComponentActivity() {
                         GameBoardScreen(
                             lobbyId = lobbyId,
                             playerNames = playerNames,
+                            myName = myPlayerName,
                             viewModel   = gameViewModel
                         )
                     }

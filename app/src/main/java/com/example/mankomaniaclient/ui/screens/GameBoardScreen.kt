@@ -18,6 +18,7 @@ import com.example.mankomaniaclient.viewmodel.GameViewModel
 fun GameBoardScreen(
     lobbyId: String,
     playerNames: List<String>,
+    myName: String,
     viewModel: GameViewModel
 ) {
     /* Subscribe exactly once when the screen appears ------------------- */
