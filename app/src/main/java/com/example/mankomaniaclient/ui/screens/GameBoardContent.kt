@@ -35,6 +35,7 @@ import com.example.mankomaniaclient.network.PlayerDto
 import com.example.mankomaniaclient.ui.components.BoardCellView
 import com.example.mankomaniaclient.ui.components.PlayerCharacterView
 import com.example.mankomaniaclient.ui.components.PlayerCharacterView
+import com.example.mankomaniaclient.viewmodel.GameViewModel
 
 /**
  * Pure-UI version of the game board. Make UI changes here, not in GameBoardScreen!
@@ -58,8 +59,10 @@ fun GameBoardContent(
     moveResult: MoveResult? = null,
     onDismissMoveResult: () -> Unit = {},
     onRollDice: () -> Unit,
-    isPlayerTurn: Boolean
+    isPlayerTurn: Boolean,
+    viewModel: GameViewModel
 ) {
+    val playerName by viewModel.myPlayerName.collectAsState()
     var showDialog by remember { mutableStateOf(true) }
 
     /* Move-result dialog --------------------------------------------- */
@@ -672,13 +675,43 @@ fun GameBoardContent(
             }
         }
 
+        var diceResultMessage by remember { mutableStateOf<String?>(null) }
+        diceResultMessage?.let { message ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 48.dp),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                Surface(
+                    color = Color(0xFF333333),
+                    shape = RoundedCornerShape(12.dp),
+                    tonalElevation = 6.dp,
+                ) {
+                    Text(
+                        text = message,
+                        color = Color.White,
+                        modifier = Modifier.padding(16.dp),
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+            LaunchedEffect(message) {
+                kotlinx.coroutines.delay(3000)
+                diceResultMessage = null
+            }
+        }
+
         Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .offset(x = (-150).dp, y = (-75).dp)
         ) {
             Button(
-                onClick = { onRollDice() },
+                onClick = {val rolledNumber = (2..12).random()
+                    diceResultMessage = "$playerName rolled $rolledNumber "
+                    onRollDice()},
                 enabled = isPlayerTurn,
                 shape = RoundedCornerShape(30.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -724,6 +757,7 @@ private fun GameBoardContentPreview() {
         PlayerDto(name = "Clara", position = 11),
         PlayerDto(name = "Anna", position = 2) // Same position as Kevin for testing
     )
+    val viewModel = remember { GameViewModel() }
 
     MaterialTheme {
         GameBoardContent(
@@ -732,7 +766,8 @@ private fun GameBoardContentPreview() {
             lobbyId = "GAME123",
             playerNames = players.map { it.name },
             onRollDice = {},
-            isPlayerTurn = true
+            isPlayerTurn = true,
+            viewModel = viewModel
         )
     }
 }

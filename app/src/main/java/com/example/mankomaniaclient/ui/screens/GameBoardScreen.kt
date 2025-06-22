@@ -43,7 +43,8 @@ fun GameBoardScreen(
             val myPlayerName = playerNames.firstOrNull() ?: return@GameBoardContent
             viewModel.rollDice(myPlayerName)
         },
-        isPlayerTurn = isMyTurn
+        isPlayerTurn = isMyTurn,
+        viewModel = viewModel
     )
 
 }
