@@ -17,7 +17,8 @@ import com.example.mankomaniaclient.viewmodel.GameViewModel
 fun GameBoardScreen(
     lobbyId: String,
     playerNames: List<String>,
-    viewModel: GameViewModel
+    viewModel: GameViewModel,
+    myPlayerName: String
 ) {
     /* Subscribe exactly once when the screen appears ------------------- */
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -40,11 +41,11 @@ fun GameBoardScreen(
         moveResult          = moveResult,
         onDismissMoveResult = { viewModel.clearMoveResult() },
         onRollDice = {
-            val myPlayerName = playerNames.firstOrNull() ?: return@GameBoardContent
-            viewModel.rollDice(myPlayerName)
+            viewModel.rollDice(lobbyId)
         },
         isPlayerTurn = isMyTurn,
-        viewModel = viewModel
+        viewModel = viewModel,
+        myPlayerName = myPlayerName
     )
 
 }

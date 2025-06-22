@@ -54,7 +54,8 @@ class GameActivity : ComponentActivity() {
                         GameBoardScreen(
                             lobbyId = lobbyId,
                             playerNames = playerNames,
-                            viewModel   = gameViewModel
+                            viewModel   = gameViewModel,
+                            myPlayerName = singleName
                         )
                     }
                 }

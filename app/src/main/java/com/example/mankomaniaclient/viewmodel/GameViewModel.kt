@@ -36,6 +36,10 @@ class GameViewModel : ViewModel() {
     private val _myPlayerName = MutableStateFlow("")
     val myPlayerName: StateFlow<String> = _myPlayerName
 
+    fun setMyPlayerName(name: String) {
+        _myPlayerName.value = name
+    }
+
     /**
      * Subscribe to the given lobby via WebSocket.
      * This will route incoming GameStateDto and MoveResults automatically

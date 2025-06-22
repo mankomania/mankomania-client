@@ -60,8 +60,11 @@ fun GameBoardContent(
     onDismissMoveResult: () -> Unit = {},
     onRollDice: () -> Unit,
     isPlayerTurn: Boolean,
-    viewModel: GameViewModel
+    viewModel: GameViewModel,
+    myPlayerName: String
+
 ) {
+
     val playerName by viewModel.myPlayerName.collectAsState()
     var showDialog by remember { mutableStateOf(true) }
 
@@ -767,7 +770,9 @@ private fun GameBoardContentPreview() {
             playerNames = players.map { it.name },
             onRollDice = {},
             isPlayerTurn = true,
-            viewModel = viewModel
+            viewModel = viewModel,
+            myPlayerName = "Dummy"
+
         )
     }
 }
