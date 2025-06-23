@@ -59,7 +59,7 @@ fun GameBoardContent(
     playerNames: List<String>,
     moveResult: MoveResult? = null,
     onDismissMoveResult: () -> Unit = {},
-            onCellClick: (CellDto) -> Unit
+            onCellClick: (CellDto) -> Unit={}
 ) {
     var showDialog by remember { mutableStateOf(true) }
 
@@ -340,7 +340,7 @@ fun GameBoardContent(
 
                     // Cell with overlaid players
                     Box {
-                        EnhancedBoardCell(board.first { it.index == i }, players)
+                        EnhancedBoardCell(board.first { it.index == i }, players, onClick = onCellClick)
 
                         // Player indicators
                         var playerOffset = 0
@@ -377,7 +377,7 @@ fun GameBoardContent(
                 ) {
                     // Cell with overlaid players
                     Box {
-                        EnhancedBoardCell(board.first { it.index == i }, players)
+                        EnhancedBoardCell(board.first { it.index == i }, players, onClick = onCellClick)
 
                         // Player indicators
                         var playerOffset = 0
@@ -423,7 +423,7 @@ fun GameBoardContent(
                 ) {
                     // Cell with overlaid players
                     Box {
-                        EnhancedBoardCell(board.first { it.index == i }, players)
+                        EnhancedBoardCell(board.first { it.index == i }, players, onClick = onCellClick)
 
                         // Player indicators
                         var playerOffset = 0
@@ -476,7 +476,7 @@ fun GameBoardContent(
 
                     // Cell with overlaid players
                     Box {
-                        EnhancedBoardCell(board.first { it.index == i }, players,onCellClick)
+                        EnhancedBoardCell(board.first { it.index == i }, players, onClick = onCellClick)
 
                         // Player indicators
                         var playerOffset = 0
