@@ -44,6 +44,7 @@ object WebSocketService {
     fun clearLobbyResponse() {
         _lobbyResponse.value = null
     }
+
     fun setGameViewModel(vm: GameViewModel) {
         gameViewModel = vm
     }
@@ -105,12 +106,20 @@ object WebSocketService {
 
                 launch{
                     stomp.subscribeText("/topic/player-moved").collect { json ->
-                    val moveResult = jsonParser.decodeFromString<MoveResult>(json)
-                    Log.d("WebSocket", "Received move result: $moveResult")
-                    gameViewModel?.onPlayerMoved(moveResult)
-                        ?: Log.e("WebSocket", "ViewModel not yet set – skipping move update.")
+                        val moveResult = jsonParser.decodeFromString<MoveResult>(json)
+                        Log.d("WebSocket", "Received move result: $moveResult")
+                        gameViewModel?.onPlayerMoved(moveResult)
+                            ?: Log.e("WebSocket", "ViewModel not yet set – skipping move update.")
+                    }
                 }
-            }
+
+                // Subscribe to minigame events
+                launch {
+                    stomp.subscribeText("/topic/minigame/events").collect { json ->
+                        Log.d("WebSocket", "Received minigame event: $json")
+                        // Handle minigame events if needed
+                    }
+                }
 
             } catch (e: Exception) {
                 connected = false
@@ -176,6 +185,32 @@ object WebSocketService {
         send("/app/lobby", jsonParser.encodeToString(LobbyMessage.serializer(), message))
     }
 
+    /**
+     * Initiates a minigame for the specified player in the given lobby.
+     * Sends a request to the server to start the minigame.
+     *
+     * @param lobbyId The ID of the lobby where the minigame should start
+     * @param playerId The ID of the player who will play the minigame
+     */
+    fun startMinigame(lobbyId: String, playerId: String) {
+        val message = """{"lobbyId": "$lobbyId", "playerId": "$playerId"}"""
+        send("/app/minigame/start", message)
+        Log.d("WebSocket", "Minigame start request sent for player $playerId in lobby $lobbyId")
+    }
+
+    /**
+     * Ends the currently active minigame and sends the result to the server.
+     *
+     * @param lobbyId The lobby ID where the minigame is active
+     * @param playerId The player who completed the minigame
+     * @param score The final score achieved in the minigame (if applicable)
+     */
+    fun endMinigame(lobbyId: String, playerId: String, score: Int = 0) {
+        val message = """{"lobbyId": "$lobbyId", "playerId": "$playerId", "score": $score}"""
+        send("/app/minigame/end", message)
+        Log.d("WebSocket", "Minigame end request sent for player $playerId with score $score")
+    }
+
     fun subscribeToLobby(lobbyId: String) {
         scope.launch {
             while (session == null) {
@@ -207,8 +242,17 @@ object WebSocketService {
                         gameViewModel?.onGameState(state)
                     }
             }
+
+            // Subscribe to minigame state updates for this specific lobby
+            launch {
+                session!!
+                    .subscribeText("/topic/minigame/state/$lobbyId")
+                    .collect { json ->
+                        Log.d("WebSocket", "Received minigame state: $json")
+                        // Update minigame state in the ViewModel when implemented
+                        // gameViewModel?.onMinigameState(state)
+                    }
+            }
         }
     }
-
-
 }
