@@ -37,6 +37,7 @@ class GameViewModel : ViewModel() {
     val myPlayerName: StateFlow<String> = _myPlayerName
 
     fun setMyPlayerName(name: String) {
+        println(">>> setMyPlayerName called with: $name")
         _myPlayerName.value = name
     }
 
@@ -55,20 +56,24 @@ class GameViewModel : ViewModel() {
 
     /** Called by WebSocketService when a new GameStateDto arrives */
     fun onGameState(state: GameStateDto) {
+        val myName = myPlayerName.value
+        println(">> onGameState: myName = '$myName' | currentTurnPlayerName = '${state.currentTurnPlayerName}'")
+
         _board.value   = state.board
         _players.value = state.players
+        println("myName: $myName | currentTurnPlayerName: ${state.currentTurnPlayerName}")
 
-        val myName = state.players.firstOrNull()?.name
-        val localName = _players.value.firstOrNull()?.name
 
-        _isPlayerTurn.value = (myName == localName)
+        _isPlayerTurn.value = (myName == state.currentTurnPlayerName)
+        println(">>> isPlayerTurn wird gesetzt auf ${myName == state.currentTurnPlayerName}")
+
     }
 
     // --- Dice Roll State ----------------------------------------------
     private val _diceResult   = MutableStateFlow<DiceResult?>(null)
     val diceResult: StateFlow<DiceResult?> = _diceResult
 
-    private val _isPlayerTurn = MutableStateFlow(true)
+    private val _isPlayerTurn = MutableStateFlow(false)
     val isPlayerTurn: StateFlow<Boolean> = _isPlayerTurn
 
     /**
@@ -80,7 +85,6 @@ class GameViewModel : ViewModel() {
 
         println("ROLL REQUEST for $playerName triggered from UI")
         WebSocketService.send("/app/rollDice", playerName)
-        _isPlayerTurn.value = false
     }
 
     /**

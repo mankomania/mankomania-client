@@ -37,8 +37,8 @@ import com.example.mankomaniaclient.RulesActivity
 fun NameEntryScreen(
     playerName: String,
     onNameChange: (String) -> Unit,
-    onCreateLobby: () -> Unit,
-    onJoinLobby: () -> Unit
+    onCreateLobby: (String) -> Unit,
+    onJoinLobby: (String) -> Unit
 ) {
     val isNameValid = playerName.isNotBlank()
     var nameConfirmed by remember { mutableStateOf(false) }
@@ -102,9 +102,9 @@ fun NameEntryScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             if (nameConfirmed) {
-                StyledButton(text = "Create Lobby", onClick = onCreateLobby)
+                StyledButton(text = "Create Lobby", onClick = { onCreateLobby(playerName) })
                 Spacer(modifier = Modifier.height(12.dp))
-                StyledButton(text = "Join Lobby", onClick = onJoinLobby)
+                StyledButton(text = "Join Lobby", onClick = { onJoinLobby(playerName) })
             }
         }
     }

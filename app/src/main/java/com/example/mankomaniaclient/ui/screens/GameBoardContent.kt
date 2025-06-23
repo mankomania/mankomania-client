@@ -64,8 +64,6 @@ fun GameBoardContent(
     myPlayerName: String
 
 ) {
-
-    val playerName by viewModel.myPlayerName.collectAsState()
     var showDialog by remember { mutableStateOf(true) }
 
     /* Move-result dialog --------------------------------------------- */
@@ -706,6 +704,9 @@ fun GameBoardContent(
             }
         }
 
+        val myName by viewModel.myPlayerName.collectAsState()
+        val isPlayerTurn by viewModel.isPlayerTurn.collectAsState()
+
         Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -713,7 +714,7 @@ fun GameBoardContent(
         ) {
             Button(
                 onClick = {val rolledNumber = (2..12).random()
-                    diceResultMessage = "$playerName rolled $rolledNumber "
+                    diceResultMessage = "$myName rolled $rolledNumber "
                     onRollDice()},
                 enabled = isPlayerTurn,
                 shape = RoundedCornerShape(30.dp),

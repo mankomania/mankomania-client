@@ -83,6 +83,7 @@ class GameActivity : ComponentActivity() {
                                         "playerNames",
                                         ArrayList(playerNames)
                                     )
+                                    putExtra("playerName", singleName)
                                     putExtra("lobbyId", lobbyId)
                                     putExtra(EXTRA_SCREEN, SCREEN_GAMEBOARD)
                                 }

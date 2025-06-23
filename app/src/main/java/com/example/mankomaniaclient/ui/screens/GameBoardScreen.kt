@@ -12,6 +12,8 @@ import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.mankomaniaclient.viewmodel.GameViewModel
+import com.example.mankomaniaclient.network.WebSocketService
+
 
 @Composable
 fun GameBoardScreen(
@@ -22,10 +24,17 @@ fun GameBoardScreen(
 ) {
     /* Subscribe exactly once when the screen appears ------------------- */
     val lifecycleOwner = LocalLifecycleOwner.current
-    LaunchedEffect(lobbyId, lifecycleOwner) {
-        Log.d("GameBoardScreen", "Subscribing to lobby $lobbyId")
+    LaunchedEffect(Unit) {
+        Log.d("DEBUG", "→ 1. Spielername setzen")
+        viewModel.setMyPlayerName(myPlayerName)
+
+        Log.d("DEBUG", "→ 2. ViewModel setzen")
+        WebSocketService.setGameViewModel(viewModel)
+
+        Log.d("DEBUG", "→ 3. Lobby abonnieren")
         viewModel.subscribeToLobby(lobbyId)
     }
+
 
     /* Collect state from the ViewModel -------------------------------- */
     val board      by viewModel.board.collectAsState()
