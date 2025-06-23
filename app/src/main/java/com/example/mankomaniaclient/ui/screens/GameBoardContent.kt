@@ -56,7 +56,8 @@ fun GameBoardContent(
     lobbyId: String,
     playerNames: List<String>,
     moveResult: MoveResult? = null,
-    onDismissMoveResult: () -> Unit = {}
+    onDismissMoveResult: () -> Unit = {},
+            onCellClick: (CellDto) -> Unit
 ) {
     var showDialog by remember { mutableStateOf(true) }
 
@@ -694,7 +695,10 @@ private fun GameBoardContentPreview() {
             board = board,
             players = players,
             lobbyId = "GAME123",
-            playerNames = players.map { it.name }
+            playerNames = players.map { it.name },
+            onCellClick = { cell -> {}
+                // Handle cell click, e.g., show details or perform an action
+            },
         )
     }
 }
