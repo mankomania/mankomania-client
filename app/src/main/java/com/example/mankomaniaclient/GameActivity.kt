@@ -40,6 +40,7 @@ class GameActivity : ComponentActivity() {
 
         // Create ViewModel (lifecycle-aware, no extra Compose dependency)
         val gameViewModel = ViewModelProvider(this)[GameViewModel::class.java]
+        gameViewModel.setMyPlayerName(singleName)
 
         WebSocketService.setGameViewModel(gameViewModel)
         WebSocketService.subscribeToLobby(lobbyId)
