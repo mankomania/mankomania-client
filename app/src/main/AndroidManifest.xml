@@ -66,6 +66,9 @@
             android:exported="false"
             android:label="Mankomania" />
 
+        <activity
+            android:name=".HorseRaceActivity"
+            android:exported="true" />
 
     </application>
 

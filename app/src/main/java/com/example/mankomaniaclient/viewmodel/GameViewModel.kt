@@ -20,6 +20,7 @@ import com.example.mankomaniaclient.model.DiceResult
 import com.example.mankomaniaclient.model.MoveResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class GameViewModel : ViewModel() {
 
@@ -32,6 +33,10 @@ class GameViewModel : ViewModel() {
 
     private val _moveResult = MutableStateFlow<MoveResult?>(null)
     val moveResult: StateFlow<MoveResult?> = _moveResult
+
+    // --- Selected Cell State ------------------------------------------
+    private val _selectedCell = MutableStateFlow<CellDto?>(null)
+    val selectedCell = _selectedCell.asStateFlow()
 
     /**
      * Subscribe to the given lobby via WebSocket.
@@ -94,5 +99,20 @@ class GameViewModel : ViewModel() {
     /** Clears the last move-result so the dialog disappears */
     fun clearMoveResult() {
         _moveResult.value = null
+    }
+
+    /**
+     * Updates the selected cell state when a cell is clicked
+     * @param cell the cell that was clicked
+     */
+    fun onCellSelected(cell: CellDto) {
+        _selectedCell.value = cell
+    }
+
+    /**
+     * Resets the selected cell state (e.g., when closing a dialog)
+     */
+    fun clearSelectedCell() {
+        _selectedCell.value = null
     }
 }

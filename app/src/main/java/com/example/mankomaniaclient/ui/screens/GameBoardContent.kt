@@ -11,8 +11,10 @@
 package com.example.mankomaniaclient.ui.screens
 
 
+import android.R.attr.onClick
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -56,7 +58,8 @@ fun GameBoardContent(
     lobbyId: String,
     playerNames: List<String>,
     moveResult: MoveResult? = null,
-    onDismissMoveResult: () -> Unit = {}
+    onDismissMoveResult: () -> Unit = {},
+            onCellClick: (CellDto) -> Unit={}
 ) {
     var showDialog by remember { mutableStateOf(true) }
 
@@ -159,7 +162,8 @@ fun GameBoardContent(
     fun EnhancedBoardCell(
         cell: CellDto,
         players: List<PlayerDto>,
-        modifier: Modifier = Modifier
+        modifier: Modifier = Modifier,
+                onClick: (CellDto) -> Unit
     ) {
         val isBranch = cell.hasBranch || cell.type == "BRANCH"
         val isStart = cell.type == "START"
@@ -178,6 +182,7 @@ fun GameBoardContent(
         Box(
             modifier = modifier
                 .size(68.dp)
+                .clickable { onClick(cell) }
                 .shadow(
                     elevation = when {
                         isLottery -> 12.dp
@@ -243,11 +248,12 @@ fun GameBoardContent(
     }
 
     @Composable
-    fun MiniBranchCell(cell: CellDto, players: List<PlayerDto>) {
+    fun MiniBranchCell(cell: CellDto, players: List<PlayerDto>,onClick: (CellDto) -> Unit) {
         EnhancedBoardCell(
             cell = cell,
             players = players,
-            modifier = Modifier.size(36.dp)
+            modifier = Modifier.size(36.dp),
+            onClick = onClick
         )
     }
 
@@ -334,7 +340,7 @@ fun GameBoardContent(
 
                     // Cell with overlaid players
                     Box {
-                        EnhancedBoardCell(board.first { it.index == i }, players)
+                        EnhancedBoardCell(board.first { it.index == i }, players, onClick = onCellClick)
 
                         // Player indicators
                         var playerOffset = 0
@@ -371,7 +377,7 @@ fun GameBoardContent(
                 ) {
                     // Cell with overlaid players
                     Box {
-                        EnhancedBoardCell(board.first { it.index == i }, players)
+                        EnhancedBoardCell(board.first { it.index == i }, players, onClick = onCellClick)
 
                         // Player indicators
                         var playerOffset = 0
@@ -417,7 +423,7 @@ fun GameBoardContent(
                 ) {
                     // Cell with overlaid players
                     Box {
-                        EnhancedBoardCell(board.first { it.index == i }, players)
+                        EnhancedBoardCell(board.first { it.index == i }, players, onClick = onCellClick)
 
                         // Player indicators
                         var playerOffset = 0
@@ -470,7 +476,7 @@ fun GameBoardContent(
 
                     // Cell with overlaid players
                     Box {
-                        EnhancedBoardCell(board.first { it.index == i }, players)
+                        EnhancedBoardCell(board.first { it.index == i }, players, onClick = onCellClick)
 
                         // Player indicators
                         var playerOffset = 0
@@ -501,12 +507,12 @@ fun GameBoardContent(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                MiniBranchCell(board.first { it.index == 5 }, players)
-                MiniBranchCell(board.first { it.index == 8 }, players)
+                MiniBranchCell(board.first { it.index == 5 }, players,onCellClick)
+                MiniBranchCell(board.first { it.index == 8 }, players,onCellClick)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                MiniBranchCell(board.first { it.index == 6 }, players)
-                MiniBranchCell(board.first { it.index == 7 }, players)
+                MiniBranchCell(board.first { it.index == 6 }, players,onCellClick)
+                MiniBranchCell(board.first { it.index == 7 }, players,onCellClick)
             }
         }
 
@@ -517,12 +523,12 @@ fun GameBoardContent(
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                MiniBranchCell(board.first { it.index == 16 }, players)
-                MiniBranchCell(board.first { it.index == 17 }, players)
+                MiniBranchCell(board.first { it.index == 16 }, players,onCellClick)
+                MiniBranchCell(board.first { it.index == 17 }, players,onCellClick)
             }
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                MiniBranchCell(board.first { it.index == 15 }, players)
-                MiniBranchCell(board.first { it.index == 18 }, players)
+                MiniBranchCell(board.first { it.index == 15 }, players,onCellClick)
+                MiniBranchCell(board.first { it.index == 18 }, players,onCellClick)
             }
         }
 
@@ -533,12 +539,12 @@ fun GameBoardContent(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                MiniBranchCell(board.first { it.index == 27 }, players)
-                MiniBranchCell(board.first { it.index == 26 }, players)
+                MiniBranchCell(board.first { it.index == 27 }, players,onCellClick)
+                MiniBranchCell(board.first { it.index == 26 }, players,onCellClick)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                MiniBranchCell(board.first { it.index == 28 }, players)
-                MiniBranchCell(board.first { it.index == 25 }, players)
+                MiniBranchCell(board.first { it.index == 28 }, players,onCellClick)
+                MiniBranchCell(board.first { it.index == 25 }, players,onCellClick)
             }
         }
 
@@ -549,12 +555,12 @@ fun GameBoardContent(
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                MiniBranchCell(board.first { it.index == 38 }, players)
-                MiniBranchCell(board.first { it.index == 35 }, players)
+                MiniBranchCell(board.first { it.index == 38 }, players,onCellClick)
+                MiniBranchCell(board.first { it.index == 35 }, players,onCellClick)
             }
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                MiniBranchCell(board.first { it.index == 37 }, players)
-                MiniBranchCell(board.first { it.index == 36 }, players)
+                MiniBranchCell(board.first { it.index == 37 }, players,onCellClick)
+                MiniBranchCell(board.first { it.index == 36 }, players,onCellClick)
             }
         }
 
@@ -694,7 +700,10 @@ private fun GameBoardContentPreview() {
             board = board,
             players = players,
             lobbyId = "GAME123",
-            playerNames = players.map { it.name }
+            playerNames = players.map { it.name },
+            onCellClick = { cell -> {}
+                // Handle cell click, e.g., show details or perform an action
+            },
         )
     }
 }
