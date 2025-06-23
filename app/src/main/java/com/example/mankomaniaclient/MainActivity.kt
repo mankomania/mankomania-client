@@ -24,31 +24,23 @@
 
 package com.example.mankomaniaclient
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.platform.LocalContext
-import android.widget.Toast
-import androidx.compose.foundation.layout.Row
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-
-import android.content.Intent
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.runtime.Composable
-
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import com.example.mankomaniaclient.network.WebSocketService
+import androidx.activity.compose.setContent
 
 class MainActivity : ComponentActivity() {
 
@@ -56,18 +48,13 @@ class MainActivity : ComponentActivity() {
         private const val TAG = "MainActivity"
     }
 
-    val webSocketService = WebSocketService
-
-
-    /* --------------------------------------------------------------------- */
-    /* Lifecycle                                                             */
-    /* --------------------------------------------------------------------- */
+    private val webSocketService = WebSocketService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate()")
 
-        webSocketService.connect()
+        WebSocketService.connect()
 
         setContent {
             val clientCount by webSocketService.clientCount.collectAsState()
@@ -83,25 +70,27 @@ class MainActivity : ComponentActivity() {
                     Toast.makeText(context, "Send Hello geklickt", Toast.LENGTH_SHORT).show()
                     webSocketService.send("/app/greetings", "hello local")
                 },
+
                 onPlay = {
                     startActivity(Intent(this, LoadingActivity::class.java))
                 },
                 onOpenLottery = {
                     startActivity(Intent(this, LotteryActivity::class.java))
+                },
+                onViewStartingMoney = {
+                    val intent = Intent(context, StartingMoneyActivity::class.java)
+                    intent.putExtra("playerId", "test-player-123")
+                    context.startActivity(intent)
                 }
             )
         }
     }
+
     fun onGameExit() {
         WebSocketService.disconnect()
         finish()
     }
-
 }
-
-/* ------------------------------------------------------------------------- */
-/* UI‑Composable                                                             */
-/* ------------------------------------------------------------------------- */
 
 @Composable
 private fun MainScreen(
@@ -109,7 +98,8 @@ private fun MainScreen(
     onConnect: () -> Unit,
     onSendHello: () -> Unit,
     onPlay: () -> Unit,
-    onOpenLottery: () -> Unit
+    onOpenLottery: () -> Unit,
+    onViewStartingMoney: () -> Unit
 ) {
     MaterialTheme {
         Column(
@@ -135,8 +125,8 @@ private fun MainScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(onClick = onPlay) { Text("Play Mankomania") }
-
             Button(onClick = onOpenLottery) { Text("Open Lottery") }
+            Button(onClick = onViewStartingMoney) { Text("View Starting Money") }
         }
     }
 }

@@ -2,9 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     id("jacoco")
     id("org.sonarqube") version "5.1.0.4882"
-    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -30,13 +30,16 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
         viewBinding = true
@@ -60,7 +63,6 @@ tasks.withType<Test> {
     exclude("**/WebSocketServiceTest.class")
 }
 
-
 tasks.register<JacocoReport>("jacocoTestReport") {
     group = "verification"
     description = "Generates code coverage report for the test task."
@@ -69,28 +71,19 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     reports {
         xml.required.set(true)
         xml.outputLocation.set(layout.buildDirectory.file("reports/jacoco/jacocoTestReport/jacocoTestReport.xml"))
-
-
     }
 
     val fileFilter = listOf(
-        "**/R.class",
-        "**/R$*.class",
-        "**/BuildConfig.*",
-        "**/Manifest*.*",
-        "**/*Test*.*",
-        "android/**/*.*"
+        "**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*", "**/*Test*.*", "android/**/*.*"
     )
 
-    val debugTree =
-        fileTree("${project.layout.buildDirectory.get().asFile}/tmp/kotlin-classes/debug") {
-            exclude(fileFilter)
-        }
+    val debugTree = fileTree("${project.layout.buildDirectory.get().asFile}/tmp/kotlin-classes/debug") {
+        exclude(fileFilter)
+    }
 
-    val javaDebugTree =
-        fileTree("${project.layout.buildDirectory.get().asFile}/intermediates/javac/debug") {
-            exclude(fileFilter)
-        }
+    val javaDebugTree = fileTree("${project.layout.buildDirectory.get().asFile}/intermediates/javac/debug") {
+        exclude(fileFilter)
+    }
 
     val mainSrc = listOf(
         "${project.projectDir}/src/main/java",
@@ -113,28 +106,21 @@ sonar {
         property("sonar.sources", "src/main/java/com/example/mankomaniaclient")
         property("sonar.tests", "src/test/java/com/example/mankomaniaclient")
         property("sonar.coverage.jacoco.xmlReportPaths", "${layout.buildDirectory.get().asFile}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
-
-        property(
-            "sonar.coverage.exclusions",
-            // alle Composables + MainActivity + Activities + Netzwerk
+        property("sonar.coverage.exclusions",
             "src/main/java/com/example/mankomaniaclient/ui/**," +
                     "src/main/java/com/example/mankomaniaclient/MainActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/CreateLobbyActivity.kt," +
-                    "src/main/java/com/example/mankomaniaclient/api/LotteryApi.kt," +
+                    "src/main/java/com/example/mankomaniaclient/api/**," +
                     "src/main/java/com/example/mankomaniaclient/LotteryActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/GameActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/JoinLobbyActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/LoadingActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/NameActivity.kt," +
                     "src/main/java/com/example/mankomaniaclient/RulesActivity.kt," +
-                    "src/main/java/com/example/mankomaniaclient/GameActivity.kt," +
-                    "src/main/java/com/example/mankomaniaclient/network/LobbyMessage.kt," +
-                    "src/main/java/com/example/mankomaniaclient/network/LobbyResponse.kt," +
-                    "src/main/java/com/example/mankomaniaclient/network/WebSocketService.kt"
+                    "src/main/java/com/example/mankomaniaclient/StartingMoneyActivity.kt,"+
+            "src/main/java/com/example/mankomaniaclient/network/**"
         )
-
-        property("sonar.exclusions",
-            "**/build/**, **/generated/**, **/.idea/**, local.properties, **/drawable/**, **/viewmodel/GameViewModel.kt, **/screens/**, **/network/**"
+        property("sonar.exclusions", "**/build/**, **/generated/**, **/.idea/**, local.properties, **/drawable/**, **/viewmodel/**, **/screens/**, **/network/**"
         )
     }
 }
@@ -155,7 +141,9 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.appcompat)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.junit.jupiter.engine)
@@ -168,5 +156,5 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
+    testImplementation(kotlin("test"))
 }

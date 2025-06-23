@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.StateFlow
 class GameViewModel : ViewModel() {
 
     // --- Board & Players State ----------------------------------------
-    private val _board   = MutableStateFlow<List<CellDto>>(emptyList())
+    private val _board = MutableStateFlow<List<CellDto>>(emptyList())
     val board: StateFlow<List<CellDto>> = _board
 
     private val _players = MutableStateFlow<List<PlayerDto>>(emptyList())
@@ -32,6 +32,10 @@ class GameViewModel : ViewModel() {
 
     private val _moveResult = MutableStateFlow<MoveResult?>(null)
     val moveResult: StateFlow<MoveResult?> = _moveResult
+
+    // --- Money State -------------------------------------------------
+    private val _playerMoney = MutableStateFlow<Map<String, Int>>(emptyMap())
+    val playerMoney: StateFlow<Map<String, Int>> = _playerMoney
 
     /**
      * Subscribe to the given lobby via WebSocket.
@@ -48,12 +52,12 @@ class GameViewModel : ViewModel() {
 
     /** Called by WebSocketService when a new GameStateDto arrives */
     fun onGameState(state: GameStateDto) {
-        _board.value   = state.board
+        _board.value = state.board
         _players.value = state.players
     }
 
     // --- Dice Roll State ----------------------------------------------
-    private val _diceResult   = MutableStateFlow<DiceResult?>(null)
+    private val _diceResult = MutableStateFlow<DiceResult?>(null)
     val diceResult: StateFlow<DiceResult?> = _diceResult
 
     private val _isPlayerTurn = MutableStateFlow(true)
@@ -94,5 +98,64 @@ class GameViewModel : ViewModel() {
     /** Clears the last move-result so the dialog disappears */
     fun clearMoveResult() {
         _moveResult.value = null
+    }
+
+    // --- Money Management Methods ------------------------------------
+
+    /**
+     * Processes money updates received from the WebSocket service.
+     *
+     * @param playerId The ID of the player whose money is being updated
+     * @param amount The amount to update
+     * @param isTotal If true, sets the amount as the total balance rather than adding/subtracting
+     */
+    fun onMoneyUpdate(playerId: String, amount: Int, isTotal: Boolean = false) {
+        val currentMoney = _playerMoney.value.toMutableMap()
+
+        if (isTotal) {
+            currentMoney[playerId] = amount
+        } else {
+            val oldAmount = currentMoney[playerId] ?: 0
+            currentMoney[playerId] = oldAmount + amount
+        }
+
+        _playerMoney.value = currentMoney
+    }
+
+    /**
+     * Sets the starting money for a player at the beginning of the game.
+     *
+     * @param lobbyId The ID of the game lobby
+     * @param playerId The ID of the player
+     * @param amount The initial amount of money to assign
+     */
+    fun setStartingMoney(lobbyId: String, playerId: String, amount: Int) {
+        WebSocketService.setStartingMoney(lobbyId, playerId, amount)
+        onMoneyUpdate(playerId, amount, true)
+    }
+
+    /**
+     * Updates a player's money balance during the game.
+     *
+     * @param lobbyId The ID of the game lobby
+     * @param playerId The ID of the player
+     * @param amount The amount to add (positive) or subtract (negative)
+     */
+    fun updatePlayerMoney(lobbyId: String, playerId: String, amount: Int) {
+        WebSocketService.updatePlayerMoney(lobbyId, playerId, amount)
+        onMoneyUpdate(playerId, amount)
+    }
+
+    /**
+     * Initializes the game with starting money for the player.
+     * Call this when a new game starts.
+     *
+     * @param lobbyId The ID of the game lobby
+     * @param playerId The ID of the player
+     * @param startingAmount The initial amount of money (default: 1500)
+     */
+    fun initializeGame(lobbyId: String, playerId: String, startingAmount: Int = 1500) {
+        subscribeToLobby(lobbyId)
+        setStartingMoney(lobbyId, playerId, startingAmount)
     }
 }
