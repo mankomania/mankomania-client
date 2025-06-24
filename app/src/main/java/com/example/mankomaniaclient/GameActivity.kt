@@ -40,6 +40,7 @@ class GameActivity : ComponentActivity() {
 
         // Create ViewModel (lifecycle-aware, no extra Compose dependency)
         val gameViewModel = ViewModelProvider(this)[GameViewModel::class.java]
+        gameViewModel.setMyPlayerName(singleName)
 
         WebSocketService.setGameViewModel(gameViewModel)
         WebSocketService.subscribeToLobby(lobbyId)
@@ -54,7 +55,8 @@ class GameActivity : ComponentActivity() {
                         GameBoardScreen(
                             lobbyId = lobbyId,
                             playerNames = playerNames,
-                            viewModel   = gameViewModel
+                            viewModel   = gameViewModel,
+                            myPlayerName = singleName
                         )
                     }
                 }
@@ -81,6 +83,7 @@ class GameActivity : ComponentActivity() {
                                         "playerNames",
                                         ArrayList(playerNames)
                                     )
+                                    putExtra("playerName", singleName)
                                     putExtra("lobbyId", lobbyId)
                                     putExtra(EXTRA_SCREEN, SCREEN_GAMEBOARD)
                                 }

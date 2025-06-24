@@ -35,6 +35,7 @@ import com.example.mankomaniaclient.network.PlayerDto
 import com.example.mankomaniaclient.ui.components.BoardCellView
 import com.example.mankomaniaclient.ui.components.PlayerCharacterView
 import com.example.mankomaniaclient.ui.components.PlayerCharacterView
+import com.example.mankomaniaclient.viewmodel.GameViewModel
 
 /**
  * Pure-UI version of the game board. Make UI changes here, not in GameBoardScreen!
@@ -56,9 +57,18 @@ fun GameBoardContent(
     lobbyId: String,
     playerNames: List<String>,
     moveResult: MoveResult? = null,
-    onDismissMoveResult: () -> Unit = {}
+    onDismissMoveResult: () -> Unit = {},
+    onRollDice: () -> Unit,
+    viewModel: GameViewModel,
+
 ) {
+    val myName by viewModel.myPlayerName.collectAsState()
+    val isPlayerTurn by viewModel.isPlayerTurn.collectAsState()
     var showDialog by remember { mutableStateOf(true) }
+
+    LaunchedEffect(myName, isPlayerTurn) {
+        println(">> COMPOSE: myName = $myName | isPlayerTurn = $isPlayerTurn")
+    }
 
     /* Move-result dialog --------------------------------------------- */
     if (moveResult != null && showDialog) {
@@ -123,6 +133,22 @@ fun GameBoardContent(
         }
         return
     }
+    Spacer(modifier = Modifier.height(16.dp))
+
+    Button(
+        onClick = { onRollDice() },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 32.dp)
+            .offset(x = (-32).dp, y = (-112).dp)
+    ) {
+        Text(
+            text = "Roll Dice",
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
+    }
+
 
     val topRow = listOf(0, 1, 2, 3, 4, 9, 10, 11, 12)
     val rightCol = listOf(13, 14, 19)
@@ -654,6 +680,54 @@ fun GameBoardContent(
             }
         }
 
+        var diceResultMessage by remember { mutableStateOf<String?>(null) }
+        diceResultMessage?.let { message ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 48.dp),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                Surface(
+                    color = Color(0xFF333333),
+                    shape = RoundedCornerShape(12.dp),
+                    tonalElevation = 6.dp,
+                ) {
+                    Text(
+                        text = message,
+                        color = Color.White,
+                        modifier = Modifier.padding(16.dp),
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+            LaunchedEffect(message) {
+                kotlinx.coroutines.delay(3000)
+                diceResultMessage = null
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .offset(x = (-150).dp, y = (-75).dp)
+        ) {
+            Button(
+                onClick = {val rolledNumber = (2..12).random()
+                    diceResultMessage = "$myName rolled $rolledNumber "
+                    onRollDice()},
+                enabled = isPlayerTurn,
+                shape = RoundedCornerShape(30.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isPlayerTurn) Color.Black else Color.LightGray
+                ),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Text("🎲 Roll", color = Color.White)
+            }
+        }
+
     }
     @Composable
     fun BranchCell(cell: CellDto, modifier: Modifier = Modifier) {
@@ -688,13 +762,17 @@ private fun GameBoardContentPreview() {
         PlayerDto(name = "Clara", position = 11),
         PlayerDto(name = "Anna", position = 2) // Same position as Kevin for testing
     )
+    val viewModel = remember { GameViewModel() }
 
     MaterialTheme {
         GameBoardContent(
             board = board,
             players = players,
             lobbyId = "GAME123",
-            playerNames = players.map { it.name }
+            playerNames = players.map { it.name },
+            onRollDice = {},
+            viewModel = viewModel,
+
         )
     }
 }

@@ -204,8 +204,21 @@ object WebSocketService {
                         Log.d("WS-STATE", "Got game state JSON: $json")
                         val state = jsonParser.decodeFromString<GameStateDto>(json)
                         Log.d("WebSocket", "Received game state: $state")
-                        gameViewModel?.onGameState(state)
+                        if (gameViewModel == null) {
+                            Log.e(
+                                "WebSocket",
+                                "❌ GameViewModel is NULL at subscription time! State will be ignored!"
+                            )
+                        } else {
+                            Log.d("WebSocket", "✅ GameViewModel is present – calling onGameState()")
+
+                            Log.d("WebSocket", "Calling onGameState with currentTurnPlayerName=${state.currentTurnPlayerName}")
+                            Log.d("WebSocket", "Current ViewModel is null? ${gameViewModel == null}")
+
+                            gameViewModel?.onGameState(state)
+                        }
                     }
+
             }
         }
     }
