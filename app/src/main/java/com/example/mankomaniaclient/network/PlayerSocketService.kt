@@ -18,9 +18,9 @@ class PlayerSocketService : PlayerSocketServiceInterface {
 
             val client = StompClient(OkHttpWebSocketClient())
             val session = try {
-                client.connect("ws://YOUR_SERVER_URL/ws")
+                client.connect("ws://se2-demo.aau.at:53210/ws")
             } catch (e: Exception) {
-                throw Exception("Impossibile connettersi al server", e)
+                throw Exception("Impossibile to connect to the server", e)
             }
 
             session.subscribeText("/topic/player/$playerId/money").collect { message ->
