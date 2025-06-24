@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.json.Json
-
 /**
  * Handles all STOMP communication with the game server.
  *  – keeps a single socket per app instance
@@ -33,7 +32,7 @@ object WebSocketService {
     val lobbyResponse: StateFlow<LobbyResponse?> = _lobbyResponse.asStateFlow()
     private val jsonParser = Json { ignoreUnknownKeys = true }
 
-
+    private val client = StompClient(OkHttpWebSocketClient())
     private var session: StompSession? = null
     private var connected = false
 
@@ -51,8 +50,9 @@ object WebSocketService {
     fun connect(
         url: String = "ws://se2-demo.aau.at:53210/ws",
         greetingsTopic: String = "/topic/greetings",
-        clientCountTopic: String = "/topic/clientCount"
+        clientCountTopic: String = "/topic/clientCount",
     ) {
+
         if (connected) return
 
         scope.launch {
@@ -102,15 +102,6 @@ object WebSocketService {
                         }
                     }
                 }
-
-                launch{
-                    stomp.subscribeText("/topic/player-moved").collect { json ->
-                    val moveResult = jsonParser.decodeFromString<MoveResult>(json)
-                    Log.d("WebSocket", "Received move result: $moveResult")
-                    gameViewModel?.onPlayerMoved(moveResult)
-                        ?: Log.e("WebSocket", "ViewModel not yet set – skipping move update.")
-                }
-            }
 
             } catch (e: Exception) {
                 connected = false
@@ -163,6 +154,26 @@ object WebSocketService {
         val json = jsonParser.encodeToString(LobbyMessage.serializer(), message)
         send("/app/lobby", json)
     }
+
+    fun subscribeToPlayerMoved(lobbyId: String, onPlayerMoved: (MoveResult) -> Unit) {
+        val topic = "/topic/$lobbyId/player-moved"
+
+        scope.launch {
+            while (session == null) {
+                delay(100)
+            }
+            try {
+                val subscription = session!!.subscribeText(topic)
+                subscription.collect { json ->
+                    val moveResult = Json.decodeFromString<MoveResult>(json)
+                    onPlayerMoved(moveResult)
+                }
+            } catch (e: Exception) {
+                Log.e("WebSocket", "❌ Fehler beim Abonnieren von $topic: ${e.message}")
+            }
+        }
+    }
+
 
     fun startGame(lobbyId: String, playerName: String) {
         subscribeToLobby(lobbyId)

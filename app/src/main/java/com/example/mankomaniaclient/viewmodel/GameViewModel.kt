@@ -122,8 +122,16 @@ class GameViewModel : ViewModel() {
     }
 
     fun onPlayerMoved(result: MoveResult) {
+        val updatedPlayers = _players.value.map { player ->
+            if (player.name == result.name) {
+                player.copy(position = result.newPosition)
+            } else player
+        }
+
+        _players.value = updatedPlayers
         _moveResult.value = result
     }
+
 
     /** Clears the last move-result so the dialog disappears */
     fun clearMoveResult() {
@@ -132,6 +140,18 @@ class GameViewModel : ViewModel() {
 
     fun sendNextTurnToServer() {
         WebSocketService.send("/app/next-turn", _myPlayerName.value)
+    }
+    fun subscribeToPlayerMovement(lobbyId: String) {
+        WebSocketService.subscribeToPlayerMoved(lobbyId) { moveResult ->
+            println("🔄 Received movement: ${moveResult.name} → ${moveResult.newPosition}")
+
+            val updated = _players.value.map { player ->
+                if (player.name == moveResult.name) {
+                    player.copy(position = moveResult.newPosition)
+                } else player
+            }
+            _players.value = updated
+        }
     }
 
     fun moveCurrentPlayerBy(steps: Int) {
@@ -148,6 +168,7 @@ class GameViewModel : ViewModel() {
                     .filter { it.position == newPos }
                     .map { it.name }
                 val moveResult = MoveResult(
+                    name = myName,
                     newPosition = newPos,
                     oldPosition = oldPos,
                     fieldType = fieldType,

@@ -30,8 +30,14 @@ fun GameBoardScreen(
         Log.d("DEBUG", "→ 2. ViewModel setzen")
         WebSocketService.setGameViewModel(viewModel)
 
+        WebSocketService.subscribeToPlayerMoved(lobbyId) { moveResult ->
+            Log.d("PLAYER-MOVED", "Empfangen in GameBoard: $moveResult")
+            viewModel.onPlayerMoved(moveResult)
+        }
+
         Log.d("DEBUG", "→ 3. Lobby abonnieren")
         viewModel.subscribeToLobby(lobbyId)
+
     }
 
 
