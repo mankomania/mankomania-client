@@ -77,6 +77,7 @@ class GameViewModelTest {
     fun testOnPlayerMovedUpdatesState() = runTest {
         val viewModel = GameViewModel()
         val result = com.example.mankomaniaclient.model.MoveResult(
+            name = "Anna",
             newPosition = 2,
             oldPosition = 0,
             fieldType = "PayFeeAction",
