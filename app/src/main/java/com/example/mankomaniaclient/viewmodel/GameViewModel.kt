@@ -61,6 +61,10 @@ class GameViewModel : ViewModel() {
         }
     }
 
+
+    fun updateGameState(gameState: GameStateDto) {
+        _isPlayerTurn.value = (gameState.currentTurnPlayerName == myPlayerName.value)
+    }
     /**
      * Subscribe to the given lobby via WebSocket.
      * This will route incoming GameStateDto and MoveResults automatically
