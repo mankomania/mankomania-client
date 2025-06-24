@@ -59,12 +59,16 @@ fun GameBoardContent(
     moveResult: MoveResult? = null,
     onDismissMoveResult: () -> Unit = {},
     onRollDice: () -> Unit,
-    isPlayerTurn: Boolean,
     viewModel: GameViewModel,
-    myPlayerName: String
 
 ) {
+    val myName by viewModel.myPlayerName.collectAsState()
+    val isPlayerTurn by viewModel.isPlayerTurn.collectAsState()
     var showDialog by remember { mutableStateOf(true) }
+
+    LaunchedEffect(myName, isPlayerTurn) {
+        println(">> COMPOSE: myName = $myName | isPlayerTurn = $isPlayerTurn")
+    }
 
     /* Move-result dialog --------------------------------------------- */
     if (moveResult != null && showDialog) {
@@ -704,9 +708,6 @@ fun GameBoardContent(
             }
         }
 
-        val myName by viewModel.myPlayerName.collectAsState()
-        val isPlayerTurn by viewModel.isPlayerTurn.collectAsState()
-
         Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -770,9 +771,7 @@ private fun GameBoardContentPreview() {
             lobbyId = "GAME123",
             playerNames = players.map { it.name },
             onRollDice = {},
-            isPlayerTurn = true,
             viewModel = viewModel,
-            myPlayerName = "Dummy"
 
         )
     }

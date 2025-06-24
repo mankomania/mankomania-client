@@ -23,7 +23,6 @@ fun GameBoardScreen(
     myPlayerName: String
 ) {
     /* Subscribe exactly once when the screen appears ------------------- */
-    val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(Unit) {
         Log.d("DEBUG", "→ 1. Spielername setzen")
         viewModel.setMyPlayerName(myPlayerName)
@@ -50,11 +49,9 @@ fun GameBoardScreen(
         moveResult          = moveResult,
         onDismissMoveResult = { viewModel.clearMoveResult() },
         onRollDice = {
-            viewModel.rollDice(lobbyId)
+            viewModel.rollDice(myPlayerName)
         },
-        isPlayerTurn = isMyTurn,
         viewModel = viewModel,
-        myPlayerName = myPlayerName
     )
 
 }

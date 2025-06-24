@@ -36,9 +36,29 @@ class GameViewModel : ViewModel() {
     private val _myPlayerName = MutableStateFlow("")
     val myPlayerName: StateFlow<String> = _myPlayerName
 
+    private val _diceResult   = MutableStateFlow<DiceResult?>(null)
+    val diceResult: StateFlow<DiceResult?> = _diceResult
+
+    private val _isPlayerTurn = MutableStateFlow(false)
+    val isPlayerTurn: StateFlow<Boolean> = _isPlayerTurn
+
+    private var pendingGameState: GameStateDto? = null
+
+
+    init {
+        // Register this ViewModel with the WebSocketService for callbacks
+        WebSocketService.setGameViewModel(this)
+    }
+
     fun setMyPlayerName(name: String) {
         println(">>> setMyPlayerName called with: $name")
         _myPlayerName.value = name
+
+        pendingGameState?.let {
+            println(">>> Applying cached GameState after setting player name.")
+            onGameState(it)
+            pendingGameState = null
+        }
     }
 
     /**
@@ -49,33 +69,25 @@ class GameViewModel : ViewModel() {
         WebSocketService.subscribeToLobby(lobbyId)
     }
 
-    init {
-        // Register this ViewModel with the WebSocketService for callbacks
-        WebSocketService.setGameViewModel(this)
-    }
 
     /** Called by WebSocketService when a new GameStateDto arrives */
     fun onGameState(state: GameStateDto) {
         val myName = myPlayerName.value
+        val currentTurn = state.currentTurnPlayerName.trim()
+        if (myName.isBlank()) {
+            println(">>> myPlayerName is empty, caching GameState for later.")
+            pendingGameState = state
+            return
+        }
         println(">> onGameState: myName = '$myName' | currentTurnPlayerName = '${state.currentTurnPlayerName}'")
 
         _board.value   = state.board
         _players.value = state.players
-        println("myName: $myName | currentTurnPlayerName: ${state.currentTurnPlayerName}")
-
-
-        _isPlayerTurn.value = (myName == state.currentTurnPlayerName)
-        println(">>> isPlayerTurn wird gesetzt auf ${myName == state.currentTurnPlayerName}")
+        _isPlayerTurn.value = myName.equals(currentTurn, ignoreCase = true)
 
     }
 
     // --- Dice Roll State ----------------------------------------------
-    private val _diceResult   = MutableStateFlow<DiceResult?>(null)
-    val diceResult: StateFlow<DiceResult?> = _diceResult
-
-    private val _isPlayerTurn = MutableStateFlow(false)
-    val isPlayerTurn: StateFlow<Boolean> = _isPlayerTurn
-
     /**
      * Sends a dice roll request to the backend via StompManager.
      * Only works when it's the player's turn.
