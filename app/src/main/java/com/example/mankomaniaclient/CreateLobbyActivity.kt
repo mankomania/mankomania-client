@@ -62,6 +62,7 @@ class CreateLobbyActivity : ComponentActivity() {
                 val players = WebSocketService.playersInLobby.value
                 val intent = Intent(context, GameActivity::class.java).apply {
                     putStringArrayListExtra("playerNames", ArrayList(players))
+                    putExtra("playerName", playerName)
                     putExtra("lobbyId", finalLobbyId.value)
                     putExtra(GameActivity.EXTRA_SCREEN, GameActivity.SCREEN_GAMEBOARD)
 
