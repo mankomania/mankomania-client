@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName
 
 class LotteryScreenTest {
 
+    // fixme not meaningful test - this test is executing the calls its verifying directly
     @Test
     @DisplayName("Test lottery screen buttons call the appropriate ViewModel methods")
     fun testLotteryScreenButtonsCallViewModel() {

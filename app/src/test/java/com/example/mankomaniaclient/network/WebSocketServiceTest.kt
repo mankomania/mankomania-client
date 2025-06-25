@@ -1,3 +1,5 @@
+// fixme remove, you can always restore from git history
+
 package com.example.mankomaniaclient.network/*
 package com.example.mankomaniaclient.network
 
