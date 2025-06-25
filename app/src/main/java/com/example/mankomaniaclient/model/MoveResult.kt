@@ -12,6 +12,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class MoveResult(
+    val name: String,
     val newPosition: Int,
     val oldPosition: Int,
     val fieldType: String,

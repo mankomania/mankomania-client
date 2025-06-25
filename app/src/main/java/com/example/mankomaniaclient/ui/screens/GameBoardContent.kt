@@ -716,7 +716,7 @@ fun GameBoardContent(
             Button(
                 onClick = {val rolledNumber = (2..12).random()
                     diceResultMessage = "$myName rolled a $rolledNumber "
-                    onRollDice()},
+                    viewModel.moveCurrentPlayerBy(rolledNumber) },
                 enabled = isPlayerTurn,
                 shape = RoundedCornerShape(30.dp),
                 colors = ButtonDefaults.buttonColors(

@@ -20,6 +20,8 @@ import com.example.mankomaniaclient.model.DiceResult
 import com.example.mankomaniaclient.model.MoveResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.serialization.json.Json
+
 
 class GameViewModel : ViewModel() {
 
@@ -120,11 +122,74 @@ class GameViewModel : ViewModel() {
     }
 
     fun onPlayerMoved(result: MoveResult) {
+        val updatedPlayers = _players.value.map { player ->
+            if (player.name == result.name) {
+                player.copy(position = result.newPosition)
+            } else player
+        }
+
+        _players.value = updatedPlayers
         _moveResult.value = result
     }
+
 
     /** Clears the last move-result so the dialog disappears */
     fun clearMoveResult() {
         _moveResult.value = null
     }
+
+    fun sendNextTurnToServer() {
+        WebSocketService.send("/app/next-turn", _myPlayerName.value)
+    }
+    fun subscribeToPlayerMovement(lobbyId: String) {
+        WebSocketService.subscribeToPlayerMoved(lobbyId) { moveResult ->
+            println("🔄 Received movement: ${moveResult.name} → ${moveResult.newPosition}")
+
+            val updated = _players.value.map { player ->
+                if (player.name == moveResult.name) {
+                    player.copy(position = moveResult.newPosition)
+                } else player
+            }
+            _players.value = updated
+        }
+    }
+
+    fun moveCurrentPlayerBy(steps: Int) {
+        val myName = _myPlayerName.value
+
+        val updatedPlayers = _players.value.map { player ->
+            if (player.name == myName) {
+                val oldPos = player.position
+                val newPos = (oldPos + steps) % _board.value.size
+                val field = _board.value.getOrNull(newPos)
+                val fieldType = field?.type ?: "unknown"
+                val fieldDescription = "" //platzhalter for later
+                val playersOnField = _players.value
+                    .filter { it.position == newPos }
+                    .map { it.name }
+                val moveResult = MoveResult(
+                    name = myName,
+                    newPosition = newPos,
+                    oldPosition = oldPos,
+                    fieldType = fieldType,
+                    fieldDescription = fieldDescription,
+                    playersOnField = playersOnField
+                )
+
+                val json = Json.encodeToString(MoveResult.serializer(), moveResult)
+                WebSocketService.send("/app/player-moved", json)
+
+                player.copy(position = newPos)
+            } else {
+                player
+            }
+        }
+
+        _players.value = updatedPlayers
+
+        sendNextTurnToServer()
+    }
+
+
+
 }

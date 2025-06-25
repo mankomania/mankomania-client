@@ -21,11 +21,12 @@ class MoveResultTest {
     @Test
     fun testMoveResultSerializationRoundTrip() {
         val original = MoveResult(
+            name = "TestMove",
             newPosition = 5,
             oldPosition = 3,
             fieldType = "CasinoAction",
             fieldDescription = "Try your luck",
-            playersOnField = listOf("Toni", "Jorge")
+            playersOnField = listOf("Toni", "Jorge"),
         )
 
         val json = Json.encodeToString(original)
